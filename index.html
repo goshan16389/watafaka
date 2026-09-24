@@ -4,7 +4,9 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#0e1014">
+<meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>Финансы</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
@@ -99,7 +101,7 @@ input,textarea,select{font-family:inherit}
   border-radius:10px;padding:7px 10px;cursor:pointer;font-size:13px;font-weight:500;
 }
 .user-badge{
-  display:flex;align-items:center;gap:8px;padding:5px 5px 5px 5px;
+  display:flex;align-items:center;gap:8px;padding:5px;
   background:var(--panel);border:1px solid var(--border);border-radius:99px;
   position:relative;transition:.15s;
 }
@@ -488,10 +490,12 @@ textarea{resize:vertical;min-height:80px;line-height:1.5}
    SUPABASE CONFIG — ЗАМЕНИ НА СВОИ ЗНАЧЕНИЯ
    Где взять: Supabase Dashboard → Settings → API
    ===================================================================== */
-const SUPABASE_URL      = 'https://YOUR-PROJECT.supabase.co';
-const SUPABASE_ANON_KEY = 'YOUR-ANON-KEY';
+const SUPABASE_URL      = 'https://heramwgczjcmkoyrvevh.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhlcmFtd2djempjbWtveXJ2ZXZoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTAyNDI2MzEsImV4cCI6MjEwNTgxODYzMX0.JcgkpaPiMnIVWXGHLmQLydDmoT8D0I6P21rmmteC5lU';
 
-const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+/* ВАЖНО: переменная клиента называется sb, а не supabase —
+   иначе конфликт с глобальной переменной из CDN. */
+const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 /* =====================================================================
    УТИЛИТЫ
@@ -620,7 +624,7 @@ function save() {
 async function pushToCloud() {
   if (!currentUser) return;
   setSyncStatus('syncing');
-  const { error } = await supabase.from('user_data').upsert({
+  const { error } = await sb.from('user_data').upsert({
     user_id: currentUser.id,
     data: state,
     updated_at: new Date().toISOString(),
@@ -636,7 +640,7 @@ async function pushToCloud() {
 
 async function pullFromCloud() {
   if (!currentUser) return { found: false };
-  const { data, error } = await supabase
+  const { data, error } = await sb
     .from('user_data')
     .select('data')
     .eq('user_id', currentUser.id)
@@ -717,11 +721,11 @@ $('#authForm').addEventListener('submit', async (e) => {
 
   try {
     if (authMode === 'login') {
-      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+      const { data, error } = await sb.auth.signInWithPassword({ email, password });
       if (error) throw error;
       // onAuthStateChange подхватит и загрузит данные
     } else {
-      const { data, error } = await supabase.auth.signUp({ email, password });
+      const { data, error } = await sb.auth.signUp({ email, password });
       if (error) throw error;
 
       if (data.user && !data.session) {
@@ -730,12 +734,10 @@ $('#authForm').addEventListener('submit', async (e) => {
         btn.textContent = original;
         return;
       }
-      // если сессия есть — вошли сразу
     }
   } catch (err) {
     console.warn(err);
     const msg = (err && err.message) ? err.message : 'Что-то пошло не так';
-    // переведём частые ошибки
     let ru = msg;
     if (/Invalid login credentials/i.test(msg)) ru = 'Неверный email или пароль';
     else if (/User already registered/i.test(msg)) ru = 'Такой email уже зарегистрирован — попробуй войти';
@@ -1475,7 +1477,7 @@ document.addEventListener('click', e => {
   if (a === 'logout') {
     if (confirm('Выйти из аккаунта? Данные останутся в облаке.')) {
       closeSheet();
-      supabase.auth.signOut();
+      sb.auth.signOut();
     }
   }
 });
@@ -1594,14 +1596,20 @@ async function handleSession(session) {
 
 /* Инициализация: сначала получить сессию, потом слушать изменения */
 (async () => {
-  const { data: { session } } = await supabase.auth.getSession();
-  await handleSession(session);
+  try {
+    const { data: { session } } = await sb.auth.getSession();
+    await handleSession(session);
 
-  supabase.auth.onAuthStateChange((event, session) => {
-    if (event === 'SIGNED_IN' || event === 'SIGNED_OUT' || event === 'USER_UPDATED') {
-      handleSession(session);
-    }
-  });
+    sb.auth.onAuthStateChange((event, session) => {
+      if (event === 'SIGNED_IN' || event === 'SIGNED_OUT' || event === 'USER_UPDATED') {
+        handleSession(session);
+      }
+    });
+  } catch (e) {
+    console.error('Auth init error:', e);
+    showAuth();
+    showAuthMsg('Не удалось подключиться к серверу. Проверь SUPABASE_URL и ключ.', 'err');
+  }
 })();
 
 /* При возврате на вкладку — подтянуть свежие данные (если изменилось на другом устройстве) */
@@ -1609,8 +1617,8 @@ let lastFocus = Date.now();
 document.addEventListener('visibilitychange', async () => {
   if (document.visibilityState !== 'visible') return;
   if (!currentUser) return;
-  if (syncState !== 'ok') return; /* есть несинхронизированные изменения — не перетрём */
-  if (Date.now() - lastFocus < 30000) return; /* не чаще раза в 30 сек */
+  if (syncState !== 'ok') return;
+  if (Date.now() - lastFocus < 30000) return;
 
   lastFocus = Date.now();
   const { found } = await pullFromCloud();
