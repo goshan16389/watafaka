@@ -245,6 +245,14 @@ textarea{resize:vertical;min-height:80px;line-height:1.5}
   padding:5px 11px;font-size:12.5px;color:var(--muted);cursor:pointer;transition:.15s;
   flex:0 0 auto;white-space:nowrap}
 .tag-suggest:hover{background:var(--panel3);color:var(--text);border-color:var(--accent)}
+.tags-selected.has-overflow{
+  -webkit-mask-image:linear-gradient(90deg,#000 calc(100% - 32px),transparent);
+          mask-image:linear-gradient(90deg,#000 calc(100% - 32px),transparent);
+}
+.tags-suggest.has-overflow{
+  -webkit-mask-image:linear-gradient(90deg,#000 calc(100% - 32px),transparent);
+          mask-image:linear-gradient(90deg,#000 calc(100% - 32px),transparent);
+}
 /* SEARCH */
 .tx-search{margin-bottom:12px;position:relative}
 .tx-search input{padding-left:38px}
@@ -345,6 +353,18 @@ textarea{resize:vertical;min-height:80px;line-height:1.5}
   display:flex;align-items:center;justify-content:center;font-size:17px;flex:0 0 auto}
 .sheet-close:active{transform:scale(.9)}
 .sheet-body{flex:1;overflow-y:auto;padding:0 18px 4px;-webkit-overflow-scrolling:touch}
+.sheet-body::-webkit-scrollbar{width:8px;height:8px}
+.sheet-body::-webkit-scrollbar-track{background:transparent;margin:8px 0}
+.sheet-body::-webkit-scrollbar-thumb{
+  background:#2e3646;border-radius:99px;border:2px solid transparent;
+  background-clip:padding-box;transition:background .15s;
+}
+.sheet-body::-webkit-scrollbar-thumb:hover{background:#3a4458;background-clip:padding-box}
+.sheet-body::-webkit-scrollbar-corner{background:transparent}
+
+/* Firefox */
+.sheet-body{scrollbar-width:thin;scrollbar-color:#2e3646 transparent}
+
 .sheet-footer{padding:14px 18px 18px;flex:0 0 auto;border-top:1px solid var(--border);background:var(--panel)}
 
 /* TOAST */
@@ -1363,7 +1383,41 @@ MOUNTS.transactions = () => {
 
   mountSwipe();
   mountLongPress();
+document.querySelectorAll('.chips-scroll').forEach(attachHorizontalWheel);
 };
+
+/* Горизонтальный скролл колёсиком на тег-фильтрах и подсказках */
+function attachHorizontalWheel(el) {
+  if (!el || el._hwMounted) return;
+  el._hwMounted = true;
+
+  const updateOverflow = () => {
+    const has = el.scrollWidth > el.clientWidth + 1;
+    el.classList.toggle('has-overflow', has);
+  };
+
+  el.addEventListener('wheel', (e) => {
+    if (Math.abs(e.deltaY) <= Math.abs(e.deltaX)) return;
+    const canScroll = el.scrollWidth > el.clientWidth;
+    if (!canScroll) return;
+    const atStart = el.scrollLeft <= 0;
+    const atEnd   = el.scrollLeft + el.clientWidth >= el.scrollWidth - 1;
+    if ((e.deltaY < 0 && atStart) || (e.deltaY > 0 && atEnd)) return;
+    e.preventDefault();
+    el.scrollLeft += e.deltaY;
+  }, { passive: false });
+
+  el.addEventListener('scroll', updateOverflow, { passive: true });
+  /* Обновлять при появлении/изменении содержимого */
+  if (window.ResizeObserver) {
+    const ro = new ResizeObserver(updateOverflow);
+    ro.observe(el);
+    el._hwRO = ro;
+  }
+  /* Первичный вызов — после рендера контента */
+  setTimeout(updateOverflow, 0);
+  updateOverflow();
+}
 
 function renderRecurringSection() {
   const list = state.recurring || [];
@@ -1905,6 +1959,8 @@ function mountTxSheet() {
       if (!b) return;
       addTag(b.dataset.tagAdd);
     });
+    attachHorizontalWheel(tagsSelected);
+    attachHorizontalWheel(tagsSuggest);
     renderTags(); renderSuggest();
   }
 
