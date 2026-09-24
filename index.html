@@ -66,6 +66,12 @@ input,textarea,select{font-family:inherit}
 .topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:22px}
 .topbar h1{font-size:23px;font-weight:700;letter-spacing:-.015em}
 .topbar-right{display:flex;align-items:center;gap:8px}
+.topbar-add{display:none;align-items:center;justify-content:center;gap:6px;
+  padding:9px 14px;border-radius:10px;background:var(--accent);color:#fff;font-weight:600;font-size:14px;
+  transition:.15s;cursor:pointer;border:0}
+.topbar-add:hover{background:var(--accent-d)}
+.topbar-add:active{transform:scale(.96)}
+.topbar-add .plus{font-size:18px;line-height:1;margin-top:-1px}
 .cur{background:var(--panel);border:1px solid var(--border);color:var(--muted);border-radius:10px;
   padding:8px 12px;cursor:pointer;font-size:14px;font-weight:600;min-width:52px;text-align:center}
 .user-badge{display:flex;align-items:center;gap:8px;padding:4px;background:var(--panel);
@@ -207,21 +213,15 @@ textarea{resize:vertical;min-height:80px;line-height:1.5}
 
 /* CHIPS */
 .chips{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:14px}
-.chips-scroll{
-  flex-wrap:nowrap;
-  overflow-x:auto;
-  overflow-y:hidden;
-  -webkit-overflow-scrolling:touch;
-  scrollbar-width:none;
-  -ms-overflow-style:none;
-  padding-bottom:4px;
-  margin-bottom:10px;
-}
-.chips-scroll::-webkit-scrollbar{display:none}
-.chips-scroll > .chip{flex:0 0 auto;white-space:nowrap}
 .chip{border:1.5px solid var(--border);background:var(--panel2);color:var(--muted);padding:9px 14px;
   border-radius:99px;cursor:pointer;font-size:13.5px;font-weight:500;transition:.15s}
 .chip.active{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:600}
+.chips-scroll{flex-wrap:nowrap;overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;
+  scrollbar-width:none;-ms-overflow-style:none;padding-bottom:4px;margin-bottom:10px}
+.chips-scroll::-webkit-scrollbar{display:none}
+.chips-scroll > .chip{flex:0 0 auto;white-space:nowrap}
+.chips-scroll.has-overflow{-webkit-mask-image:linear-gradient(90deg,#000 calc(100% - 32px),transparent);
+  mask-image:linear-gradient(90deg,#000 calc(100% - 32px),transparent)}
 
 /* TAGS INPUT */
 .tags-input-wrap{display:flex;flex-direction:column;gap:8px}
@@ -230,6 +230,8 @@ textarea{resize:vertical;min-height:80px;line-height:1.5}
   scrollbar-width:none;-ms-overflow-style:none;padding-bottom:2px}
 .tags-selected::-webkit-scrollbar{display:none}
 .tags-selected:empty{display:none}
+.tags-selected.has-overflow{-webkit-mask-image:linear-gradient(90deg,#000 calc(100% - 32px),transparent);
+  mask-image:linear-gradient(90deg,#000 calc(100% - 32px),transparent)}
 .tag-chip{display:inline-flex;align-items:center;gap:6px;background:rgba(79,140,255,.15);
   color:var(--accent);border:1px solid rgba(79,140,255,.3);border-radius:99px;
   padding:5px 11px;font-size:12.5px;font-weight:600;flex:0 0 auto;white-space:nowrap}
@@ -241,18 +243,13 @@ textarea{resize:vertical;min-height:80px;line-height:1.5}
   scrollbar-width:none;-ms-overflow-style:none;padding-bottom:2px}
 .tags-suggest::-webkit-scrollbar{display:none}
 .tags-suggest:empty{display:none}
+.tags-suggest.has-overflow{-webkit-mask-image:linear-gradient(90deg,#000 calc(100% - 32px),transparent);
+  mask-image:linear-gradient(90deg,#000 calc(100% - 32px),transparent)}
 .tag-suggest{background:var(--panel2);border:1px solid var(--border);border-radius:99px;
   padding:5px 11px;font-size:12.5px;color:var(--muted);cursor:pointer;transition:.15s;
   flex:0 0 auto;white-space:nowrap}
 .tag-suggest:hover{background:var(--panel3);color:var(--text);border-color:var(--accent)}
-.tags-selected.has-overflow{
-  -webkit-mask-image:linear-gradient(90deg,#000 calc(100% - 32px),transparent);
-          mask-image:linear-gradient(90deg,#000 calc(100% - 32px),transparent);
-}
-.tags-suggest.has-overflow{
-  -webkit-mask-image:linear-gradient(90deg,#000 calc(100% - 32px),transparent);
-          mask-image:linear-gradient(90deg,#000 calc(100% - 32px),transparent);
-}
+
 /* SEARCH */
 .tx-search{margin-bottom:12px;position:relative}
 .tx-search input{padding-left:38px}
@@ -355,16 +352,11 @@ textarea{resize:vertical;min-height:80px;line-height:1.5}
 .sheet-body{flex:1;overflow-y:auto;padding:0 18px 4px;-webkit-overflow-scrolling:touch}
 .sheet-body::-webkit-scrollbar{width:8px;height:8px}
 .sheet-body::-webkit-scrollbar-track{background:transparent;margin:8px 0}
-.sheet-body::-webkit-scrollbar-thumb{
-  background:#2e3646;border-radius:99px;border:2px solid transparent;
-  background-clip:padding-box;transition:background .15s;
-}
+.sheet-body::-webkit-scrollbar-thumb{background:#2e3646;border-radius:99px;border:2px solid transparent;
+  background-clip:padding-box;transition:background .15s}
 .sheet-body::-webkit-scrollbar-thumb:hover{background:#3a4458;background-clip:padding-box}
 .sheet-body::-webkit-scrollbar-corner{background:transparent}
-
-/* Firefox */
 .sheet-body{scrollbar-width:thin;scrollbar-color:#2e3646 transparent}
-
 .sheet-footer{padding:14px 18px 18px;flex:0 0 auto;border-top:1px solid var(--border);background:var(--panel)}
 
 /* TOAST */
@@ -410,6 +402,7 @@ textarea{resize:vertical;min-height:80px;line-height:1.5}
   .quick-btn{flex:1;min-width:0}
 }
 @media (min-width:769px){
+  .topbar-add{display:inline-flex}
   .sheet{left:50%;top:50%;right:auto;bottom:auto;transform:translate(-50%,-46%) scale(.97);opacity:0;
     width:480px;max-height:85vh;border-radius:20px;transition:.24s cubic-bezier(.32,.72,0,1);
     border:1px solid var(--border);padding-bottom:0;margin-bottom:0}
@@ -423,20 +416,6 @@ textarea{resize:vertical;min-height:80px;line-height:1.5}
 @media (min-width:769px){ .tx-item .icon-btn.del-desktop{display:inline-flex} }
 @media (max-width:768px){ .tx-item .icon-btn.del-desktop{display:none} }
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{transition-duration:.01ms!important;animation-duration:.01ms!important}}
-
-.topbar-add{
-  display:none;
-  align-items:center;justify-content:center;gap:6px;
-  padding:8px 14px;border-radius:10px;
-  background:var(--accent);color:#fff;font-weight:600;font-size:14px;
-  transition:.15s;cursor:pointer;border:0;
-}
-.topbar-add:hover{background:var(--accent-d)}
-.topbar-add:active{transform:scale(.96)}
-.topbar-add .plus{font-size:18px;line-height:1;margin-top:-1px}
-@media (min-width:769px){
-  .topbar-add{display:inline-flex}
-}
 </style>
 </head>
 <body>
@@ -472,9 +451,9 @@ textarea{resize:vertical;min-height:80px;line-height:1.5}
     <header class="topbar">
       <h1 id="pageTitle">Обзор</h1>
       <div class="topbar-right">
-  <button class="topbar-add" id="topbarAdd" aria-label="Добавить">
-    <span class="plus">+</span><span>Добавить</span>
-  </button>
+        <button class="topbar-add" id="topbarAdd" aria-label="Добавить">
+          <span class="plus">+</span><span>Добавить</span>
+        </button>
         <select id="currencySel" class="cur" aria-label="Валюта">
           <option value="€">€</option><option value="₽">₽</option>
           <option value="$">$</option><option value="₸">₸</option><option value="₴">₴</option>
@@ -588,6 +567,7 @@ const EXPENSE_CATS = [
   { id:'transport',name:'Транспорт',icon:'🚗' },{ id:'home',name:'Жильё',icon:'🏠' },
   { id:'health',name:'Здоровье',icon:'💊' },{ id:'clothes',name:'Одежда',icon:'👕' },
   { id:'other',name:'Другое',icon:'📦' },
+  { id:'savings',name:'Накопления',icon:'🏦' },
 ];
 const INCOME_CATS = [
   { id:'salary',name:'Зарплата',icon:'💰' },{ id:'freelance',name:'Фриланс',icon:'🧑‍💻' },
@@ -607,6 +587,31 @@ function getAllTags() {
   const s = new Set();
   state.transactions.forEach(t => (t.tags || []).forEach(tag => s.add(tag)));
   return [...s].sort();
+}
+
+/* Отображение транзакции (в т.ч. вклад в цель) */
+function txDisplay(x) {
+  if (x.goalId && x.category === 'savings') {
+    const g = state.goals.find(gg => gg.id === x.goalId);
+    const goalTitle = g ? g.title : 'Цель удалена';
+    return {
+      icon: '🏦',
+      iconStyle: 'background:rgba(79,140,255,.14);font-size:15px',
+      title: goalTitle,
+      sub: (x.auto ? 'Автоотчисление' : 'Вклад в цель') + ' · ' + humanDate(x.date),
+      amountClass: 'neg',
+      amountText: `−${fmt(x.amount)}`,
+    };
+  }
+  const c = catById(x.category);
+  return {
+    icon: c.icon,
+    iconStyle: '',
+    title: x.note || c.name,
+    sub: `${c.name} · ${humanDate(x.date)}`,
+    amountClass: x.type === 'income' ? 'pos' : 'neg',
+    amountText: `${x.type === 'income' ? '+' : '−'}${fmt(x.amount)}`,
+  };
 }
 
 /* =====================================================================
@@ -638,13 +643,10 @@ function loadLocal() {
       state.recurring = state.recurring || [];
       state.categoryUsage = state.categoryUsage || {};
       state.monthlyBudget = Number(state.monthlyBudget) || 0;
-      /* Миграция: подцели без spentAt оставляем как есть, добавляем поле archived */
       state.goals.forEach(g => {
         if (g.archived === undefined) g.archived = false;
         if (g.archivedAt === undefined) g.archivedAt = null;
-        (g.subgoals || []).forEach(s => {
-          if (s.spentAt === undefined) s.spentAt = null;
-        });
+        (g.subgoals || []).forEach(s => { if (s.spentAt === undefined) s.spentAt = null; });
       });
     }
   } catch(e) { console.warn(e); }
@@ -657,8 +659,6 @@ function loadLocalShared() {
   } catch(e) {}
 }
 
-/* Прогресс цели = только deposits, обрезанные по target.
-   Подцели — чеклист, в прогресс НЕ идут. */
 function goalBreakdown(g) {
   const deposits = Number(g.deposits) || 0;
   const target   = Number(g.target) || 0;
@@ -667,14 +667,36 @@ function goalBreakdown(g) {
   return { deposits, saved, remaining, target };
 }
 function goalSaved(g) { return goalBreakdown(g).saved; }
-
-/* Активные / архивные цели */
 function activeGoals()   { return state.goals.filter(g => !g.archived); }
 function archivedGoals() { return state.goals.filter(g => g.archived); }
 
 function blankState() {
   return { transactions: [], goals: [], notes: [], currency: state.currency || '€',
     budgets: {}, monthlyBudget: 0, recurring: [], categoryUsage: {} };
+}
+
+/* Создание расходных транзакций за вклады в цели */
+function applySavings(list, dateStr) {
+  const today = dateStr || todayStr();
+  list.forEach(item => {
+    const g = state.goals.find(x => x.id === item.goalId);
+    if (!g) return;
+    g.deposits = (Number(g.deposits) || 0) + item.amount;
+    state.transactions.push({
+      id: uid(),
+      type: 'expense',
+      amount: item.amount,
+      category: 'savings',
+      goalId: g.id,
+      note: `В цель «${g.title}»`,
+      date: today,
+      tags: slugTag(g.title) ? [slugTag(g.title)] : [],
+      auto: !!item.auto,
+      createdAt: new Date().toISOString(),
+    });
+  });
+  state.categoryUsage['savings'] = (state.categoryUsage['savings'] || 0) + list.length;
+  save();
 }
 
 /* =====================================================================
@@ -1015,6 +1037,39 @@ if (window.visualViewport) {
 }
 
 /* =====================================================================
+   ГОРИЗОНТАЛЬНЫЙ СКРОЛЛ КОЛЁСИКОМ
+   ===================================================================== */
+function attachHorizontalWheel(el) {
+  if (!el || el._hwMounted) return;
+  el._hwMounted = true;
+
+  const updateOverflow = () => {
+    const has = el.scrollWidth > el.clientWidth + 1;
+    el.classList.toggle('has-overflow', has);
+  };
+
+  el.addEventListener('wheel', (e) => {
+    if (Math.abs(e.deltaY) <= Math.abs(e.deltaX)) return;
+    const canScroll = el.scrollWidth > el.clientWidth;
+    if (!canScroll) return;
+    const atStart = el.scrollLeft <= 0;
+    const atEnd   = el.scrollLeft + el.clientWidth >= el.scrollWidth - 1;
+    if ((e.deltaY < 0 && atStart) || (e.deltaY > 0 && atEnd)) return;
+    e.preventDefault();
+    el.scrollLeft += e.deltaY;
+  }, { passive: false });
+
+  el.addEventListener('scroll', updateOverflow, { passive: true });
+  if (window.ResizeObserver) {
+    const ro = new ResizeObserver(updateOverflow);
+    ro.observe(el);
+    el._hwRO = ro;
+  }
+  setTimeout(updateOverflow, 0);
+  updateOverflow();
+}
+
+/* =====================================================================
    РЕНДЕР
    ===================================================================== */
 let lastTab = null;
@@ -1141,18 +1196,16 @@ VIEWS.dashboard = () => {
         <div class="card">
           <div class="section-title" style="margin-top:0">Последние операции</div>
           ${recent.length === 0 ? `<div class="hint">Пусто.</div>` : recent.map(x => {
-            const c = catById(x.category);
+            const d = txDisplay(x);
             return `
               <div class="tx-item" style="border-bottom:1px solid var(--border)">
                 <div class="tx-content" data-action="edit-tx" data-id="${x.id}">
-                  <div class="tx-ico">${c.icon}</div>
+                  <div class="tx-ico"${d.iconStyle ? ` style="${d.iconStyle}"` : ''}>${d.icon}</div>
                   <div class="tx-mid">
-                    <div class="tx-title">${esc(x.note || c.name)}</div>
-                    <div class="tx-sub">${esc(c.name)} · ${humanDate(x.date)}</div>
+                    <div class="tx-title">${esc(d.title)}</div>
+                    <div class="tx-sub">${esc(d.sub)}</div>
                   </div>
-                  <div class="tx-amt ${x.type === 'income' ? 'pos' : 'neg'}">
-                    ${x.type === 'income' ? '+' : '−'}${fmt(x.amount)}
-                  </div>
+                  <div class="tx-amt ${d.amountClass}">${d.amountText}</div>
                 </div>
               </div>`;
           }).join('')}
@@ -1292,11 +1345,11 @@ VIEWS.transactions = () => {
       <button class="chip ${txFilter==='expense'?'active':''}" data-filter="expense">Расходы</button>
       <button class="chip ${txFilter==='income'?'active':''}" data-filter="income">Доходы</button>
     </div>
-${getAllTags().length ? `
-  <div class="chips chips-scroll" style="margin-top:-6px">
-    ${getAllTags().map(t => `<button class="chip ${txTagFilter===t?'active':''}" data-tag-filter="${esc(t)}">#${esc(t)}</button>`).join('')}
-  </div>
-` : ''}
+    ${getAllTags().length ? `
+      <div class="chips chips-scroll" style="margin-top:-6px">
+        ${getAllTags().map(t => `<button class="chip ${txTagFilter===t?'active':''}" data-tag-filter="${esc(t)}">#${esc(t)}</button>`).join('')}
+      </div>
+    ` : ''}
     <div id="txList">${renderTxList()}</div>
     ${renderRecurringSection()}
   `;
@@ -1307,6 +1360,12 @@ function renderTxList() {
   if (txSearch) {
     const q = txSearch.toLowerCase();
     list = list.filter(x => {
+      if (x.goalId && x.category === 'savings') {
+        const g = state.goals.find(gg => gg.id === x.goalId);
+        return (g?.title || '').toLowerCase().includes(q)
+          || (x.note || '').toLowerCase().includes(q)
+          || String(x.amount).includes(q);
+      }
       const c = catById(x.category);
       return (x.note || '').toLowerCase().includes(q)
         || c.name.toLowerCase().includes(q)
@@ -1325,7 +1384,7 @@ function renderTxList() {
   }
   return `<div class="card" style="padding:0 18px">
     ${list.map(x => {
-      const c = catById(x.category);
+      const d = txDisplay(x);
       const tagsHtml = (x.tags || []).length
         ? `<div class="tx-tags">${(x.tags||[]).map(t => `<span class="tx-tag">#${esc(t)}</span>`).join('')}</div>`
         : '';
@@ -1333,15 +1392,13 @@ function renderTxList() {
         <div class="tx-item" data-id="${x.id}">
           <div class="tx-delete-bg" data-action="del-tx" data-id="${x.id}">🗑</div>
           <div class="tx-content" data-action="edit-tx" data-id="${x.id}">
-            <div class="tx-ico">${c.icon}</div>
+            <div class="tx-ico"${d.iconStyle ? ` style="${d.iconStyle}"` : ''}>${d.icon}</div>
             <div class="tx-mid">
-              <div class="tx-title">${esc(x.note || c.name)}</div>
-              <div class="tx-sub">${esc(c.name)} · ${humanDate(x.date)}</div>
+              <div class="tx-title">${esc(d.title)}</div>
+              <div class="tx-sub">${esc(d.sub)}</div>
               ${tagsHtml}
             </div>
-            <div class="tx-amt ${x.type === 'income' ? 'pos' : 'neg'}">
-              ${x.type === 'income' ? '+' : '−'}${fmt(x.amount)}
-            </div>
+            <div class="tx-amt ${d.amountClass}">${d.amountText}</div>
             <button class="icon-btn del-desktop" data-action="del-tx" data-id="${x.id}" aria-label="Удалить">✕</button>
           </div>
         </div>`;
@@ -1383,41 +1440,8 @@ MOUNTS.transactions = () => {
 
   mountSwipe();
   mountLongPress();
-document.querySelectorAll('.chips-scroll').forEach(attachHorizontalWheel);
+  document.querySelectorAll('.chips-scroll').forEach(attachHorizontalWheel);
 };
-
-/* Горизонтальный скролл колёсиком на тег-фильтрах и подсказках */
-function attachHorizontalWheel(el) {
-  if (!el || el._hwMounted) return;
-  el._hwMounted = true;
-
-  const updateOverflow = () => {
-    const has = el.scrollWidth > el.clientWidth + 1;
-    el.classList.toggle('has-overflow', has);
-  };
-
-  el.addEventListener('wheel', (e) => {
-    if (Math.abs(e.deltaY) <= Math.abs(e.deltaX)) return;
-    const canScroll = el.scrollWidth > el.clientWidth;
-    if (!canScroll) return;
-    const atStart = el.scrollLeft <= 0;
-    const atEnd   = el.scrollLeft + el.clientWidth >= el.scrollWidth - 1;
-    if ((e.deltaY < 0 && atStart) || (e.deltaY > 0 && atEnd)) return;
-    e.preventDefault();
-    el.scrollLeft += e.deltaY;
-  }, { passive: false });
-
-  el.addEventListener('scroll', updateOverflow, { passive: true });
-  /* Обновлять при появлении/изменении содержимого */
-  if (window.ResizeObserver) {
-    const ro = new ResizeObserver(updateOverflow);
-    ro.observe(el);
-    el._hwRO = ro;
-  }
-  /* Первичный вызов — после рендера контента */
-  setTimeout(updateOverflow, 0);
-  updateOverflow();
-}
 
 function renderRecurringSection() {
   const list = state.recurring || [];
@@ -1456,7 +1480,7 @@ function renderRecurringSection() {
 /* =====================================================================
    ЦЕЛИ
    ===================================================================== */
-let goalsView = 'active'; // 'active' | 'archive'
+let goalsView = 'active';
 
 function forecastForGoal(g) {
   const bd = goalBreakdown(g);
@@ -1481,7 +1505,7 @@ function goalCard(g, opts = {}) {
   const compact = !!opts.compact;
   const archived = !!g.archived;
   const bd = goalBreakdown(g);
-  const { target, saved, remaining, deposits } = bd;
+  const { target, saved, remaining } = bd;
   const pct = target > 0 ? Math.min(100, saved / target * 100) : 0;
   const months = monthsUntil(g.deadline);
   const perMonth = months > 0 ? remaining / months : remaining;
@@ -1491,7 +1515,6 @@ function goalCard(g, opts = {}) {
   const subSum = (g.subgoals || []).reduce((a,s) => a + (Number(s.amount) || 0), 0);
   const forecast = (!compact && !archived) ? forecastForGoal(g) : null;
   const autoPct = Number(g.autoSavePercent) || 0;
-  const goalTag = slugTag(g.title);
 
   return `
     <div class="card" style="margin-top:14px">
@@ -1654,7 +1677,6 @@ VIEWS.goals = () => {
   const archived = archivedGoals();
   const totalTarget = active.reduce((a,g) => a + g.target, 0);
   const totalSaved  = active.reduce((a,g) => a + goalSaved(g), 0);
-  const list = goalsView === 'archive' ? archived : active;
 
   return `
     <div class="chips" style="margin-bottom:16px">
@@ -1754,9 +1776,9 @@ MOUNTS.notes = () => {
 };
 
 /* =====================================================================
-   FAB
+   FAB / topbar-add
    ===================================================================== */
-$('#fab').addEventListener('click', () => {
+function fabAction() {
   haptic(10);
   if (currentTab === 'goals') openGoalSheet();
   else if (currentTab === 'notes') {
@@ -1764,17 +1786,9 @@ $('#fab').addEventListener('click', () => {
     save(); render();
     setTimeout(() => { const f = document.querySelector('.note-card input.note-title'); if (f) f.focus(); }, 40);
   } else openTxSheet();
-});
-
-$('#topbarAdd').addEventListener('click', () => {
-  haptic(10);
-  if (currentTab === 'goals') openGoalSheet();
-  else if (currentTab === 'notes') {
-    state.notes.unshift({ id: uid(), title: '', text: '', updated: new Date().toISOString() });
-    save(); render();
-    setTimeout(() => { const f = document.querySelector('.note-card input.note-title'); if (f) f.focus(); }, 40);
-  } else openTxSheet();
-});
+}
+$('#fab').addEventListener('click', fabAction);
+$('#topbarAdd').addEventListener('click', fabAction);
 
 /* =====================================================================
    TX SHEET
@@ -1925,7 +1939,7 @@ function mountTxSheet() {
   const renderSuggest = () => {
     const all = getAllTags().filter(t => !sheetTx.tags.includes(t));
     if (!all.length) { tagsSuggest.innerHTML = ''; return; }
-    tagsSuggest.innerHTML = all.slice(0, 12).map(t =>
+    tagsSuggest.innerHTML = all.slice(0, 20).map(t =>
       `<button type="button" class="tag-suggest" data-tag-add="${esc(t)}">#${esc(t)}</button>`
     ).join('');
   };
@@ -1982,7 +1996,6 @@ function mountTxSheet() {
       tags: [...sheetTx.tags],
     };
 
-    let autoSaveMessage = null;
     let txId = null;
 
     if (editing) {
@@ -1993,9 +2006,9 @@ function mountTxSheet() {
       state.transactions.push({ id: txId, ...data, createdAt: new Date().toISOString() });
       state.categoryUsage[sheetTx.category] = (state.categoryUsage[sheetTx.category] || 0) + 1;
 
-      /* Авто-отчисление — не переполняем цель */
+      /* Собираем авто-отчисления, но НЕ применяем — покажем подтверждение */
       if (data.type === 'income') {
-        let totalAuto = 0;
+        const pending = [];
         state.goals.forEach(g => {
           if (g.archived) return;
           const pct = Number(g.autoSavePercent) || 0;
@@ -2004,14 +2017,14 @@ function mountTxSheet() {
           if (bd.remaining <= 0) return;
           let add = amount * pct / 100;
           if (add > bd.remaining) add = bd.remaining;
-          g.deposits = (Number(g.deposits) || 0) + add;
-          totalAuto += add;
+          if (add <= 0) return;
+          pending.push({ goalId: g.id, goalTitle: g.title, amount: add });
         });
-        if (totalAuto > 0) autoSaveMessage = `Автоотчислено ${fmt(totalAuto)} в цели`;
+        if (pending.length) window._pendingAutoSaves = { list: pending, date: data.date };
       }
     }
 
-    /* Помечаем подцель как «расход записан» */
+    /* Подцель помечаем как «расход записан» */
     if (sheetTx.subgoalContext) {
       const g = state.goals.find(x => x.id === sheetTx.subgoalContext.goalId);
       if (g) {
@@ -2023,8 +2036,12 @@ function mountTxSheet() {
     save(); haptic(15); closeSheet();
     setTimeout(() => {
       toast(editing ? 'Сохранено' : (data.type === 'income' ? `Доход ${fmt(amount)} записан` : `Расход ${fmt(amount)} записан`));
-      if (autoSaveMessage) setTimeout(() => toast(autoSaveMessage), 700);
       render();
+      if (window._pendingAutoSaves) {
+        const p = window._pendingAutoSaves;
+        window._pendingAutoSaves = null;
+        setTimeout(() => openConfirmSavingsSheet(p.list, p.date, { auto: true }), 260);
+      }
     }, 180);
   };
   addBtn.addEventListener('click', saveTx);
@@ -2034,12 +2051,67 @@ function mountTxSheet() {
   if (editing) {
     $('#txDelBtn').addEventListener('click', () => {
       if (confirm('Удалить операцию?')) {
+        const t = state.transactions.find(x => x.id === sheetTx.editId);
+        if (t && t.goalId) {
+          const g = state.goals.find(gg => gg.id === t.goalId);
+          if (g) g.deposits = Math.max(0, (Number(g.deposits) || 0) - t.amount);
+        }
         state.transactions = state.transactions.filter(x => x.id !== sheetTx.editId);
         save(); haptic(12); closeSheet();
         setTimeout(() => { toast('Удалено'); render(); }, 180);
       }
     });
   }
+}
+
+/* =====================================================================
+   CONFIRM SAVINGS SHEET — единое подтверждение для авто и ручного
+   ===================================================================== */
+function openConfirmSavingsSheet(list, dateStr, opts = {}) {
+  const total = list.reduce((a, x) => a + x.amount, 0);
+  const isAuto = !!opts.auto;
+  const rows = list.map(x => `
+    <div style="display:flex;align-items:center;gap:11px;padding:10px 0;border-bottom:1px solid var(--border)">
+      <span style="flex:1;font-size:14px;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(x.goalTitle)}</span>
+      <span style="font-size:13.5px;font-weight:600;font-variant-numeric:tabular-nums">${fmt(x.amount)}</span>
+    </div>
+  `).join('');
+
+  const intro = isAuto
+    ? 'По правилам автоотчислений с этого дохода можно отложить:'
+    : 'Записать вклад как расход из свободного баланса?';
+
+  openSheet(`
+    <div class="sheet-handle-wrap"><div class="sheet-handle"></div></div>
+    <div class="sheet-header"><h2>${isAuto ? 'Автоотчисление' : 'Вклад в цель'}</h2>
+      <button class="sheet-close" data-action="close-sheet">✕</button></div>
+    <div class="sheet-body">
+      <div class="hint" style="margin-top:0;margin-bottom:14px">${intro}</div>
+      <div style="background:var(--panel2);border-radius:12px;padding:0 14px;margin-bottom:14px">
+        ${rows}
+        <div style="display:flex;align-items:center;gap:11px;padding:12px 0">
+          <span style="flex:1;font-size:14px;font-weight:600">Итого</span>
+          <span style="font-size:15px;font-weight:700;color:var(--accent);font-variant-numeric:tabular-nums">${fmt(total)}</span>
+        </div>
+      </div>
+      <div class="hint">
+        Если записать — деньги уйдут из свободного баланса как расход в категории «Накопления» и попадут в цели.
+        ${isAuto ? 'Если пропустить — доход сохранится без отчислений.' : 'Если отменить — вклад не сохранится.'}
+      </div>
+    </div>
+    <div class="sheet-footer">
+      <button class="btn primary block" id="confirmSavingsBtn" style="margin-bottom:8px">
+        Записать расход ${fmt(total)}
+      </button>
+      <button class="btn ghost block" data-action="close-sheet">${isAuto ? 'Пропустить' : 'Отмена'}</button>
+    </div>
+  `, () => {
+    $('#confirmSavingsBtn').addEventListener('click', () => {
+      applySavings(list, dateStr);
+      haptic(15); closeSheet();
+      setTimeout(() => { toast(`Отложено ${fmt(total)}`); render(); }, 200);
+    });
+  });
 }
 
 /* =====================================================================
@@ -2050,6 +2122,7 @@ let suppressEditClick = false;
 function showTxMenu(id) {
   const t = state.transactions.find(x => x.id === id);
   if (!t) return;
+  if (t.goalId && t.category === 'savings') { showTransferSheet(id); return; }
   const c = catById(t.category);
   const tagsHtml = (t.tags || []).length
     ? `<div class="tx-tags" style="margin-top:6px">${t.tags.map(tag => `<span class="tx-tag">#${esc(tag)}</span>`).join('')}</div>`
@@ -2077,6 +2150,32 @@ function showTxMenu(id) {
       <button class="ctx-item danger" data-action="del-tx-from-menu" data-id="${id}">
         <span class="ico">🗑</span><span>Удалить</span>
       </button>
+    </div>
+  `);
+}
+
+function showTransferSheet(txId) {
+  const t = state.transactions.find(x => x.id === txId);
+  if (!t) return;
+  const g = state.goals.find(gg => gg.id === t.goalId);
+  const goalTitle = g ? g.title : 'Цель удалена';
+  openSheet(`
+    <div class="sheet-handle-wrap"><div class="sheet-handle"></div></div>
+    <div class="sheet-header"><h2>${t.auto ? 'Автоотчисление' : 'Вклад в цель'}</h2>
+      <button class="sheet-close" data-action="close-sheet">✕</button></div>
+    <div class="sheet-body">
+      <div style="display:flex;align-items:center;gap:12px;padding:14px;background:var(--panel2);border-radius:14px;margin-bottom:16px">
+        <div class="tx-ico" style="background:rgba(79,140,255,.14);font-size:16px">🏦</div>
+        <div class="tx-mid">
+          <div class="tx-title">${esc(goalTitle)}</div>
+          <div class="tx-sub">${humanDate(t.date)}${t.auto ? ' · авто' : ''}</div>
+        </div>
+        <div class="tx-amt neg">−${fmt(t.amount)}</div>
+      </div>
+      <div class="hint">Удаление вернёт деньги в свободный баланс и уменьшит счётчик цели на ${fmt(t.amount)}.</div>
+    </div>
+    <div class="sheet-footer">
+      <button class="btn danger block" data-action="del-transfer" data-id="${t.id}">Удалить</button>
     </div>
   `);
 }
@@ -2228,8 +2327,8 @@ function openAutoSaveSheet(goalId) {
         <input id="asPercent" type="number" min="0" max="100" step="1" inputmode="numeric"
           value="${current || ''}" placeholder="0" data-autofocus>
       </div>
-      <div class="hint">Каждый раз, когда ты записываешь доход, эта доля автоматически уйдёт в цель «${esc(g.title)}».</div>
-      <div class="hint">Например: 10% от зарплаты 1200 ${state.currency} — это 120 ${state.currency} в цель.</div>
+      <div class="hint">Каждый раз, когда ты записываешь доход, приложение предложит отложить эту долю в цель «${esc(g.title)}».</div>
+      <div class="hint">Например: 10% от зарплаты 1200 ${state.currency} — это 120 ${state.currency}.</div>
     </div>
     <div class="sheet-footer">
       <button class="btn primary block" id="asSave">Сохранить</button>
@@ -2475,20 +2574,43 @@ document.addEventListener('click', async e => {
 
   if (a === 'del-tx') {
     e.stopPropagation();
+    const tx = state.transactions.find(x => x.id === el.dataset.id);
+    if (tx && tx.goalId) {
+      const g = state.goals.find(gg => gg.id === tx.goalId);
+      if (g) g.deposits = Math.max(0, (Number(g.deposits) || 0) - tx.amount);
+    }
     state.transactions = state.transactions.filter(x => x.id !== el.dataset.id);
     save(); haptic(10); render();
     toast('Удалено');
   }
   if (a === 'del-tx-from-menu') {
     if (!confirm('Удалить операцию?')) return;
+    const tx = state.transactions.find(x => x.id === el.dataset.id);
+    if (tx && tx.goalId) {
+      const g = state.goals.find(gg => gg.id === tx.goalId);
+      if (g) g.deposits = Math.max(0, (Number(g.deposits) || 0) - tx.amount);
+    }
     state.transactions = state.transactions.filter(x => x.id !== el.dataset.id);
     save(); haptic(12); closeSheet();
     setTimeout(() => { toast('Удалено'); render(); }, 180);
+  }
+  if (a === 'del-transfer') {
+    if (!confirm('Удалить вклад? Депозит цели уменьшится.')) return;
+    const tx = state.transactions.find(x => x.id === el.dataset.id);
+    if (tx && tx.goalId) {
+      const g = state.goals.find(gg => gg.id === tx.goalId);
+      if (g) g.deposits = Math.max(0, (Number(g.deposits) || 0) - tx.amount);
+    }
+    state.transactions = state.transactions.filter(x => x.id !== el.dataset.id);
+    save(); haptic(12); closeSheet();
+    setTimeout(() => { toast('Вклад удалён'); render(); }, 180);
   }
   if (a === 'edit-tx') {
     if (suppressEditClick) return;
     const item = el.closest('.tx-item');
     if (item?.classList.contains('swiped')) { item.classList.remove('swiped'); return; }
+    const tx = state.transactions.find(x => x.id === el.dataset.id);
+    if (tx && tx.goalId && tx.category === 'savings') { showTransferSheet(tx.id); return; }
     openTxEditSheet(el.dataset.id);
   }
   if (a === 'open-edit-tx') {
@@ -2645,16 +2767,15 @@ document.addEventListener('submit', async e => {
       if (!amount || amount <= 0) return;
       if (amount > bd.remaining) {
         amount = bd.remaining;
-        toast(`Отложено максимум ${fmt(amount)} — столько осталось`, false);
+        toast(`Максимум ${fmt(amount)} — столько осталось`, false);
       }
       if (amount <= 0) return;
-      g.deposits = (Number(g.deposits) || 0) + amount;
-      save(); haptic(12);
-      if (bd.remaining - amount > 0.001) {
-        /* не последний вклад — показываем тост */
-        toast(`Отложено ${fmt(amount)}`);
-      }
-      render();
+      /* Ручной вклад — тоже через подтверждение */
+      openConfirmSavingsSheet(
+        [{ goalId: g.id, goalTitle: g.title, amount }],
+        todayStr(),
+        { auto: false }
+      );
       return;
     }
     const sgId = form.dataset.shared;
