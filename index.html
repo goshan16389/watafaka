@@ -233,7 +233,7 @@ textarea{resize:vertical;min-height:80px;line-height:1.5}
 .tx-search::before{content:"🔍";position:absolute;left:14px;top:50%;transform:translateY(-50%);
   font-size:14px;pointer-events:none;opacity:.6}
 
-/* CONTEXT MENU (sheet items) */
+/* CONTEXT MENU */
 .ctx-item{display:flex;align-items:center;gap:12px;padding:14px;background:var(--panel2);
   border-radius:12px;width:100%;text-align:left;font-weight:500;font-size:15px;
   margin-bottom:8px;transition:.15s;cursor:pointer;border:0;color:inherit}
@@ -262,20 +262,27 @@ textarea{resize:vertical;min-height:80px;line-height:1.5}
 .deposit-row{display:flex;gap:8px;margin-top:12px}
 .deposit-row input{flex:1}
 .subgoals{margin-top:14px;padding-top:14px;border-top:1px dashed var(--border)}
-.subgoal{display:flex;align-items:center;gap:11px;padding:11px 12px;border-radius:12px;background:var(--panel2);
-  margin-bottom:7px;transition:.15s;cursor:pointer;border:1px solid transparent}
+.subgoal{display:flex;align-items:center;gap:11px;padding:10px 12px;border-radius:12px;background:var(--panel2);
+  margin-bottom:7px;transition:.15s;border:1px solid transparent}
 .subgoal input[type=checkbox]{width:19px;height:19px;flex:0 0 19px;accent-color:var(--green);cursor:pointer;padding:0}
 .subgoal .t{flex:1;font-size:14px;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .subgoal .a{font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums;font-weight:500}
-.subgoal.done{background:rgba(61,220,151,.09);border-color:rgba(61,220,151,.25)}
+.subgoal-actions{display:flex;align-items:center;gap:2px;flex:0 0 auto}
 .subgoal.done .t{color:var(--green);text-decoration:line-through}
 .subgoal.done .a{color:var(--green)}
+.subgoal.spent{background:rgba(61,220,151,.06);border-color:rgba(61,220,151,.2)}
+.subgoal .spent-badge{font-size:11px;color:var(--green);background:rgba(61,220,151,.12);
+  padding:2px 8px;border-radius:99px;white-space:nowrap}
 .sub-add{display:flex;gap:6px;margin-top:10px}
 .sub-add input:first-child{flex:1.6}
 .sub-add input:nth-child(2){flex:1;min-width:0}
 .goal-done-badge{display:inline-block;background:rgba(61,220,151,.15);color:var(--green);
   padding:4px 11px;border-radius:99px;font-size:12px;font-weight:600}
+.archived-badge{display:inline-block;background:rgba(139,147,167,.15);color:var(--muted);
+  padding:4px 11px;border-radius:99px;font-size:12px;font-weight:600}
 .badge{display:inline-block;font-size:11.5px;color:var(--muted);background:var(--panel2);padding:3px 9px;border-radius:99px;font-weight:500}
+.goal-actions{display:flex;gap:6px;margin-top:12px}
+.goal-actions .btn{flex:1}
 
 /* NOTES */
 .note-card{position:relative;padding-top:16px}
@@ -465,7 +472,7 @@ const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
   try {
     document.getElementById('manifestLink').href =
       'data:application/manifest+json;charset=utf-8,' + encodeURIComponent(JSON.stringify(manifest));
-  } catch (e) { console.warn('manifest setup failed', e); }
+  } catch (e) {}
 })();
 
 /* =====================================================================
@@ -510,6 +517,12 @@ function plural(n, one, few, many) {
   return many;
 }
 function haptic(ms=8) { if (navigator.vibrate) try { navigator.vibrate(ms); } catch(e) {} }
+function slugTag(s) {
+  return String(s || '').trim().toLowerCase()
+    .replace(/[^a-zа-яё0-9\s_-]/gi, '')
+    .replace(/\s+/g, '_')
+    .slice(0, 24);
+}
 
 /* =====================================================================
    КАТЕГОРИИ
@@ -570,6 +583,14 @@ function loadLocal() {
       state.recurring = state.recurring || [];
       state.categoryUsage = state.categoryUsage || {};
       state.monthlyBudget = Number(state.monthlyBudget) || 0;
+      /* Миграция: подцели без spentAt оставляем как есть, добавляем поле archived */
+      state.goals.forEach(g => {
+        if (g.archived === undefined) g.archived = false;
+        if (g.archivedAt === undefined) g.archivedAt = null;
+        (g.subgoals || []).forEach(s => {
+          if (s.spentAt === undefined) s.spentAt = null;
+        });
+      });
     }
   } catch(e) { console.warn(e); }
 }
@@ -580,20 +601,22 @@ function loadLocalShared() {
     if (raw) sharedGoals = JSON.parse(raw) || [];
   } catch(e) {}
 }
+
+/* Прогресс цели = только deposits, обрезанные по target.
+   Подцели — чеклист, в прогресс НЕ идут. */
 function goalBreakdown(g) {
-  const subsDone = (g.subgoals || []).filter(s => s.done).reduce((a, s) => a + (Number(s.amount) || 0), 0);
   const deposits = Number(g.deposits) || 0;
   const target   = Number(g.target) || 0;
-  /* Отложено не может быть больше цели — режем по target */
-  const saved     = Math.min(target, deposits + subsDone);
+  const saved    = Math.min(target, deposits);
   const remaining = Math.max(0, target - saved);
-  const depositsEffective = Math.min(deposits, saved);
-  const subsEffective     = saved - depositsEffective;
-  return { deposits, subsDone, saved, remaining, target,
-           depositsEffective, subsEffective };
+  return { deposits, saved, remaining, target };
 }
-/* Оставляем алиас для остальных мест в коде */
 function goalSaved(g) { return goalBreakdown(g).saved; }
+
+/* Активные / архивные цели */
+function activeGoals()   { return state.goals.filter(g => !g.archived); }
+function archivedGoals() { return state.goals.filter(g => g.archived); }
+
 function blankState() {
   return { transactions: [], goals: [], notes: [], currency: state.currency || '€',
     budgets: {}, monthlyBudget: 0, recurring: [], categoryUsage: {} };
@@ -668,6 +691,11 @@ async function pullFromCloud() {
   if (data && data.data && typeof data.data === 'object') {
     state = Object.assign(blankState(), data.data);
     state.monthlyBudget = Number(state.monthlyBudget) || 0;
+    state.goals.forEach(g => {
+      if (g.archived === undefined) g.archived = false;
+      if (g.archivedAt === undefined) g.archivedAt = null;
+      (g.subgoals || []).forEach(s => { if (s.spentAt === undefined) s.spentAt = null; });
+    });
     saveLocal();
     return { found: true };
   }
@@ -693,16 +721,10 @@ function subscribeRealtime() {
         render();
         //toast('Обновлено с другого устройства');
       })
-    .subscribe((status) => {
-      if (status === 'SUBSCRIBED') console.log('[rt] subscribed');
-      if (status === 'CHANNEL_ERROR') console.warn('[rt] channel error');
-    });
+    .subscribe();
 }
 function unsubscribeRealtime() {
-  if (realtimeChannel) {
-    try { sb.removeChannel(realtimeChannel); } catch(e) {}
-    realtimeChannel = null;
-  }
+  if (realtimeChannel) { try { sb.removeChannel(realtimeChannel); } catch(e) {} realtimeChannel = null; }
 }
 
 /* =====================================================================
@@ -960,9 +982,8 @@ VIEWS.dashboard = () => {
   const income  = t.filter(x => x.type === 'income').reduce((a,b) => a + b.amount, 0);
   const expense = t.filter(x => x.type === 'expense').reduce((a,b) => a + b.amount, 0);
   const balance = income - expense;
-  const savedInGoals = state.goals.reduce((a,g) => a + goalSaved(g), 0);
+  const savedInGoals = activeGoals().reduce((a,g) => a + goalSaved(g), 0);
 
-  // Расход в день
   let perDayText = r.label;
   if (uiPeriod !== 'all' && expense > 0) {
     const now = new Date();
@@ -972,7 +993,6 @@ VIEWS.dashboard = () => {
     perDayText = `≈ ${fmt(expense / days)} в день`;
   }
 
-  // Прошлый месяц по категориям
   const now = new Date();
   const prevStart = new Date(now.getFullYear(), now.getMonth()-1, 1);
   const prevEnd = new Date(now.getFullYear(), now.getMonth(), 1, 0,0,0,0);
@@ -993,6 +1013,7 @@ VIEWS.dashboard = () => {
   const maxCat = cats.length ? cats[0][1] : 1;
   const recent = [...state.transactions]
     .sort((a,b) => (b.date + b.createdAt).localeCompare(a.date + a.createdAt)).slice(0, 6);
+  const goals = activeGoals();
 
   return `
     <div class="chips" style="margin-bottom:16px">
@@ -1020,7 +1041,7 @@ VIEWS.dashboard = () => {
       <div class="card stat">
         <div class="lbl">Отложено</div>
         <div class="val">${fmt(savedInGoals)}</div>
-        <div class="sub">${state.goals.length} ${plural(state.goals.length,'цель','цели','целей')}</div>
+        <div class="sub">${goals.length} ${plural(goals.length,'цель','цели','целей')}</div>
       </div>
     </div>
 
@@ -1084,9 +1105,9 @@ VIEWS.dashboard = () => {
       </div>
     `}
 
-    ${state.goals.length ? `
+    ${goals.length ? `
       <div class="section-title">Активные цели</div>
-      ${state.goals.map(g => goalCard(g, { compact: true })).join('')}
+      ${goals.map(g => goalCard(g, { compact: true })).join('')}
       <button class="btn ghost sm block" data-action="goto-goals" style="margin-top:10px">Все цели →</button>
     ` : ''}
 
@@ -1238,9 +1259,7 @@ function renderTxList() {
         || (x.tags || []).some(t => t.toLowerCase().includes(q));
     });
   }
-  if (txTagFilter) {
-    list = list.filter(x => (x.tags || []).includes(txTagFilter));
-  }
+  if (txTagFilter) list = list.filter(x => (x.tags || []).includes(txTagFilter));
   list.sort((a,b) => (b.date + b.createdAt).localeCompare(a.date + a.createdAt));
 
   if (!list.length) {
@@ -1348,63 +1367,54 @@ function renderRecurringSection() {
 /* =====================================================================
    ЦЕЛИ
    ===================================================================== */
-function forecastForGoal(g) {
-  const saved = goalSaved(g);
-  const remaining = Math.max(0, g.target - saved);
-  if (remaining <= 0) return null;
+let goalsView = 'active'; // 'active' | 'archive'
 
+function forecastForGoal(g) {
+  const bd = goalBreakdown(g);
+  if (bd.remaining <= 0) return null;
   const created = new Date(g.createdAt || new Date().toISOString());
   const now = new Date();
   const daysSinceCreated = Math.max(1, (now - created) / (1000*60*60*24));
   const monthsSinceCreated = daysSinceCreated / 30.44;
   if (monthsSinceCreated < 0.5) return null;
-  if (saved < 1) return null;
-
-  const rate = saved / monthsSinceCreated;
+  if (bd.saved < 1) return null;
+  const rate = bd.saved / monthsSinceCreated;
   if (rate < 1) return null;
-
-  const monthsToFinish = remaining / rate;
+  const monthsToFinish = bd.remaining / rate;
   const forecastDate = new Date(now.getTime() + monthsToFinish * 30.44 * 24*60*60*1000);
-
   const extra = 50;
-  const monthsToFinishWithExtra = remaining / (rate + extra);
-  const savedMonths = monthsToFinish - monthsToFinishWithExtra;
-
-  return {
-    forecastDate,
-    monthsToFinish,
-    savedMonths: savedMonths >= 1 ? Math.round(savedMonths) : 0,
-  };
+  const monthsToFinishWithExtra = bd.remaining / (rate + extra);
+  const savedMonths = Math.round(monthsToFinish - monthsToFinishWithExtra);
+  return { forecastDate, monthsToFinish, savedMonths: savedMonths >= 1 ? savedMonths : 0 };
 }
 
 function goalCard(g, opts = {}) {
   const compact = !!opts.compact;
+  const archived = !!g.archived;
   const bd = goalBreakdown(g);
-  const { target, saved, remaining, deposits, subsDone,
-          depositsEffective, subsEffective } = bd;
-
-  const pct       = target > 0 ? Math.min(100, saved / target * 100) : 0;
-  const depPct    = target > 0 ? depositsEffective / target * 100 : 0;
-  const subPct    = target > 0 ? subsEffective / target * 100 : 0;
-  const months    = monthsUntil(g.deadline);
-  const perMonth  = months > 0 ? remaining / months : remaining;
-  const done      = remaining <= 0;
+  const { target, saved, remaining, deposits } = bd;
+  const pct = target > 0 ? Math.min(100, saved / target * 100) : 0;
+  const months = monthsUntil(g.deadline);
+  const perMonth = months > 0 ? remaining / months : remaining;
+  const done = remaining <= 0;
   const dl = new Date(g.deadline + 'T00:00:00');
   const dlText = isNaN(dl) ? '—' : dl.toLocaleDateString('ru-RU', { day:'numeric', month:'long', year:'numeric' });
   const subSum = (g.subgoals || []).reduce((a,s) => a + (Number(s.amount) || 0), 0);
-  const forecast = !compact ? forecastForGoal(g) : null;
+  const forecast = (!compact && !archived) ? forecastForGoal(g) : null;
   const autoPct = Number(g.autoSavePercent) || 0;
-  const hasBothSources = depositsEffective > 0 && subsEffective > 0;
+  const goalTag = slugTag(g.title);
 
   return `
     <div class="card" style="margin-top:14px">
       <div class="goal-head">
         <div style="min-width:0">
           <div class="goal-title">${esc(g.title)}</div>
-          <div class="goal-deadline">до ${dlText} · ${months > 0 ? months + ' ' + plural(months,'месяц','месяца','месяцев') : 'срок вышел'}</div>
+          <div class="goal-deadline">
+            ${archived ? `архивирована ${g.archivedAt ? humanDate(g.archivedAt.slice(0,10)) : ''}` : `до ${dlText} · ${months > 0 ? months + ' ' + plural(months,'месяц','месяца','месяцев') : 'срок вышел'}`}
+          </div>
         </div>
         <div style="display:flex;align-items:center;gap:6px;flex:0 0 auto">
-          ${done ? `<span class="goal-done-badge">Готово 🎉</span>` : ''}
+          ${archived ? `<span class="archived-badge">Архив</span>` : done ? `<span class="goal-done-badge">Готово 🎉</span>` : ''}
           <button class="icon-btn" data-action="del-goal" data-id="${g.id}">✕</button>
         </div>
       </div>
@@ -1412,21 +1422,10 @@ function goalCard(g, opts = {}) {
         <span><b>${fmt(saved)}</b> <span style="color:var(--muted)">из ${fmt(target)}</span></span>
         <span style="color:var(--muted)">${Math.round(pct)}%</span>
       </div>
-
-      <div class="bar" style="display:flex">
-        ${depPct > 0 ? `<div style="width:${depPct}%;height:100%;background:linear-gradient(90deg,#4f8cff,#7aa8ff);transition:width .5s"></div>` : ''}
-        ${subPct > 0 ? `<div style="width:${subPct}%;height:100%;background:linear-gradient(90deg,#2fbf85,#3ddc97);transition:width .5s"></div>` : ''}
-      </div>
-
-      ${hasBothSources ? `
-        <div class="hint" style="margin-top:8px;display:flex;gap:14px;flex-wrap:wrap;font-size:12px">
-          <span><span style="display:inline-block;width:8px;height:8px;border-radius:2px;background:#4f8cff;margin-right:5px"></span>Вклады: ${fmt(depositsEffective)}</span>
-          <span><span style="display:inline-block;width:8px;height:8px;border-radius:2px;background:#3ddc97;margin-right:5px"></span>Подцели: ${fmt(subsEffective)}</span>
-        </div>
-      ` : ''}
+      <div class="bar"><div class="bar-fill ${done ? 'green' : ''}" style="width:${pct}%"></div></div>
 
       <div class="goal-plan">
-        ${done ? `<span>Цель закрыта. Можно тратить 🎉</span>` :
+        ${done ? `<span>Цель закрыта 🎉</span>` :
           `<span>Осталось: <b>${fmt(remaining)}</b></span>
            <span>В месяц: <b>${fmt(perMonth)}</b></span>`}
       </div>
@@ -1438,7 +1437,7 @@ function goalCard(g, opts = {}) {
         </div>
       ` : ''}
 
-      ${!compact ? `
+      ${!compact && !archived ? `
         <div class="auto-save-row ${autoPct > 0 ? 'on' : ''}" data-action="edit-autosave" data-id="${g.id}">
           <span style="font-size:18px">🔄</span>
           <span class="label">Авто-отчисление от доходов</span>
@@ -1450,25 +1449,31 @@ function goalCard(g, opts = {}) {
         <div class="subgoals">
           <div class="section-title" style="margin:0 0 10px">Подцели</div>
           ${g.subgoals.map(s => {
-            const cantMark = !s.done && Number(s.amount) > remaining;
+            const spent = !!s.spentAt;
+            const doneCls = s.done ? 'done' : '';
+            const spentCls = spent ? 'spent' : '';
             return `
-              <label class="subgoal ${s.done ? 'done' : ''}" ${cantMark ? 'style="opacity:.55"' : ''}>
+              <div class="subgoal ${doneCls} ${spentCls}">
                 <input type="checkbox" data-action="toggle-sub" data-goal="${g.id}" data-sub="${s.id}" ${s.done ? 'checked' : ''}>
                 <span class="t">${esc(s.title)}</span>
-                <span class="a">${fmt(s.amount)}${cantMark ? ` · сверх остатка` : ''}</span>
-                <button class="icon-btn" data-action="del-sub" data-goal="${g.id}" data-sub="${s.id}">✕</button>
-              </label>
+                <span class="a">${s.amount ? fmt(s.amount) : ''}</span>
+                ${spent ? `<span class="spent-badge">расход ✓</span>` : ''}
+                ${!archived ? `<div class="subgoal-actions">
+                  ${!spent ? `<button class="icon-btn" data-action="spend-sub" data-goal="${g.id}" data-sub="${s.id}" title="Записать как расход">💸</button>` : ''}
+                  <button class="icon-btn" data-action="del-sub" data-goal="${g.id}" data-sub="${s.id}">✕</button>
+                </div>` : ''}
+              </div>
             `;
           }).join('')}
-          ${subSum !== target ? `<div class="hint">Подцели: ${fmt(subSum)} — ${subSum < target ? 'остаток' : 'перебор'} ${fmt(Math.abs(target - subSum))}</div>` : ''}
+          ${subSum > 0 ? `<div class="hint">План по подцелям: ${fmt(subSum)}${subSum > target ? ` — больше цели на ${fmt(subSum - target)}` : ''}</div>` : ''}
         </div>
       ` : ''}
 
-      ${!compact && !(g.subgoals && g.subgoals.length) ? `
-        <div class="hint">Разбей цель на подцели — виза, билеты, техника. Отмечаешь галочку → сумма уходит в «отложено».</div>
+      ${!compact && !archived && !(g.subgoals && g.subgoals.length) ? `
+        <div class="hint">Разбей цель на подцели — виза, билеты, техника. Это чеклист, он не влияет на прогресс. Каждую можно записать как расход.</div>
       ` : ''}
 
-      ${!compact && !done ? `
+      ${!compact && !archived ? `
         <form class="sub-add" data-goal="${g.id}">
           <input name="title" placeholder="Подцель: виза, билеты…" required>
           <input name="amount" type="number" step="0.01" min="0" inputmode="decimal" placeholder="Сумма" required>
@@ -1476,7 +1481,7 @@ function goalCard(g, opts = {}) {
         </form>
       ` : ''}
 
-      ${!compact && !done ? `
+      ${!compact && !archived && !done ? `
         <form class="deposit-row" data-goal="${g.id}">
           <input name="amount" type="number" step="0.01" min="0.01" max="${remaining}"
                  inputmode="decimal" placeholder="Отложить (макс. ${fmt(remaining)})">
@@ -1484,9 +1489,17 @@ function goalCard(g, opts = {}) {
         </form>
       ` : ''}
 
-      ${!compact && done ? `
+      ${!compact && !archived && done ? `
         <div class="hint" style="margin-top:12px;text-align:center;color:var(--green)">
-          Цель полностью закрыта
+          Цель полностью закрыта — можно убрать в архив
+        </div>
+      ` : ''}
+
+      ${!compact ? `
+        <div class="goal-actions">
+          ${archived
+            ? `<button class="btn ghost sm" data-action="unarchive-goal" data-id="${g.id}">Вернуть из архива</button>`
+            : `<button class="btn ghost sm" data-action="archive-goal" data-id="${g.id}">${done ? 'В архив' : 'Архивировать'}</button>`}
         </div>
       ` : ''}
     </div>
@@ -1510,7 +1523,7 @@ function sharedGoalCard(g) {
           <div class="goal-title">${esc(g.title)} <span class="badge" style="margin-left:6px">👥 ${g.members.length}</span></div>
           <div class="goal-deadline">до ${dlText} · ${months > 0 ? months + ' ' + plural(months,'месяц','месяца','месяцев') : 'срок вышел'}</div>
         </div>
-        <button class="icon-btn" data-action="${isOwner ? 'del-shared' : 'leave-shared'}" data-id="${g.id}" title="${isOwner ? 'Удалить' : 'Выйти'}">✕</button>
+        <button class="icon-btn" data-action="${isOwner ? 'del-shared' : 'leave-shared'}" data-id="${g.id}">✕</button>
       </div>
       <div class="goal-nums">
         <span><b>${fmt(total)}</b> <span style="color:var(--muted)">из ${fmt(g.target)}</span></span>
@@ -1548,48 +1561,70 @@ function sharedGoalCard(g) {
 }
 
 VIEWS.goals = () => {
-  const totalTarget = state.goals.reduce((a,g) => a + g.target, 0);
-  const totalSaved  = state.goals.reduce((a,g) => a + goalSaved(g), 0);
+  const active = activeGoals();
+  const archived = archivedGoals();
+  const totalTarget = active.reduce((a,g) => a + g.target, 0);
+  const totalSaved  = active.reduce((a,g) => a + goalSaved(g), 0);
+  const list = goalsView === 'archive' ? archived : active;
+
   return `
-    ${state.goals.length ? `
-      <div class="stats" style="grid-template-columns:repeat(2,minmax(0,1fr));margin-bottom:8px">
-        <div class="card stat">
-          <div class="lbl">Всего нужно</div>
-          <div class="val">${fmt(totalTarget)}</div>
-          <div class="sub">${state.goals.length} ${plural(state.goals.length,'цель','цели','целей')}</div>
+    <div class="chips" style="margin-bottom:16px">
+      <button class="chip ${goalsView==='active'?'active':''}" data-goals-view="active">Активные (${active.length})</button>
+      <button class="chip ${goalsView==='archive'?'active':''}" data-goals-view="archive">Архив (${archived.length})</button>
+    </div>
+
+    ${goalsView === 'active' ? `
+      ${active.length ? `
+        <div class="stats" style="grid-template-columns:repeat(2,minmax(0,1fr));margin-bottom:8px">
+          <div class="card stat">
+            <div class="lbl">Всего нужно</div>
+            <div class="val">${fmt(totalTarget)}</div>
+            <div class="sub">${active.length} ${plural(active.length,'цель','цели','целей')}</div>
+          </div>
+          <div class="card stat">
+            <div class="lbl">Уже отложено</div>
+            <div class="val pos">${fmt(totalSaved)}</div>
+            <div class="sub">${totalTarget ? Math.round(totalSaved/totalTarget*100) : 0}% от всех целей</div>
+          </div>
         </div>
-        <div class="card stat">
-          <div class="lbl">Уже отложено</div>
-          <div class="val pos">${fmt(totalSaved)}</div>
-          <div class="sub">${totalTarget ? Math.round(totalSaved/totalTarget*100) : 0}% от всех целей</div>
-        </div>
-      </div>
-      <div class="section-title">Мои цели</div>
-      ${state.goals.map(g => goalCard(g)).join('')}
+        <div class="section-title">Мои цели</div>
+        ${active.map(g => goalCard(g)).join('')}
+      ` : `
+        <div class="card"><div class="empty">
+          <div class="big">🎯</div>
+          <p>Активных целей нет. Нажми <b>+</b> внизу — приложение само посчитает, сколько откладывать в месяц.</p>
+        </div></div>
+      `}
     ` : `
-      <div class="card"><div class="empty">
-        <div class="big">🎯</div>
-        <p>Целей пока нет. Нажми <b>+</b> внизу — приложение само посчитает, сколько откладывать в месяц.</p>
-      </div></div>
+      ${archived.length ? `
+        ${archived.map(g => goalCard(g)).join('')}
+      ` : `
+        <div class="card"><div class="empty">
+          <div class="big">📦</div>
+          <p>В архиве пусто. Сюда попадут цели, которые ты уберёшь из активных.</p>
+        </div></div>
+      `}
     `}
 
-    <div class="section-title">Общие цели</div>
-    ${sharedGoals.length === 0 ? `
-      <div class="card"><div class="empty" style="padding:28px 16px">
-        <div class="big" style="font-size:30px">👥</div>
-        <p style="font-size:13.5px">Копите вместе с друзьями: создай общую цель и отправь код, или присоединись по чужому коду.</p>
-        <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap">
-          <button class="btn primary sm" data-action="new-shared">+ Создать</button>
-          <button class="btn ghost sm" data-action="join-shared">Присоединиться</button>
+    ${goalsView === 'active' ? `
+      <div class="section-title">Общие цели</div>
+      ${sharedGoals.length === 0 ? `
+        <div class="card"><div class="empty" style="padding:28px 16px">
+          <div class="big" style="font-size:30px">👥</div>
+          <p style="font-size:13.5px">Копите вместе с друзьями: создай общую цель и отправь код, или присоединись по чужому коду.</p>
+          <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap">
+            <button class="btn primary sm" data-action="new-shared">+ Создать</button>
+            <button class="btn ghost sm" data-action="join-shared">Присоединиться</button>
+          </div>
+        </div></div>
+      ` : `
+        ${sharedGoals.map(g => sharedGoalCard(g)).join('')}
+        <div style="display:flex;gap:8px;margin-top:12px">
+          <button class="btn primary sm" data-action="new-shared" style="flex:1">+ Создать</button>
+          <button class="btn ghost sm" data-action="join-shared" style="flex:1">Присоединиться</button>
         </div>
-      </div></div>
-    ` : `
-      ${sharedGoals.map(g => sharedGoalCard(g)).join('')}
-      <div style="display:flex;gap:8px;margin-top:12px">
-        <button class="btn primary sm" data-action="new-shared" style="flex:1">+ Создать</button>
-        <button class="btn ghost sm" data-action="join-shared" style="flex:1">Присоединиться</button>
-      </div>
-    `}
+      `}
+    ` : ''}
   `;
 };
 
@@ -1645,23 +1680,42 @@ $('#fab').addEventListener('click', () => {
 /* =====================================================================
    TX SHEET
    ===================================================================== */
-let sheetTx = { type:'expense', category:'food', editId: null, tags: [] };
+let sheetTx = { type:'expense', category:'food', editId: null, tags: [], subgoalContext: null };
 
 function openTxSheet() {
-  sheetTx = { type:'expense', category:'food', editId: null, tags: [] };
+  sheetTx = { type:'expense', category:'food', editId: null, tags: [], subgoalContext: null };
   renderTxSheet();
 }
 function openTxEditSheet(id) {
   const t = state.transactions.find(x => x.id === id);
   if (!t) return;
-  sheetTx = { type: t.type, category: t.category, editId: id, tags: [...(t.tags || [])] };
+  sheetTx = { type: t.type, category: t.category, editId: id, tags: [...(t.tags || [])], subgoalContext: null };
   renderTxSheet({ amount: t.amount, note: t.note, date: t.date });
+}
+function openSpendSubgoalSheet(goalId, subId) {
+  const g = state.goals.find(x => x.id === goalId);
+  if (!g) return;
+  const s = (g.subgoals || []).find(x => x.id === subId);
+  if (!s) return;
+  const goalTag = slugTag(g.title);
+  sheetTx = {
+    type: 'expense',
+    category: 'other',
+    editId: null,
+    tags: goalTag ? [goalTag] : [],
+    subgoalContext: { goalId, subId },
+  };
+  renderTxSheet({ amount: s.amount || '', note: s.title, date: todayStr() });
 }
 
 function renderTxSheet(prefill) {
   const cats = sortCatsByUsage(sheetTx.type === 'expense' ? EXPENSE_CATS : INCOME_CATS);
   if (!cats.some(c => c.id === sheetTx.category)) sheetTx.category = cats[0].id;
   const editing = !!sheetTx.editId;
+  const ctx = sheetTx.subgoalContext;
+  const ctxGoal = ctx ? state.goals.find(x => x.id === ctx.goalId) : null;
+  const ctxSub  = ctxGoal ? (ctxGoal.subgoals || []).find(s => s.id === ctx.subId) : null;
+
   const html = `
     <div class="sheet-handle-wrap"><div class="sheet-handle"></div></div>
     <div class="sheet-header">
@@ -1669,6 +1723,12 @@ function renderTxSheet(prefill) {
       <button class="sheet-close" data-action="close-sheet">✕</button>
     </div>
     <div class="sheet-body">
+      ${ctxSub ? `
+        <div class="card" style="margin:0 0 14px;background:rgba(79,140,255,.08);border-color:rgba(79,140,255,.25)">
+          <div class="hint" style="margin:0 0 4px">Записать расход на подцель</div>
+          <div style="font-weight:600">${esc(ctxSub.title)} <span style="color:var(--muted);font-weight:400">· цель «${esc(ctxGoal.title)}»</span></div>
+        </div>
+      ` : ''}
       <div class="seg">
         <button class="seg-btn ${sheetTx.type==='expense'?'active':''}" data-sheet-type="expense">− Расход</button>
         <button class="seg-btn ${sheetTx.type==='income'?'active':''}" data-sheet-type="income">+ Доход</button>
@@ -1722,7 +1782,6 @@ function mountTxSheet() {
   };
   amountEl.addEventListener('input', updateBtn); updateBtn();
 
-  // Быстрые суммы
   const quickWrap = $('#quickAmounts');
   if (quickWrap) {
     quickWrap.addEventListener('click', e => {
@@ -1756,7 +1815,6 @@ function mountTxSheet() {
     haptic(5);
   });
 
-  // Теги
   const tagsSelected = $('#tagsSelected');
   const tagsSuggest = $('#tagsSuggest');
   const tagInput = $('#tagInput');
@@ -1787,8 +1845,7 @@ function mountTxSheet() {
   if (tagInput) {
     tagInput.addEventListener('keydown', e => {
       if (e.key === 'Enter' || e.key === ',') {
-        e.preventDefault();
-        addTag(tagInput.value);
+        e.preventDefault(); addTag(tagInput.value);
       } else if (e.key === 'Backspace' && !tagInput.value && sheetTx.tags.length) {
         removeTag(sheetTx.tags[sheetTx.tags.length - 1]);
       }
@@ -1814,7 +1871,6 @@ function mountTxSheet() {
       setTimeout(() => amountEl.style.borderColor = '', 800);
       return;
     }
-    // Уточняем теги — на случай, если в поле остался необработанный текст
     const rawTag = tagInput?.value.trim();
     if (rawTag) addTag(rawTag);
 
@@ -1826,37 +1882,47 @@ function mountTxSheet() {
     };
 
     let autoSaveMessage = null;
+    let txId = null;
 
     if (editing) {
       const t = state.transactions.find(x => x.id === sheetTx.editId);
-      if (t) Object.assign(t, data);
+      if (t) { Object.assign(t, data); txId = t.id; }
     } else {
-      state.transactions.push({ id: uid(), ...data, createdAt: new Date().toISOString() });
+      txId = uid();
+      state.transactions.push({ id: txId, ...data, createdAt: new Date().toISOString() });
       state.categoryUsage[sheetTx.category] = (state.categoryUsage[sheetTx.category] || 0) + 1;
 
-      // Авто-отчисление в цели при доходе
+      /* Авто-отчисление — не переполняем цель */
       if (data.type === 'income') {
         let totalAuto = 0;
         state.goals.forEach(g => {
+          if (g.archived) return;
           const pct = Number(g.autoSavePercent) || 0;
           if (pct <= 0) return;
           const bd = goalBreakdown(g);
-          if (bd.remaining <= 0) return; // цель уже закрыта
+          if (bd.remaining <= 0) return;
           let add = amount * pct / 100;
-          if (add > bd.remaining) add = bd.remaining; // не перебираем
+          if (add > bd.remaining) add = bd.remaining;
           g.deposits = (Number(g.deposits) || 0) + add;
           totalAuto += add;
         });
-        if (totalAuto > 0) {
-          autoSaveMessage = `Автоотчислено ${fmt(totalAuto)} в цели`;
-        }
+        if (totalAuto > 0) autoSaveMessage = `Автоотчислено ${fmt(totalAuto)} в цели`;
+      }
+    }
+
+    /* Помечаем подцель как «расход записан» */
+    if (sheetTx.subgoalContext) {
+      const g = state.goals.find(x => x.id === sheetTx.subgoalContext.goalId);
+      if (g) {
+        const s = (g.subgoals || []).find(x => x.id === sheetTx.subgoalContext.subId);
+        if (s) { s.spentAt = txId; s.spentDate = data.date; s.done = true; }
       }
     }
 
     save(); haptic(15); closeSheet();
     setTimeout(() => {
       toast(editing ? 'Сохранено' : (data.type === 'income' ? `Доход ${fmt(amount)} записан` : `Расход ${fmt(amount)} записан`));
-      if (autoSaveMessage) setTimeout(() => toast(autoSaveMessage), 800);
+      if (autoSaveMessage) setTimeout(() => toast(autoSaveMessage), 700);
       render();
     }, 180);
   };
@@ -1920,10 +1986,7 @@ function mountLongPress() {
     el._longPressMounted = true;
     const id = el.dataset.id;
     if (!id) return;
-
-    let timer = null;
-    let moved = false;
-
+    let timer = null, moved = false;
     const cancel = () => { clearTimeout(timer); timer = null; };
     const startTimer = () => {
       moved = false;
@@ -1932,25 +1995,18 @@ function mountLongPress() {
         if (!moved) {
           suppressEditClick = true;
           setTimeout(() => { suppressEditClick = false; }, 800);
-          haptic(20);
-          showTxMenu(id);
+          haptic(20); showTxMenu(id);
         }
       }, 500);
     };
     const onMove = () => { moved = true; cancel(); };
-
     el.addEventListener('touchstart', startTimer, { passive: true });
     el.addEventListener('touchend', cancel);
     el.addEventListener('touchmove', onMove, { passive: true });
     el.addEventListener('touchcancel', cancel);
-
-    el.addEventListener('mousedown', e => {
-      if (e.button !== 0) return;
-      startTimer();
-    });
+    el.addEventListener('mousedown', e => { if (e.button !== 0) return; startTimer(); });
     el.addEventListener('mouseup', cancel);
     el.addEventListener('mouseleave', cancel);
-
     el.addEventListener('contextmenu', e => {
       e.preventDefault();
       suppressEditClick = true;
@@ -1969,11 +2025,10 @@ function mountSwipe() {
     item._swipeMounted = true;
     const content = item.querySelector('.tx-content');
     if (!content) return;
-
     let start = null;
     item.addEventListener('touchstart', e => {
       if (e.target.closest('[data-action="del-tx"]')) return;
-      start = { x: e.touches[0].clientX, y: e.touches[0].clientY, swiped: false, moved: false };
+      start = { x: e.touches[0].clientX, y: e.touches[0].clientY, swiped: false };
     }, { passive: true });
     item.addEventListener('touchmove', e => {
       if (!start) return;
@@ -1982,7 +2037,6 @@ function mountSwipe() {
       if (Math.abs(dy) > Math.abs(dx) && Math.abs(dy) > 12) { start = null; return; }
       if (Math.abs(dx) > 8) {
         start.swiped = true;
-        start.moved = true;
         content.classList.add('dragging');
         const shift = Math.max(-72, Math.min(0, dx));
         content.style.transform = `translateX(${shift}px)`;
@@ -1995,8 +2049,7 @@ function mountSwipe() {
       content.style.transform = '';
       document.querySelectorAll('.tx-item').forEach(i => i.classList.remove('swiped'));
       if (start.swiped && dx < -40) {
-        item.classList.add('swiped');
-        haptic(6);
+        item.classList.add('swiped'); haptic(6);
         suppressEditClick = true;
         setTimeout(() => { suppressEditClick = false; }, 300);
       }
@@ -2049,7 +2102,8 @@ function openGoalSheet() {
       if (!target || target <= 0) { targetEl.focus(); return; }
       if (!deadline) { dlEl.focus(); return; }
       state.goals.push({ id: uid(), title, target, deadline, deposits: 0, subgoals: [],
-        autoSavePercent: 0, createdAt: new Date().toISOString() });
+        autoSavePercent: 0, archived: false, archivedAt: null,
+        createdAt: new Date().toISOString() });
       save(); haptic(15); closeSheet();
       setTimeout(() => { toast('Цель создана'); render(); }, 180);
     });
@@ -2137,7 +2191,7 @@ function openBudgetSheet() {
           </div>
         `;
       }).join('')}
-      <div class="hint" style="margin-top:14px">Оставь пустым, чтобы убрать бюджет. Только расходы, только текущий месяц.</div>
+      <div class="hint" style="margin-top:14px">Оставь пустым, чтобы убрать бюджет.</div>
     </div>
     <div class="sheet-footer"><button class="btn primary block" id="saveBudgets">Сохранить</button></div>
   `;
@@ -2250,7 +2304,7 @@ function openSharedGoalSheet() {
       if (!target || target <= 0) { $('#sgTarget').focus(); return; }
       const btn = $('#sgAddBtn'); btn.disabled = true; btn.textContent = 'Создаю…';
       const { error } = await sb.rpc('create_shared_goal', { title, target, deadline });
-      if (error) { console.warn(error); toast('Ошибка: ' + error.message, false); btn.disabled = false; btn.textContent = 'Создать'; return; }
+      if (error) { toast('Ошибка: ' + error.message, false); btn.disabled = false; btn.textContent = 'Создать'; return; }
       await loadSharedGoals();
       haptic(15); closeSheet();
       setTimeout(() => { toast('Общая цель создана'); render(); }, 180);
@@ -2333,10 +2387,7 @@ document.addEventListener('click', async e => {
   if (a === 'edit-tx') {
     if (suppressEditClick) return;
     const item = el.closest('.tx-item');
-    if (item?.classList.contains('swiped')) {
-      item.classList.remove('swiped');
-      return;
-    }
+    if (item?.classList.contains('swiped')) { item.classList.remove('swiped'); return; }
     openTxEditSheet(el.dataset.id);
   }
   if (a === 'open-edit-tx') {
@@ -2348,7 +2399,7 @@ document.addEventListener('click', async e => {
     if (!t) return;
     closeSheet();
     setTimeout(() => {
-      sheetTx = { type: t.type, category: t.category, editId: null, tags: [...(t.tags || [])] };
+      sheetTx = { type: t.type, category: t.category, editId: null, tags: [...(t.tags || [])], subgoalContext: null };
       renderTxSheet({ amount: t.amount, note: t.note, date: todayStr() });
     }, 240);
   }
@@ -2358,10 +2409,28 @@ document.addEventListener('click', async e => {
       save(); render();
     }
   }
+  if (a === 'archive-goal') {
+    const g = state.goals.find(x => x.id === el.dataset.id);
+    if (!g) return;
+    g.archived = true;
+    g.archivedAt = new Date().toISOString();
+    save(); haptic(12); toast('Убрано в архив'); render();
+  }
+  if (a === 'unarchive-goal') {
+    const g = state.goals.find(x => x.id === el.dataset.id);
+    if (!g) return;
+    g.archived = false;
+    g.archivedAt = null;
+    save(); haptic(12); toast('Возвращена из архива'); render();
+  }
   if (a === 'del-sub') {
     e.preventDefault(); e.stopPropagation();
     const g = state.goals.find(x => x.id === el.dataset.goal);
     if (g) { g.subgoals = g.subgoals.filter(s => s.id !== el.dataset.sub); save(); haptic(10); render(); }
+  }
+  if (a === 'spend-sub') {
+    e.preventDefault(); e.stopPropagation();
+    openSpendSubgoalSheet(el.dataset.goal, el.dataset.sub);
   }
   if (a === 'new-note') {
     state.notes.unshift({ id: uid(), title: '', text: '', updated: new Date().toISOString() });
@@ -2408,8 +2477,7 @@ document.addEventListener('click', async e => {
   if (a === 'share-code') {
     const code = el.dataset.code;
     if (navigator.share) {
-      try { await navigator.share({ title: 'Код для общей цели', text: `Присоединяйся: ${code}` }); }
-      catch {}
+      try { await navigator.share({ title: 'Код для общей цели', text: `Присоединяйся: ${code}` }); } catch {}
     } else {
       try { await navigator.clipboard.writeText(code); toast('Код скопирован'); } catch {}
     }
@@ -2437,9 +2505,9 @@ document.addEventListener('click', async e => {
 
 document.addEventListener('click', e => {
   const c = e.target.closest('[data-period]');
-  if (!c) return;
-  uiPeriod = c.dataset.period;
-  haptic(5); render();
+  if (c) { uiPeriod = c.dataset.period; haptic(5); render(); return; }
+  const gv = e.target.closest('[data-goals-view]');
+  if (gv) { goalsView = gv.dataset.goalsView; haptic(5); render(); return; }
 });
 
 document.addEventListener('change', e => {
@@ -2449,20 +2517,9 @@ document.addEventListener('change', e => {
   if (!g) return;
   const s = g.subgoals.find(x => x.id === cb.dataset.sub);
   if (!s) return;
-
-  /* Проверка на перерасход при отметке */
-  if (cb.checked) {
-    const bd = goalBreakdown(g);
-    if (Number(s.amount) > bd.remaining) {
-      cb.checked = false;
-      toast(`Остаток по цели — ${fmt(bd.remaining)}, а подцель на ${fmt(s.amount)}`, false);
-      return;
-    }
-  }
-
   s.done = cb.checked;
   save(); haptic(8);
-  setTimeout(render, 220);
+  setTimeout(render, 200);
 });
 
 document.addEventListener('submit', async e => {
@@ -2475,7 +2532,7 @@ document.addEventListener('submit', async e => {
     const amount = parseFloat(form.querySelector('[name=amount]').value);
     if (!title || !amount || amount <= 0) return;
     g.subgoals = g.subgoals || [];
-    g.subgoals.push({ id: uid(), title, amount, done: false });
+    g.subgoals.push({ id: uid(), title, amount, done: false, spentAt: null });
     save(); haptic(10); toast('Подцель добавлена'); render();
   }
   if (form.classList.contains('deposit-row')) {
@@ -2491,10 +2548,14 @@ document.addEventListener('submit', async e => {
       }
       if (amount <= 0) return;
       g.deposits = (Number(g.deposits) || 0) + amount;
-      save(); haptic(12); toast(`Отложено ${fmt(amount)}`); render();
+      save(); haptic(12);
+      if (bd.remaining - amount > 0.001) {
+        /* не последний вклад — показываем тост */
+        toast(`Отложено ${fmt(amount)}`);
+      }
+      render();
       return;
     }
-    /* shared-goal ниже без изменений */
     const sgId = form.dataset.shared;
     if (sgId) {
       const amount = parseFloat(form.querySelector('[name=amount]').value);
@@ -2528,13 +2589,13 @@ function loadDemo() {
   const deadline = new Date(Date.now() + 300*86400000).toISOString().slice(0,10);
   state.goals = [{
     id: uid(), title: 'Поездка в Европу', target: 1500, deadline, deposits: 200,
-    autoSavePercent: 10,
+    autoSavePercent: 10, archived: false, archivedAt: null,
     subgoals: [
-      { id: uid(), title: 'Виза', amount: 100, done: true },
-      { id: uid(), title: 'Фотоаппарат', amount: 200, done: false },
-      { id: uid(), title: 'Билеты', amount: 400, done: false },
-      { id: uid(), title: 'Жильё', amount: 500, done: false },
-      { id: uid(), title: 'На жизнь', amount: 300, done: false },
+      { id: uid(), title: 'Виза', amount: 100, done: false, spentAt: null },
+      { id: uid(), title: 'Фотоаппарат', amount: 200, done: false, spentAt: null },
+      { id: uid(), title: 'Билеты', amount: 400, done: false, spentAt: null },
+      { id: uid(), title: 'Жильё', amount: 500, done: false, spentAt: null },
+      { id: uid(), title: 'На жизнь', amount: 300, done: false, spentAt: null },
     ],
     createdAt: new Date(Date.now() - 60*86400000).toISOString(),
   }];
