@@ -440,8 +440,8 @@ textarea{resize:vertical;min-height:80px;line-height:1.5}
 /* =====================================================================
    CONFIG
    ===================================================================== */
-const SUPABASE_URL      = 'https://YOUR-PROJECT.supabase.co';
-const SUPABASE_ANON_KEY = 'YOUR-ANON-KEY';
+const SUPABASE_URL      = 'https://heramwgczjcmkoyrvevh.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhlcmFtd2djempjbWtveXJ2ZXZoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTAyNDI2MzEsImV4cCI6MjEwNTgxODYzMX0.JcgkpaPiMnIVWXGHLmQLydDmoT8D0I6P21rmmteC5lU';
 const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 /* =====================================================================
@@ -681,7 +681,7 @@ function subscribeRealtime() {
         state.monthlyBudget = Number(state.monthlyBudget) || 0;
         saveLocal();
         render();
-        toast('Обновлено с другого устройства');
+        //toast('Обновлено с другого устройства');
       })
     .subscribe((status) => {
       if (status === 'SUBSCRIBED') console.log('[rt] subscribed');
