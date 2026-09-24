@@ -87,13 +87,38 @@ input,textarea,select{font-family:inherit}
 .section-title:first-child{margin-top:0}
 
 /* ============ DASHBOARD ============ */
-.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;align-items:stretch}
-.stats > .card{min-height:0;display:flex;flex-direction:column;justify-content:space-between}
-.stat .lbl{font-size:12.5px;color:var(--muted);margin-bottom:6px;font-weight:500}
-.stat .val{font-size:21px;font-weight:700;letter-spacing:-.02em;line-height:1.15;
-  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
-.stat .sub{font-size:12px;color:var(--muted);margin-top:4px;
-  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+/* Ряд карточек — одинаковой высоты через grid-auto-rows */
+.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;grid-auto-rows:1fr}
+
+/* Карточка — flex-колонка, контент сверху, минимальная высота */
+.stats > .card{
+  min-height:90px;
+  display:flex;
+  flex-direction:column;
+  justify-content:flex-start;
+  padding:14px 16px;
+}
+
+/* Метка сверху */
+.stat .lbl{
+  font-size:12.5px;color:var(--muted);margin:0;font-weight:500;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  flex:0 0 auto;
+}
+
+/* Число — фиксированные отступы, никакого растягивания */
+.stat .val{
+  font-size:21px;font-weight:700;letter-spacing:-.02em;line-height:1.15;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0;
+  margin:6px 0 0;flex:0 0 auto;
+}
+
+/* Подпись — прижата к низу карточки через margin-top:auto */
+.stat .sub{
+  font-size:12px;color:var(--muted);margin:auto 0 0;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  flex:0 0 auto;
+}
 .pos{color:var(--green)} .neg{color:var(--red)}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px}
 .cat-row{margin-bottom:14px}
@@ -286,8 +311,10 @@ textarea{resize:vertical;min-height:80px;line-height:1.5}
   .topbar{position:sticky;top:0;z-index:30;background:linear-gradient(180deg,var(--bg) 70%,rgba(14,16,20,0));
     padding:8px 0 14px;margin-bottom:8px}
   .topbar h1{font-size:22px}
-  .stats{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
-  .stat .val{font-size:19px}
+.stats{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.stats > .card{min-height:86px;padding:12px 14px}
+.stat .val{font-size:19px}
+.stat .sub{font-size:11.5px}
   .grid2{grid-template-columns:1fr;gap:12px}
   .card{padding:16px}
   .row{grid-template-columns:1fr}
@@ -1283,9 +1310,10 @@ VIEWS.goals = () => {
     ${state.goals.length ? `
       <div class="stats" style="grid-template-columns:repeat(2,minmax(0,1fr));margin-bottom:8px">
         <div class="card stat">
-          <div class="lbl">Всего нужно</div>
-          <div class="val">${fmt(totalTarget)}</div>
-        </div>
+  		<div class="lbl">Всего нужно</div>
+  		<div class="val">${fmt(totalTarget)}</div>
+  		<div class="sub">${state.goals.length} ${plural(state.goals.length,'цель','цели','целей')}</div>
+	</div>
         <div class="card stat">
           <div class="lbl">Уже отложено</div>
           <div class="val pos">${fmt(totalSaved)}</div>
