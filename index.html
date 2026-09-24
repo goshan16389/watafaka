@@ -2763,14 +2763,21 @@ document.addEventListener('submit', async e => {
     const g = state.goals.find(x => x.id === form.dataset.goal);
     if (g) {
       const bd = goalBreakdown(g);
-      let amount = parseFloat(form.querySelector('[name=amount]').value);
+      const input = form.querySelector('[name=amount]');
+      let amount = parseFloat(input.value);
       if (!amount || amount <= 0) return;
-      if (amount > bd.remaining) {
-        amount = bd.remaining;
-        toast(`Максимум ${fmt(amount)} — столько осталось`, false);
+
+      /* Больше остатка — подставляем максимум и просим нажать повторно */
+      if (amount > bd.remaining + 0.001) {
+        input.value = bd.remaining.toFixed(2);
+        toast(`Больше не отложить — подставил максимум ${fmt(bd.remaining)}. Нажми ещё раз`, false);
+        input.focus();
+        haptic(8);
+        return;
       }
-      if (amount <= 0) return;
-      /* Ручной вклад — тоже через подтверждение */
+      if (bd.remaining <= 0) return;
+
+      /* Второе нажатие — открываем подтверждение */
       openConfirmSavingsSheet(
         [{ goalId: g.id, goalTitle: g.title, amount }],
         todayStr(),
