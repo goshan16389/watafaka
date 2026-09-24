@@ -646,6 +646,7 @@ function loadLocal() {
       state.goals.forEach(g => {
         if (g.archived === undefined) g.archived = false;
         if (g.archivedAt === undefined) g.archivedAt = null;
+        if (g.virtual === undefined) g.virtual = false;
         (g.subgoals || []).forEach(s => { if (s.spentAt === undefined) s.spentAt = null; });
       });
     }
@@ -678,10 +679,13 @@ function blankState() {
 /* Создание расходных транзакций за вклады в цели */
 function applySavings(list, dateStr) {
   const today = dateStr || todayStr();
+  let writtenCount = 0;
   list.forEach(item => {
     const g = state.goals.find(x => x.id === item.goalId);
     if (!g) return;
     g.deposits = (Number(g.deposits) || 0) + item.amount;
+    /* Виртуальная копилка — не пишем расход */
+    if (g.virtual) return;
     state.transactions.push({
       id: uid(),
       type: 'expense',
@@ -694,8 +698,11 @@ function applySavings(list, dateStr) {
       auto: !!item.auto,
       createdAt: new Date().toISOString(),
     });
+    writtenCount++;
   });
-  state.categoryUsage['savings'] = (state.categoryUsage['savings'] || 0) + list.length;
+  if (writtenCount > 0) {
+    state.categoryUsage['savings'] = (state.categoryUsage['savings'] || 0) + writtenCount;
+  }
   save();
 }
 
@@ -768,9 +775,10 @@ async function pullFromCloud() {
   if (data && data.data && typeof data.data === 'object') {
     state = Object.assign(blankState(), data.data);
     state.monthlyBudget = Number(state.monthlyBudget) || 0;
-    state.goals.forEach(g => {
+     state.goals.forEach(g => {
       if (g.archived === undefined) g.archived = false;
       if (g.archivedAt === undefined) g.archivedAt = null;
+      if (g.virtual === undefined) g.virtual = false;
       (g.subgoals || []).forEach(s => { if (s.spentAt === undefined) s.spentAt = null; });
     });
     saveLocal();
@@ -1555,6 +1563,11 @@ function goalCard(g, opts = {}) {
           <span class="label">Авто-отчисление от доходов</span>
           <span class="status">${autoPct > 0 ? autoPct + '%' : 'Выкл'}</span>
         </div>
+        <div class="auto-save-row ${g.virtual ? 'on' : ''}" data-action="toggle-virtual" data-id="${g.id}" title="Вклады в цель не будут записываться как расход">
+          <span style="font-size:18px">👻</span>
+          <span class="label">Виртуальная копилка</span>
+          <span class="status">${g.virtual ? 'Вкл' : 'Выкл'}</span>
+        </div>
       ` : ''}
 
       ${!compact && (g.subgoals && g.subgoals.length) ? `
@@ -2078,8 +2091,8 @@ function openConfirmSavingsSheet(list, dateStr, opts = {}) {
   `).join('');
 
   const intro = isAuto
-    ? 'По правилам автоотчислений с этого дохода можно отложить:'
-    : 'Записать вклад как расход из свободного баланса?';
+    ? 'С этого дохода можно отложить:'
+    : 'Записать вклад';
 
   openSheet(`
     <div class="sheet-handle-wrap"><div class="sheet-handle"></div></div>
@@ -2094,16 +2107,13 @@ function openConfirmSavingsSheet(list, dateStr, opts = {}) {
           <span style="font-size:15px;font-weight:700;color:var(--accent);font-variant-numeric:tabular-nums">${fmt(total)}</span>
         </div>
       </div>
-      <div class="hint">
-        Если записать — деньги уйдут из свободного баланса как расход в категории «Накопления» и попадут в цели.
-        ${isAuto ? 'Если пропустить — доход сохранится без отчислений.' : 'Если отменить — вклад не сохранится.'}
-      </div>
+      <div class="hint">Если отложить — деньги уйдут в цели. Если пропустить — доход сохранится без отчислений.</div>
     </div>
     <div class="sheet-footer">
       <button class="btn primary block" id="confirmSavingsBtn" style="margin-bottom:8px">
-        Записать расход ${fmt(total)}
+        Отложить ${fmt(total)}
       </button>
-      <button class="btn ghost block" data-action="close-sheet">${isAuto ? 'Пропустить' : 'Отмена'}</button>
+      <button class="btn ghost block" data-action="close-sheet">Пропустить</button>
     </div>
   `, () => {
     $('#confirmSavingsBtn').addEventListener('click', () => {
@@ -2678,6 +2688,14 @@ document.addEventListener('click', async e => {
   }
   if (a === 'edit-budgets') openBudgetSheet();
   if (a === 'edit-autosave') openAutoSaveSheet(el.dataset.id);
+if (a === 'toggle-virtual') {
+    const g = state.goals.find(x => x.id === el.dataset.id);
+    if (!g) return;
+    g.virtual = !g.virtual;
+    save(); haptic(10);
+    toast(g.virtual ? 'Виртуальная копилка включена — вклады не будут в расходах' : 'Виртуальная копилка выключена');
+    render();
+  }
   if (a === 'new-recurring') openRecurringSheet();
   if (a === 'toggle-recurring') {
     const r = state.recurring.find(x => x.id === el.dataset.id);
@@ -2767,22 +2785,21 @@ document.addEventListener('submit', async e => {
       let amount = parseFloat(input.value);
       if (!amount || amount <= 0) return;
 
-      /* Больше остатка — подставляем максимум и просим нажать повторно */
+      /* Больше остатка — подставляем максимум, просим нажать ещё раз */
       if (amount > bd.remaining + 0.001) {
         input.value = bd.remaining.toFixed(2);
-        toast(`Больше не отложить — подставил максимум ${fmt(bd.remaining)}. Нажми ещё раз`, false);
+        toast(`Больше не отложить — максимум ${fmt(bd.remaining)}. Нажми ещё раз`, false);
         input.focus();
         haptic(8);
         return;
       }
       if (bd.remaining <= 0) return;
 
-      /* Второе нажатие — открываем подтверждение */
-      openConfirmSavingsSheet(
-        [{ goalId: g.id, goalTitle: g.title, amount }],
-        todayStr(),
-        { auto: false }
-      );
+      /* Ручной вклад — пишем сразу */
+      applySavings([{ goalId: g.id, goalTitle: g.title, amount, auto: false }], todayStr());
+      haptic(12);
+      toast(g.virtual ? `Отложено ${fmt(amount)} (виртуально)` : `Отложено ${fmt(amount)} → Накопления`);
+      render();
       return;
     }
     const sgId = form.dataset.shared;
