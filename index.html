@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#0e1014">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>Финансы</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
@@ -25,6 +24,50 @@ body{
 button,input,select,textarea{font:inherit;color:inherit;touch-action:manipulation}
 button{cursor:pointer;border:0;background:none}
 input,textarea,select{font-family:inherit}
+
+/* ============ AUTH ============ */
+.auth-screen{
+  position:fixed;inset:0;display:flex;align-items:center;justify-content:center;
+  padding:24px;background:
+    radial-gradient(1200px 600px at 50% -10%,rgba(79,140,255,.10),transparent 60%),
+    var(--bg);
+  z-index:500;overflow-y:auto;
+}
+.auth-card{
+  width:100%;max-width:400px;background:var(--panel);border:1px solid var(--border);
+  border-radius:20px;padding:28px 24px;
+  box-shadow:0 30px 80px -20px rgba(0,0,0,.6);
+}
+.auth-logo{font-size:26px;font-weight:700;display:flex;align-items:center;gap:10px;margin-bottom:6px}
+.auth-sub{color:var(--muted);font-size:14px;margin-bottom:22px;line-height:1.5}
+.auth-tabs{display:flex;gap:5px;background:var(--panel2);padding:5px;border-radius:14px;margin-bottom:18px}
+.auth-tab{flex:1;padding:10px;border-radius:10px;background:transparent;color:var(--muted);
+  font-weight:600;font-size:14px;transition:.15s}
+.auth-tab.active{background:var(--panel);color:var(--text);box-shadow:0 2px 8px rgba(0,0,0,.3)}
+.auth-field{display:flex;flex-direction:column;gap:6px;margin-bottom:12px}
+.auth-field label{font-size:12.5px;color:var(--muted);font-weight:500}
+.auth-field input{
+  background:var(--panel2);border:1.5px solid var(--border);border-radius:12px;
+  padding:13px 14px;outline:none;transition:border-color .15s,box-shadow .15s;width:100%;
+  font-size:16px;
+}
+.auth-field input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(79,140,255,.15)}
+.auth-btn{
+  width:100%;padding:14px;border-radius:12px;background:var(--accent);color:#fff;
+  font-weight:600;font-size:15px;margin-top:6px;transition:transform .1s,background .15s;
+  display:flex;align-items:center;justify-content:center;gap:8px;
+}
+.auth-btn:active{transform:scale(.98)}
+.auth-btn:hover{background:var(--accent-d)}
+.auth-btn:disabled{opacity:.6;cursor:not-allowed}
+.auth-msg{
+  margin-top:14px;padding:11px 13px;border-radius:11px;font-size:13.5px;line-height:1.45;
+  display:none;
+}
+.auth-msg.show{display:block}
+.auth-msg.err{background:rgba(255,92,122,.12);color:#ff8da1;border:1px solid rgba(255,92,122,.25)}
+.auth-msg.ok{background:rgba(61,220,151,.12);color:#7eecbb;border:1px solid rgba(61,220,151,.25)}
+.auth-msg.info{background:rgba(79,140,255,.12);color:#9ec0ff;border:1px solid rgba(79,140,255,.25)}
 
 /* ============ LAYOUT ============ */
 .app{display:flex;min-height:100vh}
@@ -48,12 +91,35 @@ input,textarea,select{font-family:inherit}
   box-shadow:0 8px 20px -10px var(--accent)}
 
 /* ============ TOPBAR ============ */
-.topbar{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-bottom:22px}
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:22px}
 .topbar h1{font-size:23px;font-weight:700;letter-spacing:-.015em}
+.topbar-right{display:flex;align-items:center;gap:8px}
 .cur{
   background:var(--panel);border:1px solid var(--border);color:var(--muted);
   border-radius:10px;padding:7px 10px;cursor:pointer;font-size:13px;font-weight:500;
 }
+.user-badge{
+  display:flex;align-items:center;gap:8px;padding:5px 5px 5px 5px;
+  background:var(--panel);border:1px solid var(--border);border-radius:99px;
+  position:relative;transition:.15s;
+}
+.user-badge:hover{border-color:#39415a}
+.user-avatar{
+  width:32px;height:32px;border-radius:50%;
+  background:linear-gradient(135deg,#4f8cff,#7aa8ff);
+  color:#fff;font-weight:700;font-size:13px;
+  display:flex;align-items:center;justify-content:center;
+  text-transform:uppercase;
+}
+.sync-dot{
+  position:absolute;top:2px;right:2px;width:11px;height:11px;border-radius:50%;
+  border:2px solid var(--panel);transition:background .25s;
+}
+.sync-dot.ok{background:var(--green)}
+.sync-dot.syncing{background:var(--yellow);animation:pulse 1s infinite}
+.sync-dot.error{background:var(--red)}
+.sync-dot.pending{background:var(--yellow)}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
 
 /* ============ CARDS ============ */
 .card{background:var(--panel);border:1px solid var(--border);border-radius:var(--r);padding:18px}
@@ -68,9 +134,7 @@ input,textarea,select{font-family:inherit}
 .stat .val{font-size:21px;font-weight:700;letter-spacing:-.02em}
 .stat .sub{font-size:12px;color:var(--muted);margin-top:4px}
 .pos{color:var(--green)} .neg{color:var(--red)}
-
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px}
-
 .cat-row{margin-bottom:14px}
 .cat-row:last-child{margin-bottom:0}
 .cat-head{display:flex;justify-content:space-between;font-size:13.5px;margin-bottom:7px;gap:10px}
@@ -80,7 +144,6 @@ input,textarea,select{font-family:inherit}
   background:linear-gradient(90deg,var(--accent),#7aa8ff);
   transition:width .5s cubic-bezier(.2,.7,.2,1)}
 .bar-fill.green{background:linear-gradient(90deg,#2fbf85,var(--green))}
-
 .tx-item{display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid var(--border)}
 .tx-item:last-child{border-bottom:0}
 .tx-ico{width:38px;height:38px;flex:0 0 38px;border-radius:12px;background:var(--panel2);
@@ -105,7 +168,6 @@ input:focus,textarea:focus,select:focus{border-color:var(--accent);box-shadow:0 
 input::placeholder,textarea::placeholder{color:#5a6277}
 textarea{resize:vertical;min-height:80px;line-height:1.5}
 .row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-
 .btn{
   border:0;border-radius:12px;padding:12px 18px;cursor:pointer;font-weight:600;
   background:var(--panel2);color:var(--text);transition:transform .1s,filter .15s;
@@ -118,7 +180,6 @@ textarea{resize:vertical;min-height:80px;line-height:1.5}
 .btn.ghost{background:transparent;border:1px solid var(--border);color:var(--muted)}
 .btn.block{width:100%}
 .btn.sm{padding:8px 13px;font-size:13.5px;border-radius:10px}
-
 .hint{font-size:12.5px;color:var(--muted);margin-top:8px;line-height:1.5}
 
 /* ============ SEGMENTED ============ */
@@ -157,7 +218,7 @@ textarea{resize:vertical;min-height:80px;line-height:1.5}
 .cat-cell.active{background:rgba(79,140,255,.14);border-color:var(--accent)}
 .cat-cell.active .cn{color:var(--text);font-weight:600}
 
-/* ============ CHIPS (filters) ============ */
+/* ============ CHIPS ============ */
 .chips{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:14px}
 .chip{
   border:1.5px solid var(--border);background:var(--panel2);color:var(--muted);
@@ -221,9 +282,6 @@ textarea{resize:vertical;min-height:80px;line-height:1.5}
 .empty .big{font-size:38px;margin-bottom:12px;opacity:.75;line-height:1}
 .empty p{font-size:14px;max-width:400px;margin:0 auto 16px;line-height:1.6}
 
-.badge{display:inline-block;font-size:11.5px;color:var(--muted);background:var(--panel2);
-  padding:3px 9px;border-radius:99px;font-weight:500}
-
 /* ============ FAB ============ */
 .fab{
   position:fixed;right:18px;bottom:calc(20px + var(--safe-b));
@@ -234,7 +292,7 @@ textarea{resize:vertical;min-height:80px;line-height:1.5}
   z-index:45;transition:transform .15s,box-shadow .15s;
   font-size:30px;font-weight:300;line-height:1;
 }
-.fab:active{transform:scale(.9);box-shadow:0 6px 16px -4px rgba(79,140,255,.55)}
+.fab:active{transform:scale(.9)}
 .fab svg{width:26px;height:26px;stroke-width:2.5}
 
 /* ============ SHEET ============ */
@@ -244,12 +302,11 @@ textarea{resize:vertical;min-height:80px;line-height:1.5}
   z-index:100;backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);
 }
 .sheet-backdrop.open{opacity:1;pointer-events:auto}
-
 .sheet{
   position:fixed;left:0;right:0;bottom:0;
   background:var(--panel);border-radius:22px 22px 0 0;
   transform:translateY(100%);
-  transition:transform .34s cubic-bezier(.32,.72,0,1),bottom .2s;
+  transition:transform .34s cubic-bezier(.32,.72,0,1);
   z-index:101;max-height:92vh;
   display:flex;flex-direction:column;
   padding-bottom:var(--safe-b);
@@ -315,7 +372,6 @@ textarea{resize:vertical;min-height:80px;line-height:1.5}
   .nav-btn.active{color:var(--accent)}
   .nav-btn.active i{transform:translateY(-1px) scale(1.05)}
   .nav-btn span{letter-spacing:.01em}
-
   .main{padding:8px 14px calc(var(--nav-h) + var(--safe-b) + 90px);max-width:none}
   .topbar{
     position:sticky;top:0;z-index:30;
@@ -324,24 +380,18 @@ textarea{resize:vertical;min-height:80px;line-height:1.5}
   }
   .topbar h1{font-size:22px}
   .fab{display:flex}
-
   .stats{grid-template-columns:1fr 1fr;gap:10px}
   .stat .val{font-size:19px}
   .grid2{grid-template-columns:1fr;gap:12px}
   .card{padding:16px}
   .row{grid-template-columns:1fr}
   input,textarea,select{font-size:16px}
-
-  .deposit-row{flex-wrap:nowrap}
   .sub-add{flex-wrap:wrap}
   .sub-add input:first-child{flex:1 1 100%}
   .sub-add input:nth-child(2){flex:1 1 auto}
   .sub-add button{flex:0 0 44px}
-
   .toast{bottom:calc(var(--nav-h) + var(--safe-b) + 100px)}
 }
-
-/* ============ DESKTOP SHEET ============ */
 @media (min-width:769px){
   .sheet{
     left:50%;top:50%;right:auto;bottom:auto;
@@ -356,15 +406,42 @@ textarea{resize:vertical;min-height:80px;line-height:1.5}
   .sheet-header{padding-top:20px}
   .sheet-footer{border-radius:0 0 20px 20px}
 }
-
-/* reduced motion */
 @media (prefers-reduced-motion:reduce){
   *,*::before,*::after{transition-duration:.01ms!important;animation-duration:.01ms!important}
 }
 </style>
 </head>
 <body>
-<div class="app">
+
+<!-- ================= AUTH SCREEN ================= -->
+<div class="auth-screen" id="authScreen" style="display:none">
+  <div class="auth-card">
+    <div class="auth-logo">💸 <span>Финансы</span></div>
+    <div class="auth-sub" id="authSub">Войди, чтобы данные синхронизировались между устройствами</div>
+
+    <div class="auth-tabs">
+      <button class="auth-tab active" data-auth-tab="login">Вход</button>
+      <button class="auth-tab" data-auth-tab="register">Регистрация</button>
+    </div>
+
+    <form id="authForm" autocomplete="on">
+      <div class="auth-field">
+        <label>Email</label>
+        <input id="authEmail" type="email" autocomplete="email" required placeholder="you@example.com">
+      </div>
+      <div class="auth-field">
+        <label>Пароль</label>
+        <input id="authPass" type="password" autocomplete="current-password" required minlength="6" placeholder="Минимум 6 символов">
+      </div>
+      <button class="auth-btn" type="submit" id="authBtn">Войти</button>
+    </form>
+
+    <div class="auth-msg" id="authMsg"></div>
+  </div>
+</div>
+
+<!-- ================= APP ================= -->
+<div class="app" id="appScreen" style="display:none">
   <aside class="sidebar">
     <div class="logo">💸 <span>Финансы</span></div>
     <button class="nav-btn active" data-tab="dashboard"><i>📊</i><span>Обзор</span></button>
@@ -376,13 +453,19 @@ textarea{resize:vertical;min-height:80px;line-height:1.5}
   <main class="main">
     <header class="topbar">
       <h1 id="pageTitle">Обзор</h1>
-      <select id="currencySel" class="cur" aria-label="Валюта">
-        <option value="€">€ EUR</option>
-        <option value="₽">₽ RUB</option>
-        <option value="$">$ USD</option>
-        <option value="₸">₸ KZT</option>
-        <option value="₴">₴ UAH</option>
-      </select>
+      <div class="topbar-right">
+        <select id="currencySel" class="cur" aria-label="Валюта">
+          <option value="€">€ EUR</option>
+          <option value="₽">₽ RUB</option>
+          <option value="$">$ USD</option>
+          <option value="₸">₸ KZT</option>
+          <option value="₴">₴ UAH</option>
+        </select>
+        <button class="user-badge" id="userBadge" aria-label="Аккаунт">
+          <span class="user-avatar" id="userAvatar">?</span>
+          <span class="sync-dot ok" id="syncDot" title="Синхронизировано"></span>
+        </button>
+      </div>
     </header>
     <div id="view"></div>
   </main>
@@ -398,10 +481,21 @@ textarea{resize:vertical;min-height:80px;line-height:1.5}
 <div class="sheet-backdrop" id="backdrop"></div>
 <div class="sheet" id="sheet" role="dialog" aria-modal="true"></div>
 
+<!-- ================= SUPABASE ================= -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-/* =========================================================
+/* =====================================================================
+   SUPABASE CONFIG — ЗАМЕНИ НА СВОИ ЗНАЧЕНИЯ
+   Где взять: Supabase Dashboard → Settings → API
+   ===================================================================== */
+const SUPABASE_URL      = 'https://YOUR-PROJECT.supabase.co';
+const SUPABASE_ANON_KEY = 'YOUR-ANON-KEY';
+
+const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+/* =====================================================================
    УТИЛИТЫ
-   ========================================================= */
+   ===================================================================== */
 const $  = s => document.querySelector(s);
 const uid = () => Math.random().toString(36).slice(2, 9);
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c =>
@@ -444,9 +538,9 @@ function haptic(ms=8) {
   if (navigator.vibrate) try { navigator.vibrate(ms); } catch(e) {}
 }
 
-/* =========================================================
+/* =====================================================================
    КАТЕГОРИИ
-   ========================================================= */
+   ===================================================================== */
 const EXPENSE_CATS = [
   { id:'food',      name:'Еда',          icon:'🍔' },
   { id:'tech',      name:'Техника',      icon:'💻' },
@@ -467,18 +561,20 @@ const INCOME_CATS = [
 const ALL_CATS = [...EXPENSE_CATS, ...INCOME_CATS];
 const catById = id => ALL_CATS.find(c => c.id === id) || { name:'Без категории', icon:'❓' };
 
-/* =========================================================
+/* =====================================================================
    СОСТОЯНИЕ
-   ========================================================= */
+   ===================================================================== */
 const LS_KEY = 'finance_app_v2';
+const LAST_USER_KEY = 'finance_app_last_user';
 let state = { transactions: [], goals: [], notes: [], currency: '€' };
+let currentUser = null;
 
-function save() {
+function saveLocal() {
   try { localStorage.setItem(LS_KEY, JSON.stringify(state)); } catch(e) {}
 }
-function load() {
+function loadLocal() {
   try {
-    const raw = localStorage.getItem(LS_KEY) || localStorage.getItem('finance_app_v1');
+    const raw = localStorage.getItem(LS_KEY);
     if (raw) {
       const parsed = JSON.parse(raw);
       state = Object.assign(state, parsed);
@@ -493,19 +589,214 @@ function goalSaved(g) {
   return (Number(g.deposits) || 0) + subs;
 }
 
-/* =========================================================
+/* =====================================================================
+   ОБЛАЧНАЯ СИНХРОНИЗАЦИЯ
+   ===================================================================== */
+let syncTimer = null;
+let syncState = 'ok'; // ok | pending | syncing | error
+
+function setSyncStatus(s) {
+  syncState = s;
+  const dot = $('#syncDot');
+  if (!dot) return;
+  dot.className = 'sync-dot ' + s;
+  dot.title =
+    s === 'ok'      ? 'Синхронизировано' :
+    s === 'pending' ? 'Ожидает сохранения' :
+    s === 'syncing' ? 'Сохраняю…' :
+                      'Ошибка синхронизации';
+}
+
+/* Сохранить: сначала локально, потом в облако с дебаунсом */
+function save() {
+  saveLocal();
+  if (!currentUser) return;
+
+  setSyncStatus('pending');
+  clearTimeout(syncTimer);
+  syncTimer = setTimeout(pushToCloud, 700);
+}
+
+async function pushToCloud() {
+  if (!currentUser) return;
+  setSyncStatus('syncing');
+  const { error } = await supabase.from('user_data').upsert({
+    user_id: currentUser.id,
+    data: state,
+    updated_at: new Date().toISOString(),
+  }, { onConflict: 'user_id' });
+
+  if (error) {
+    console.warn('sync push error', error);
+    setSyncStatus('error');
+    return;
+  }
+  setSyncStatus('ok');
+}
+
+async function pullFromCloud() {
+  if (!currentUser) return { found: false };
+  const { data, error } = await supabase
+    .from('user_data')
+    .select('data')
+    .eq('user_id', currentUser.id)
+    .maybeSingle();
+
+  if (error) {
+    console.warn('sync pull error', error);
+    return { found: false, error };
+  }
+
+  if (data && data.data && typeof data.data === 'object') {
+    state = Object.assign(
+      { transactions: [], goals: [], notes: [], currency: '€' },
+      data.data
+    );
+    saveLocal();
+    return { found: true };
+  }
+  return { found: false };
+}
+
+/* =====================================================================
+   АУТЕНТИФИКАЦИЯ
+   ===================================================================== */
+let authMode = 'login';
+
+function showAuth() {
+  $('#authScreen').style.display = 'flex';
+  $('#appScreen').style.display = 'none';
+  document.body.style.overflow = '';
+}
+function showApp() {
+  $('#authScreen').style.display = 'none';
+  $('#appScreen').style.display = 'flex';
+
+  const email = currentUser?.email || '';
+  const initial = (email[0] || '?').toUpperCase();
+  $('#userAvatar').textContent = initial;
+}
+
+document.querySelectorAll('[data-auth-tab]').forEach(b => {
+  b.addEventListener('click', () => {
+    authMode = b.dataset.authTab;
+    document.querySelectorAll('[data-auth-tab]').forEach(x =>
+      x.classList.toggle('active', x === b));
+    $('#authBtn').textContent = authMode === 'login' ? 'Войти' : 'Создать аккаунт';
+    $('#authSub').textContent = authMode === 'login'
+      ? 'Войди, чтобы данные синхронизировались между устройствами'
+      : 'Создай аккаунт — данные будут доступны на всех устройствах';
+    $('#authPass').autocomplete = authMode === 'login' ? 'current-password' : 'new-password';
+    hideAuthMsg();
+  });
+});
+
+function showAuthMsg(text, kind = 'info') {
+  const el = $('#authMsg');
+  el.textContent = text;
+  el.className = 'auth-msg show ' + kind;
+}
+function hideAuthMsg() {
+  const el = $('#authMsg');
+  el.className = 'auth-msg';
+  el.textContent = '';
+}
+
+$('#authForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  hideAuthMsg();
+
+  const email = $('#authEmail').value.trim();
+  const password = $('#authPass').value;
+  if (!email || !password) return;
+
+  const btn = $('#authBtn');
+  const original = btn.textContent;
+  btn.disabled = true;
+  btn.textContent = authMode === 'login' ? 'Вход…' : 'Создаю…';
+
+  try {
+    if (authMode === 'login') {
+      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+      if (error) throw error;
+      // onAuthStateChange подхватит и загрузит данные
+    } else {
+      const { data, error } = await supabase.auth.signUp({ email, password });
+      if (error) throw error;
+
+      if (data.user && !data.session) {
+        showAuthMsg('Аккаунт создан. Проверь почту и перейди по ссылке для входа.', 'info');
+        btn.disabled = false;
+        btn.textContent = original;
+        return;
+      }
+      // если сессия есть — вошли сразу
+    }
+  } catch (err) {
+    console.warn(err);
+    const msg = (err && err.message) ? err.message : 'Что-то пошло не так';
+    // переведём частые ошибки
+    let ru = msg;
+    if (/Invalid login credentials/i.test(msg)) ru = 'Неверный email или пароль';
+    else if (/User already registered/i.test(msg)) ru = 'Такой email уже зарегистрирован — попробуй войти';
+    else if (/Password should be at least/i.test(msg)) ru = 'Пароль слишком короткий';
+    else if (/Email not confirmed/i.test(msg)) ru = 'Подтверди email — мы прислали ссылку на почту';
+    else if (/rate limit/i.test(msg)) ru = 'Слишком много попыток, подожди немного';
+    showAuthMsg(ru, 'err');
+    btn.disabled = false;
+    btn.textContent = original;
+  }
+});
+
+/* User badge → sheet с email и logout */
+$('#userBadge').addEventListener('click', () => {
+  haptic(8);
+  const email = currentUser?.email || '—';
+  const syncText =
+    syncState === 'ok'      ? 'Все данные в облаке' :
+    syncState === 'pending' ? 'Ждёт сохранения…' :
+    syncState === 'syncing' ? 'Сохраняю…' :
+                              'Ошибка синхронизации';
+
+  openSheet(`
+    <div class="sheet-handle-wrap"><div class="sheet-handle"></div></div>
+    <div class="sheet-header">
+      <h2>Аккаунт</h2>
+      <button class="sheet-close" data-action="close-sheet">✕</button>
+    </div>
+    <div class="sheet-body">
+      <div class="card" style="margin:0 0 12px">
+        <div class="hint" style="margin:0 0 4px">Email</div>
+        <div style="font-weight:600;word-break:break-all">${esc(email)}</div>
+      </div>
+      <div class="card" style="margin:0">
+        <div class="hint" style="margin:0 0 4px">Синхронизация</div>
+        <div style="display:flex;align-items:center;gap:8px;font-weight:500">
+          <span class="sync-dot ${syncState}" style="position:static;border-color:transparent"></span>
+          <span>${syncText}</span>
+        </div>
+      </div>
+      <div class="hint" style="margin-top:14px">
+        Заходи с любого устройства под этим email — все операции, цели и заметки подтянутся автоматически.
+      </div>
+    </div>
+    <div class="sheet-footer">
+      <button class="btn ghost block" data-action="force-sync" style="margin-bottom:8px">Синхронизировать сейчас</button>
+      <button class="btn block" data-action="logout" style="background:rgba(255,92,122,.15);color:#ff8da1">Выйти из аккаунта</button>
+    </div>
+  `);
+});
+
+/* =====================================================================
    НАВИГАЦИЯ
-   ========================================================= */
+   ===================================================================== */
 let currentTab = 'dashboard';
 const TITLES = { dashboard:'Обзор', transactions:'Операции', goals:'Цели', notes:'Заметки' };
 
 document.querySelectorAll('.nav-btn').forEach(btn => {
   btn.addEventListener('click', () => {
     const tab = btn.dataset.tab;
-    if (tab === currentTab) {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-      return;
-    }
+    if (tab === currentTab) { window.scrollTo({ top: 0, behavior: 'smooth' }); return; }
     currentTab = tab;
     document.querySelectorAll('.nav-btn').forEach(b => b.classList.toggle('active', b === btn));
     $('#pageTitle').textContent = TITLES[currentTab];
@@ -519,9 +810,9 @@ $('#currencySel').addEventListener('change', e => {
   save(); render();
 });
 
-/* =========================================================
+/* =====================================================================
    TOAST
-   ========================================================= */
+   ===================================================================== */
 let toastTimer;
 function toast(msg, withTick=true) {
   let el = document.querySelector('.toast');
@@ -536,9 +827,9 @@ function toast(msg, withTick=true) {
   toastTimer = setTimeout(() => el.classList.remove('show'), 1900);
 }
 
-/* =========================================================
-   SHEET (модальное окно снизу)
-   ========================================================= */
+/* =====================================================================
+   SHEET
+   ===================================================================== */
 const sheet = $('#sheet');
 const backdrop = $('#backdrop');
 let sheetMount = null;
@@ -546,13 +837,11 @@ let sheetMount = null;
 function openSheet(html, mount) {
   sheet.innerHTML = html;
   sheetMount = mount || null;
-  /* force reflow, затем открываем */
   void sheet.offsetHeight;
   sheet.classList.add('open');
   backdrop.classList.add('open');
   document.body.style.overflow = 'hidden';
   if (sheetMount) sheetMount();
-  /* автофокус на первый input, если это не мешает */
   const firstInput = sheet.querySelector('[data-autofocus]');
   if (firstInput) setTimeout(() => firstInput.focus({ preventScroll: true }), 340);
 }
@@ -571,9 +860,7 @@ document.addEventListener('keydown', e => {
   if (e.key === 'Escape' && sheet.classList.contains('open')) closeSheet();
 });
 
-/* =========================================================
-   ВИРТУАЛЬНАЯ КЛАВИАТУРА (iOS)
-   ========================================================= */
+/* Клавиатура на iOS */
 if (window.visualViewport) {
   const vv = window.visualViewport;
   const update = () => {
@@ -585,27 +872,24 @@ if (window.visualViewport) {
   update();
 }
 
-/* =========================================================
+/* =====================================================================
    РЕНДЕР
-   ========================================================= */
+   ===================================================================== */
 let lastTab = null;
 function render(resetScroll=false) {
   const view = $('#view');
   view.innerHTML = VIEWS[currentTab]();
   if (MOUNTS[currentTab]) MOUNTS[currentTab]();
   $('#currencySel').value = state.currency;
-
-  if (resetScroll || lastTab !== currentTab) {
-    window.scrollTo(0, 0);
-  }
+  if (resetScroll || lastTab !== currentTab) window.scrollTo(0, 0);
   lastTab = currentTab;
 }
 const VIEWS = {};
 const MOUNTS = {};
 
-/* =========================================================
+/* =====================================================================
    ОБЗОР
-   ========================================================= */
+   ===================================================================== */
 VIEWS.dashboard = () => {
   const t = state.transactions;
   const income  = t.filter(x => x.type === 'income').reduce((a,b) => a + b.amount, 0);
@@ -623,7 +907,6 @@ VIEWS.dashboard = () => {
   });
   const cats = Object.entries(byCat).sort((a,b) => b[1] - a[1]);
   const maxCat = cats.length ? cats[0][1] : 1;
-
   const recent = [...t].sort((a,b) => (b.date + b.createdAt).localeCompare(a.date + a.createdAt)).slice(0, 6);
 
   return `
@@ -708,9 +991,9 @@ VIEWS.dashboard = () => {
   `;
 };
 
-/* =========================================================
+/* =====================================================================
    ОПЕРАЦИИ
-   ========================================================= */
+   ===================================================================== */
 let txFilter = 'all';
 
 VIEWS.transactions = () => {
@@ -760,9 +1043,9 @@ MOUNTS.transactions = () => {
   });
 };
 
-/* =========================================================
+/* =====================================================================
    ЦЕЛИ
-   ========================================================= */
+   ===================================================================== */
 function goalCard(g) {
   const saved     = goalSaved(g);
   const remaining = Math.max(0, g.target - saved);
@@ -868,9 +1151,9 @@ VIEWS.goals = () => {
   `;
 };
 
-/* =========================================================
+/* =====================================================================
    ЗАМЕТКИ
-   ========================================================= */
+   ===================================================================== */
 VIEWS.notes = () => {
   if (state.notes.length === 0) {
     return `
@@ -905,14 +1188,14 @@ MOUNTS.notes = () => {
       if (!n) return;
       n[el.dataset.noteField] = el.value;
       n.updated = new Date().toISOString();
-      save();
+      save(); /* без ре-рендера — чтобы не терять фокус */
     });
   });
 };
 
-/* =========================================================
-   FAB — контекстное действие
-   ========================================================= */
+/* =====================================================================
+   FAB
+   ===================================================================== */
 $('#fab').addEventListener('click', () => {
   haptic(10);
   if (currentTab === 'goals') openGoalSheet();
@@ -928,9 +1211,9 @@ $('#fab').addEventListener('click', () => {
   }
 });
 
-/* =========================================================
+/* =====================================================================
    SHEET: ТРАНЗАКЦИЯ
-   ========================================================= */
+   ===================================================================== */
 let sheetTx = { type:'expense', category:'food' };
 
 function openTxSheet() {
@@ -996,19 +1279,16 @@ function mountTxSheet() {
   amountEl.addEventListener('input', updateBtn);
   updateBtn();
 
-  /* тип */
   document.querySelectorAll('[data-sheet-type]').forEach(b => {
     b.addEventListener('click', () => {
       sheetTx.type = b.dataset.sheetType;
       haptic(5);
-      /* сохраняем введённую сумму и дату/заметку */
       const v = amountEl.value;
       const n = $('#txNote')?.value || '';
       const d = $('#txDate')?.value || todayStr();
       const cats = sheetTx.type === 'expense' ? EXPENSE_CATS : INCOME_CATS;
       if (!cats.some(c => c.id === sheetTx.category)) sheetTx.category = cats[0].id;
       renderTxSheet();
-      /* восстановление */
       setTimeout(() => {
         const a2 = $('#txAmount');
         if (a2) { a2.value = v; a2.dispatchEvent(new Event('input')); }
@@ -1018,7 +1298,6 @@ function mountTxSheet() {
     });
   });
 
-  /* категории */
   catGrid.addEventListener('click', e => {
     const c = e.target.closest('[data-sheet-cat]');
     if (!c) return;
@@ -1027,7 +1306,6 @@ function mountTxSheet() {
     haptic(5);
   });
 
-  /* добавление */
   const add = () => {
     const amount = parseFloat(amountEl.value);
     if (!amount || amount <= 0) {
@@ -1059,9 +1337,9 @@ function mountTxSheet() {
   $('#txNote').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); add(); } });
 }
 
-/* =========================================================
+/* =====================================================================
    SHEET: ЦЕЛЬ
-   ========================================================= */
+   ===================================================================== */
 function openGoalSheet() {
   const defDeadline = new Date(Date.now() + 180*86400000).toISOString().slice(0,10);
 
@@ -1137,9 +1415,9 @@ function mountGoalSheet() {
   });
 }
 
-/* =========================================================
+/* =====================================================================
    ГЛОБАЛЬНЫЕ ДЕЙСТВИЯ
-   ========================================================= */
+   ===================================================================== */
 document.addEventListener('click', e => {
   const el = e.target.closest('[data-action]');
   if (!el) return;
@@ -1188,6 +1466,18 @@ document.addEventListener('click', e => {
   }
 
   if (a === 'demo') { loadDemo(); }
+
+  if (a === 'force-sync') {
+    closeSheet();
+    pushToCloud().then(() => toast('Синхронизировано'));
+  }
+
+  if (a === 'logout') {
+    if (confirm('Выйти из аккаунта? Данные останутся в облаке.')) {
+      closeSheet();
+      supabase.auth.signOut();
+    }
+  }
 });
 
 /* чекбоксы подцелей */
@@ -1200,7 +1490,6 @@ document.addEventListener('change', e => {
   if (!s) return;
   s.done = cb.checked;
   save(); haptic(8);
-  /* короткая задержка для анимации галочки */
   setTimeout(render, 220);
 });
 
@@ -1231,9 +1520,9 @@ document.addEventListener('submit', e => {
   }
 });
 
-/* =========================================================
+/* =====================================================================
    ДЕМО
-   ========================================================= */
+   ===================================================================== */
 function loadDemo() {
   const d = (offset) => new Date(Date.now() - offset*86400000).toISOString().slice(0,10);
   state.transactions = [
@@ -1266,11 +1555,67 @@ function loadDemo() {
   save(); haptic(15); toast('Пример загружен'); render(true);
 }
 
-/* =========================================================
-   СТАРТ
-   ========================================================= */
-load();
-render(true);
+/* =====================================================================
+   СТАРТ + АВТОРИЗАЦИЯ
+   ===================================================================== */
+loadLocal();  /* кэш мгновенно, чтобы не мигало пустотой */
+
+async function handleSession(session) {
+  const wasUser = !!currentUser;
+  currentUser = session?.user || null;
+
+  if (currentUser && !wasUser) {
+    /* Сменился ли пользователь — сбросить кэш, если другой аккаунт */
+    const lastUser = localStorage.getItem(LAST_USER_KEY);
+    if (lastUser && lastUser !== currentUser.id) {
+      state = { transactions: [], goals: [], notes: [], currency: '€' };
+    }
+    localStorage.setItem(LAST_USER_KEY, currentUser.id);
+
+    showApp();
+    $('#pageTitle').textContent = TITLES[currentTab];
+    setSyncStatus('syncing');
+
+    const { found } = await pullFromCloud();
+    if (!found) {
+      /* Первый вход — пушим локальное (если что-то было) */
+      await pushToCloud();
+    }
+    setSyncStatus('ok');
+    render(true);
+
+  } else if (!currentUser && wasUser) {
+    /* Выход */
+    showAuth();
+  } else if (!currentUser) {
+    showAuth();
+  }
+}
+
+/* Инициализация: сначала получить сессию, потом слушать изменения */
+(async () => {
+  const { data: { session } } = await supabase.auth.getSession();
+  await handleSession(session);
+
+  supabase.auth.onAuthStateChange((event, session) => {
+    if (event === 'SIGNED_IN' || event === 'SIGNED_OUT' || event === 'USER_UPDATED') {
+      handleSession(session);
+    }
+  });
+})();
+
+/* При возврате на вкладку — подтянуть свежие данные (если изменилось на другом устройстве) */
+let lastFocus = Date.now();
+document.addEventListener('visibilitychange', async () => {
+  if (document.visibilityState !== 'visible') return;
+  if (!currentUser) return;
+  if (syncState !== 'ok') return; /* есть несинхронизированные изменения — не перетрём */
+  if (Date.now() - lastFocus < 30000) return; /* не чаще раза в 30 сек */
+
+  lastFocus = Date.now();
+  const { found } = await pullFromCloud();
+  if (found) render();
+});
 </script>
 </body>
 </html>
