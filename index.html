@@ -231,10 +231,22 @@ textarea{resize:vertical;min-height:80px;line-height:1.5}
 .sheet-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.55);opacity:0;pointer-events:none;
   transition:opacity .25s;z-index:100;backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px)}
 .sheet-backdrop.open{opacity:1;pointer-events:auto}
-.sheet{position:fixed;left:0;right:0;bottom:0;background:var(--panel);border-radius:22px 22px 0 0;
-  transform:translateY(100%);transition:transform .34s cubic-bezier(.32,.72,0,1);z-index:101;max-height:92vh;
-  display:flex;flex-direction:column;padding-bottom:var(--safe-b);border-top:1px solid var(--border);
-  bottom:var(--kb);will-change:transform}
+.sheet{
+  position:fixed;left:0;right:0;bottom:0;
+  background:var(--panel);border-radius:22px 22px 0 0;
+  transform:translateY(100%);
+  /* margin-bottom меняется мгновенно (0s), transform — плавно для open/close */
+  transition:transform .34s cubic-bezier(.32,.72,0,1), margin-bottom 0s;
+  z-index:101;
+  /* max-height ограничен и видимой областью через --vvh */
+  max-height:min(92vh, var(--vvh, 92vh));
+  display:flex;flex-direction:column;
+  padding-bottom:var(--safe-b);
+  border-top:1px solid var(--border);
+  /* сдвиг над клавиатурой — через margin, а не через bottom */
+  margin-bottom:var(--kb, 0);
+  will-change:transform;
+}
 .sheet.open{transform:translateY(0)}
 .sheet-handle-wrap{padding:10px 0 6px;display:flex;justify-content:center;flex:0 0 auto}
 .sheet-handle{width:42px;height:4px;border-radius:99px;background:#3a4152}
@@ -818,13 +830,39 @@ backdrop.addEventListener('click', closeSheet);
 document.addEventListener('click', e => { if (e.target.closest('[data-action="close-sheet"]')) closeSheet(); });
 document.addEventListener('keydown', e => { if (e.key === 'Escape' && sheet.classList.contains('open')) closeSheet(); });
 
+/* Когда пользователь тапнул поле ввода — прокручиваем его в видимую часть sheet.
+   Работает только внутри .sheet-body, страницу не трогает. */
+sheet.addEventListener('focusin', (e) => {
+  const t = e.target;
+  if (!(t instanceof HTMLInputElement || t instanceof HTMLTextAreaElement)) return;
+  setTimeout(() => {
+    const body = t.closest('.sheet-body');
+    if (!body) return;
+    const tr = t.getBoundingClientRect();
+    const br = body.getBoundingClientRect();
+    if (tr.bottom > br.bottom - 24) {
+      body.scrollBy({ top: tr.bottom - br.bottom + 48, behavior: 'smooth' });
+    } else if (tr.top < br.top + 24) {
+      body.scrollBy({ top: tr.top - br.top - 48, behavior: 'smooth' });
+    }
+  }, 350);  // ждём, пока клавиатура откроется и sheet сдвинется
+});
+
 if (window.visualViewport) {
   const vv = window.visualViewport;
-  const upd = () => {
-    const kb = Math.max(0, window.innerHeight - vv.height - vv.offsetTop);
-    document.documentElement.style.setProperty('--kb', kb + 'px');
+  const root = document.documentElement;
+  let lastKb = -1, lastVvh = -1;
+  const update = () => {
+    const kb  = Math.max(0, Math.round(window.innerHeight - vv.height - vv.offsetTop));
+    const vvh = Math.round(vv.height);
+    if (kb === lastKb && vvh === lastVvh) return;  // игнорируем микроколебания
+    lastKb = kb; lastVvh = vvh;
+    root.style.setProperty('--kb', kb + 'px');
+    root.style.setProperty('--vvh', vvh + 'px');
   };
-  vv.addEventListener('resize', upd); vv.addEventListener('scroll', upd); upd();
+  vv.addEventListener('resize', update);
+  vv.addEventListener('scroll', update);
+  update();
 }
 
 /* =====================================================================
