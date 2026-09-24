@@ -25,7 +25,7 @@ button,input,select,textarea{font:inherit;color:inherit;touch-action:manipulatio
 button{cursor:pointer;border:0;background:none}
 input,textarea,select{font-family:inherit}
 
-/* ============ AUTH ============ */
+/* AUTH */
 .auth-screen{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;padding:24px;
   background:radial-gradient(1200px 600px at 50% -10%,rgba(79,140,255,.10),transparent 60%),var(--bg);
   z-index:500;overflow-y:auto}
@@ -48,11 +48,11 @@ input,textarea,select{font-family:inherit}
 .auth-msg.err{background:rgba(255,92,122,.12);color:#ff8da1;border:1px solid rgba(255,92,122,.25)}
 .auth-msg.info{background:rgba(79,140,255,.12);color:#9ec0ff;border:1px solid rgba(79,140,255,.25)}
 
-/* ============ LAYOUT ============ */
+/* LAYOUT */
 .app{display:flex;min-height:100vh}
 .main{flex:1;min-width:0;padding:24px 28px 80px;max-width:1080px;margin:0 auto;width:100%}
 
-/* ============ SIDEBAR ============ */
+/* SIDEBAR */
 .sidebar{width:228px;flex:0 0 228px;background:var(--panel);border-right:1px solid var(--border);
   padding:18px 12px;display:flex;flex-direction:column;gap:3px;position:sticky;top:0;height:100vh;z-index:40}
 .logo{font-size:17px;font-weight:700;padding:4px 10px 18px;display:flex;align-items:center;gap:9px}
@@ -62,7 +62,7 @@ input,textarea,select{font-family:inherit}
 .nav-btn:hover{background:var(--panel2);color:var(--text)}
 .nav-btn.active{background:var(--accent);color:#fff;font-weight:600;box-shadow:0 8px 20px -10px var(--accent)}
 
-/* ============ TOPBAR ============ */
+/* TOPBAR */
 .topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:22px}
 .topbar h1{font-size:23px;font-weight:700;letter-spacing:-.015em}
 .topbar-right{display:flex;align-items:center;gap:8px}
@@ -79,53 +79,24 @@ input,textarea,select{font-family:inherit}
 .sync-dot.error{background:var(--red)}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
 
-/* ============ CARDS ============ */
+/* CARDS */
 .card{background:var(--panel);border:1px solid var(--border);border-radius:var(--r);padding:18px}
-/* Отступ между карточками в вертикальном стеке */
 .card + .card{margin-top:14px}
-
-/* Внутри сеток отступ не нужен — там gap уже разводит карточки */
 .stats > .card + .card,
-.grid2 > .card + .card{
-  margin-top:0;
-}
+.grid2 > .card + .card{margin-top:0}
 .section-title{font-size:12.5px;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);
   font-weight:700;margin:26px 0 12px}
 .section-title:first-child{margin-top:0}
 
-/* ============ DASHBOARD ============ */
-/* Ряд карточек — одинаковой высоты через grid-auto-rows */
+/* DASHBOARD */
 .stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;grid-auto-rows:1fr}
-
-/* Карточка — flex-колонка, контент сверху, минимальная высота */
-.stats > .card{
-  min-height:90px;
-  display:flex;
-  flex-direction:column;
-  justify-content:flex-start;
-  padding:14px 16px;
-}
-
-/* Метка сверху */
-.stat .lbl{
-  font-size:12.5px;color:var(--muted);margin:0;font-weight:500;
-  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
-  flex:0 0 auto;
-}
-
-/* Число — фиксированные отступы, никакого растягивания */
-.stat .val{
-  font-size:21px;font-weight:700;letter-spacing:-.02em;line-height:1.15;
-  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0;
-  margin:6px 0 0;flex:0 0 auto;
-}
-
-/* Подпись — прижата к низу карточки через margin-top:auto */
-.stat .sub{
-  font-size:12px;color:var(--muted);margin:auto 0 0;
-  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
-  flex:0 0 auto;
-}
+.stats > .card{min-height:90px;display:flex;flex-direction:column;justify-content:flex-start;padding:14px 16px}
+.stat .lbl{font-size:12.5px;color:var(--muted);margin:0;font-weight:500;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:0 0 auto}
+.stat .val{font-size:21px;font-weight:700;letter-spacing:-.02em;line-height:1.15;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0;margin:6px 0 0;flex:0 0 auto}
+.stat .sub{font-size:12px;color:var(--muted);margin:auto 0 0;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:0 0 auto}
 .pos{color:var(--green)} .neg{color:var(--red)}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px}
 .cat-row{margin-bottom:14px}
@@ -136,8 +107,17 @@ input,textarea,select{font-family:inherit}
 .bar-fill{height:100%;border-radius:99px;background:linear-gradient(90deg,var(--accent),#7aa8ff);
   transition:width .5s cubic-bezier(.2,.7,.2,1)}
 .bar-fill.green{background:linear-gradient(90deg,#2fbf85,var(--green))}
+.cat-diff{font-size:11.5px;font-weight:600;margin-left:6px}
+.cat-diff.up{color:#ff8da1}
+.cat-diff.down{color:var(--green)}
 
-/* ============ TX ITEM ============ */
+/* TOTAL BUDGET */
+.total-budget{cursor:pointer;transition:.15s}
+.total-budget:hover{border-color:#39415a}
+.total-budget .cat-head{font-size:14px;font-weight:600;margin-bottom:8px}
+.total-budget .sub{font-size:12.5px;color:var(--muted);margin-top:8px}
+
+/* TX ITEM */
 .tx-item{position:relative;overflow:hidden;border-bottom:1px solid var(--border)}
 .tx-item:last-child{border-bottom:0}
 .tx-content{position:relative;background:var(--panel);display:flex;align-items:center;gap:12px;
@@ -152,13 +132,16 @@ input,textarea,select{font-family:inherit}
 .tx-title{font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .tx-sub{font-size:12px;color:var(--muted);margin-top:1px}
 .tx-amt{font-weight:600;font-size:14.5px;white-space:nowrap;font-variant-numeric:tabular-nums}
+.tx-tags{display:flex;flex-wrap:wrap;gap:4px;margin-top:4px}
+.tx-tag{font-size:11px;color:var(--accent);background:rgba(79,140,255,.1);
+  padding:1px 7px;border-radius:99px;display:inline-block}
 .icon-btn{background:transparent;border:0;color:var(--muted);cursor:pointer;font-size:16px;
   padding:8px 10px;min-width:38px;min-height:38px;border-radius:10px;line-height:1;
   transition:.15s;flex:0 0 auto;display:inline-flex;align-items:center;justify-content:center}
 .icon-btn:hover{background:var(--panel2);color:var(--red)}
 .icon-btn:active{transform:scale(.9)}
 
-/* ============ CHART ============ */
+/* CHART */
 .chart{display:flex;gap:8px;align-items:flex-end;padding:14px 0 0;min-height:140px}
 .chart-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;min-width:0}
 .chart-bar{width:100%;max-width:44px;background:linear-gradient(180deg,var(--accent),#2a5fc9);
@@ -166,7 +149,7 @@ input,textarea,select{font-family:inherit}
 .chart-bar.current{background:linear-gradient(180deg,#ffcc66,#d99e2e)}
 .chart-label{font-size:11px;color:var(--muted);text-transform:lowercase}
 
-/* ============ FORMS ============ */
+/* FORMS */
 .field{display:flex;flex-direction:column;gap:6px;margin-bottom:12px}
 .field label{font-size:12.5px;color:var(--muted);font-weight:500}
 input,textarea,select{background:var(--panel2);border:1.5px solid var(--border);border-radius:12px;
@@ -187,7 +170,7 @@ textarea{resize:vertical;min-height:80px;line-height:1.5}
 .btn.sm{padding:8px 13px;font-size:13.5px;border-radius:10px}
 .hint{font-size:12.5px;color:var(--muted);margin-top:8px;line-height:1.5}
 
-/* ============ SEGMENTED ============ */
+/* SEGMENTED */
 .seg{display:flex;gap:5px;background:var(--panel2);padding:5px;border-radius:14px;margin-bottom:16px}
 .seg-btn{flex:1;border:0;background:transparent;color:var(--muted);padding:11px;border-radius:10px;
   cursor:pointer;font-weight:600;font-size:14.5px;transition:.15s}
@@ -195,14 +178,22 @@ textarea{resize:vertical;min-height:80px;line-height:1.5}
 .seg-btn.active[data-type="income"],.seg-btn.active[data-sheet-type="income"],.seg-btn.active[data-rec-type="income"]{color:var(--green)}
 .seg-btn.active[data-type="expense"],.seg-btn.active[data-sheet-type="expense"],.seg-btn.active[data-rec-type="expense"]{color:var(--red)}
 
-/* ============ AMOUNT ============ */
-.amount-wrap{position:relative;margin-bottom:16px}
+/* AMOUNT */
+.amount-wrap{position:relative;margin-bottom:12px}
 .amount-input{width:100%;font-size:34px;font-weight:700;letter-spacing:-.02em;padding:14px 58px 14px 18px;
   background:var(--panel2);border:1.5px solid var(--border);border-radius:16px;-moz-appearance:textfield}
 .amount-input::-webkit-outer-spin-button,.amount-input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
 .amount-cur{position:absolute;right:18px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:20px;font-weight:600;pointer-events:none}
 
-/* ============ CATEGORY GRID ============ */
+/* QUICK AMOUNTS */
+.quick-amounts{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px}
+.quick-btn{background:var(--panel2);border:1.5px solid var(--border);border-radius:10px;
+  padding:8px 14px;font-size:13.5px;font-weight:600;color:var(--muted);transition:.15s;
+  cursor:pointer;min-width:56px;text-align:center}
+.quick-btn:hover{background:var(--panel3);color:var(--text);border-color:var(--accent)}
+.quick-btn:active{transform:scale(.95)}
+
+/* CATEGORY GRID */
 .cat-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;margin-bottom:14px}
 @media (max-width:340px){.cat-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
 .cat-cell{display:flex;flex-direction:column;align-items:center;gap:4px;padding:10px 4px;border-radius:13px;
@@ -214,13 +205,43 @@ textarea{resize:vertical;min-height:80px;line-height:1.5}
 .cat-cell.active{background:rgba(79,140,255,.14);border-color:var(--accent)}
 .cat-cell.active .cn{color:var(--text);font-weight:600}
 
-/* ============ CHIPS ============ */
+/* CHIPS */
 .chips{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:14px}
 .chip{border:1.5px solid var(--border);background:var(--panel2);color:var(--muted);padding:9px 14px;
   border-radius:99px;cursor:pointer;font-size:13.5px;font-weight:500;transition:.15s}
 .chip.active{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:600}
 
-/* ============ GOALS ============ */
+/* TAGS INPUT */
+.tags-input-wrap{display:flex;flex-direction:column;gap:8px}
+.tags-selected{display:flex;flex-wrap:wrap;gap:6px;min-height:0}
+.tags-selected:empty{display:none}
+.tag-chip{display:inline-flex;align-items:center;gap:6px;background:rgba(79,140,255,.15);
+  color:var(--accent);border:1px solid rgba(79,140,255,.3);border-radius:99px;
+  padding:5px 11px;font-size:12.5px;font-weight:600}
+.tag-chip button{color:inherit;font-size:14px;line-height:1;padding:0 0 0 2px;cursor:pointer;
+  background:transparent;border:0;opacity:.7}
+.tag-chip button:hover{opacity:1}
+.tags-suggest{display:flex;flex-wrap:wrap;gap:6px}
+.tags-suggest:empty{display:none}
+.tag-suggest{background:var(--panel2);border:1px solid var(--border);border-radius:99px;
+  padding:5px 11px;font-size:12.5px;color:var(--muted);cursor:pointer;transition:.15s}
+.tag-suggest:hover{background:var(--panel3);color:var(--text);border-color:var(--accent)}
+
+/* SEARCH */
+.tx-search{margin-bottom:12px;position:relative}
+.tx-search input{padding-left:38px}
+.tx-search::before{content:"🔍";position:absolute;left:14px;top:50%;transform:translateY(-50%);
+  font-size:14px;pointer-events:none;opacity:.6}
+
+/* CONTEXT MENU (sheet items) */
+.ctx-item{display:flex;align-items:center;gap:12px;padding:14px;background:var(--panel2);
+  border-radius:12px;width:100%;text-align:left;font-weight:500;font-size:15px;
+  margin-bottom:8px;transition:.15s;cursor:pointer;border:0;color:inherit}
+.ctx-item:hover{background:var(--panel3)}
+.ctx-item.danger{color:#ff8da1}
+.ctx-item .ico{font-size:20px;width:24px;text-align:center}
+
+/* GOALS */
 .goal-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:14px}
 .goal-title{font-size:17px;font-weight:700;letter-spacing:-.01em}
 .goal-deadline{font-size:12.5px;color:var(--muted);margin-top:3px}
@@ -229,6 +250,15 @@ textarea{resize:vertical;min-height:80px;line-height:1.5}
 .goal-plan{display:flex;flex-wrap:wrap;gap:8px 18px;font-size:13px;color:var(--muted);
   margin-top:14px;padding-top:14px;border-top:1px dashed var(--border)}
 .goal-plan b{color:var(--text);font-variant-numeric:tabular-nums}
+.forecast{margin-top:12px;padding-top:12px;border-top:1px dashed var(--border);
+  display:flex;flex-direction:column;gap:5px;font-size:12.5px;color:var(--muted)}
+.forecast b{color:var(--text)}
+.auto-save-row{display:flex;align-items:center;gap:10px;margin-top:12px;padding:10px 12px;
+  background:var(--panel2);border-radius:12px;cursor:pointer;font-size:13.5px;transition:.15s;border:1.5px solid transparent}
+.auto-save-row:hover{background:var(--panel3)}
+.auto-save-row.on{border-color:rgba(79,140,255,.4);background:rgba(79,140,255,.08)}
+.auto-save-row .label{flex:1}
+.auto-save-row .status{color:var(--accent);font-weight:700}
 .deposit-row{display:flex;gap:8px;margin-top:12px}
 .deposit-row input{flex:1}
 .subgoals{margin-top:14px;padding-top:14px;border-top:1px dashed var(--border)}
@@ -247,7 +277,7 @@ textarea{resize:vertical;min-height:80px;line-height:1.5}
   padding:4px 11px;border-radius:99px;font-size:12px;font-weight:600}
 .badge{display:inline-block;font-size:11.5px;color:var(--muted);background:var(--panel2);padding:3px 9px;border-radius:99px;font-weight:500}
 
-/* ============ NOTES ============ */
+/* NOTES */
 .note-card{position:relative;padding-top:16px}
 .note-card input.note-title{background:transparent;border:0;padding:0 44px 8px 0;font-size:16px;font-weight:700;border-radius:0}
 .note-card input.note-title:focus{border-bottom:1px solid var(--accent);box-shadow:none}
@@ -255,19 +285,19 @@ textarea{resize:vertical;min-height:80px;line-height:1.5}
 .note-card textarea:focus{box-shadow:none}
 .note-del{position:absolute;top:8px;right:6px}
 
-/* ============ EMPTY ============ */
+/* EMPTY */
 .empty{text-align:center;padding:42px 20px;color:var(--muted)}
 .empty .big{font-size:38px;margin-bottom:12px;opacity:.75;line-height:1}
 .empty p{font-size:14px;max-width:400px;margin:0 auto 16px;line-height:1.6}
 
-/* ============ FAB ============ */
+/* FAB */
 .fab{position:fixed;right:18px;bottom:calc(20px + var(--safe-b));width:58px;height:58px;border-radius:50%;
   background:var(--accent);color:#fff;display:none;align-items:center;justify-content:center;
   box-shadow:0 10px 28px -6px rgba(79,140,255,.55),0 4px 12px rgba(0,0,0,.35);z-index:45;transition:.15s}
 .fab:active{transform:scale(.9);box-shadow:0 6px 16px -4px rgba(79,140,255,.55)}
 .fab svg{width:26px;height:26px;stroke-width:2.5}
 
-/* ============ SHEET ============ */
+/* SHEET */
 .sheet-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.55);opacity:0;pointer-events:none;
   transition:opacity .25s;z-index:100;backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px)}
 .sheet-backdrop.open{opacity:1;pointer-events:auto}
@@ -292,16 +322,15 @@ textarea{resize:vertical;min-height:80px;line-height:1.5}
 .sheet-body{flex:1;overflow-y:auto;padding:0 18px 4px;-webkit-overflow-scrolling:touch}
 .sheet-footer{padding:14px 18px 18px;flex:0 0 auto;border-top:1px solid var(--border);background:var(--panel)}
 
-/* ============ TOAST ============ */
+/* TOAST */
 .toast{position:fixed;left:50%;transform:translate(-50%,16px);background:var(--panel3);border:1px solid var(--border);
   color:var(--text);padding:12px 20px;border-radius:14px;font-size:14px;font-weight:500;z-index:200;opacity:0;
   transition:.25s;pointer-events:none;box-shadow:0 16px 40px rgba(0,0,0,.5);
-  white-space:nowrap;max-width:90vw;overflow:hidden;text-overflow:ellipsis;
-  bottom:90px}
+  white-space:nowrap;max-width:90vw;overflow:hidden;text-overflow:ellipsis;bottom:90px}
 .toast.show{opacity:1;transform:translate(-50%,0)}
 .toast .tick{color:var(--green);margin-right:6px}
 
-/* ============ MOBILE ============ */
+/* MOBILE */
 @media (max-width:768px){
   .app{flex-direction:column}
   .sidebar{position:fixed;bottom:0;left:0;right:0;top:auto;width:100%;height:auto;flex:none;
@@ -318,23 +347,22 @@ textarea{resize:vertical;min-height:80px;line-height:1.5}
   .topbar{position:sticky;top:0;z-index:30;background:linear-gradient(180deg,var(--bg) 70%,rgba(14,16,20,0));
     padding:8px 0 14px;margin-bottom:8px}
   .topbar h1{font-size:22px}
-.stats{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
-.stats > .card{min-height:86px;padding:12px 14px}
-.stat .val{font-size:19px}
-.stat .sub{font-size:11.5px}
+  .stats{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+  .stats > .card{min-height:86px;padding:12px 14px}
+  .stat .val{font-size:19px}
+  .stat .sub{font-size:11.5px}
   .grid2{grid-template-columns:1fr;gap:12px}
   .card{padding:16px}
   .row{grid-template-columns:1fr}
   input,textarea,select{font-size:16px}
-  /* FAB приподнят над нижним меню */
   .fab{display:flex;bottom:calc(var(--nav-h) + var(--safe-b) + 16px);right:16px}
-  /* Подцель: заголовок на всю ширину, ниже сумма + "+" */
   .sub-add{display:grid;grid-template-columns:1fr 44px;gap:6px;margin-top:10px}
   .sub-add input:first-child{grid-column:1 / -1}
   .sub-add input:nth-child(2){grid-column:1}
   .sub-add button{grid-column:2;padding:0;height:44px;font-size:20px;line-height:1;
     display:flex;align-items:center;justify-content:center}
   .toast{bottom:calc(var(--nav-h) + var(--safe-b) + 96px)}
+  .quick-btn{flex:1;min-width:0}
 }
 @media (min-width:769px){
   .sheet{left:50%;top:50%;right:auto;bottom:auto;transform:translate(-50%,-46%) scale(.97);opacity:0;
@@ -386,11 +414,8 @@ textarea{resize:vertical;min-height:80px;line-height:1.5}
       <h1 id="pageTitle">Обзор</h1>
       <div class="topbar-right">
         <select id="currencySel" class="cur" aria-label="Валюта">
-          <option value="€">€</option>
-          <option value="₽">₽</option>
-          <option value="$">$</option>
-          <option value="₸">₸</option>
-          <option value="₴">₴</option>
+          <option value="€">€</option><option value="₽">₽</option>
+          <option value="$">$</option><option value="₸">₸</option><option value="₴">₴</option>
         </select>
         <button class="user-badge" id="userBadge" aria-label="Аккаунт">
           <span class="user-avatar" id="userAvatar">?</span>
@@ -415,8 +440,8 @@ textarea{resize:vertical;min-height:80px;line-height:1.5}
 /* =====================================================================
    CONFIG
    ===================================================================== */
-const SUPABASE_URL      = 'https://heramwgczjcmkoyrvevh.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhlcmFtd2djempjbWtveXJ2ZXZoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTAyNDI2MzEsImV4cCI6MjEwNTgxODYzMX0.JcgkpaPiMnIVWXGHLmQLydDmoT8D0I6P21rmmteC5lU';
+const SUPABASE_URL      = 'https://YOUR-PROJECT.supabase.co';
+const SUPABASE_ANON_KEY = 'YOUR-ANON-KEY';
 const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 /* =====================================================================
@@ -510,6 +535,12 @@ function sortCatsByUsage(cats) {
   return cats.slice().sort((a, b) => (usage[b.id] || 0) - (usage[a.id] || 0));
 }
 
+function getAllTags() {
+  const s = new Set();
+  state.transactions.forEach(t => (t.tags || []).forEach(tag => s.add(tag)));
+  return [...s].sort();
+}
+
 /* =====================================================================
    СОСТОЯНИЕ
    ===================================================================== */
@@ -519,7 +550,8 @@ const LAST_USER_KEY = 'finance_app_last_user';
 
 let state = {
   transactions: [], goals: [], notes: [], currency: '€',
-  budgets: {}, recurring: [], categoryUsage: {},
+  budgets: {}, monthlyBudget: 0,
+  recurring: [], categoryUsage: {},
 };
 let sharedGoals = [];
 let currentUser = null;
@@ -537,6 +569,7 @@ function loadLocal() {
       state.budgets = state.budgets || {};
       state.recurring = state.recurring || [];
       state.categoryUsage = state.categoryUsage || {};
+      state.monthlyBudget = Number(state.monthlyBudget) || 0;
     }
   } catch(e) { console.warn(e); }
 }
@@ -550,6 +583,10 @@ function loadLocalShared() {
 function goalSaved(g) {
   const subs = (g.subgoals || []).filter(s => s.done).reduce((a, s) => a + (Number(s.amount) || 0), 0);
   return (Number(g.deposits) || 0) + subs;
+}
+function blankState() {
+  return { transactions: [], goals: [], notes: [], currency: state.currency || '€',
+    budgets: {}, monthlyBudget: 0, recurring: [], categoryUsage: {} };
 }
 
 /* =====================================================================
@@ -576,11 +613,12 @@ function inPeriod(dateStr, r) {
 }
 
 /* =====================================================================
-   ОБЛАЧНАЯ СИНХРОНИЗАЦИЯ
+   СИНХРОНИЗАЦИЯ
    ===================================================================== */
 let syncTimer = null;
 let syncState = 'ok';
 let lastPushTimestamp = null;
+let lastPushAt = 0;
 let realtimeChannel = null;
 
 function setSyncStatus(s) {
@@ -609,6 +647,7 @@ async function pushToCloud() {
   }, { onConflict: 'user_id' });
   if (error) { console.warn('push error', error); setSyncStatus('error'); return; }
   lastPushTimestamp = ts;
+  lastPushAt = Date.now();
   setSyncStatus('ok');
 }
 async function pullFromCloud() {
@@ -617,10 +656,8 @@ async function pullFromCloud() {
     .select('data').eq('user_id', currentUser.id).maybeSingle();
   if (error) { console.warn('pull error', error); return { found: false, error }; }
   if (data && data.data && typeof data.data === 'object') {
-    state = Object.assign(
-      { transactions: [], goals: [], notes: [], currency: '€', budgets: {}, recurring: [], categoryUsage: {} },
-      data.data
-    );
+    state = Object.assign(blankState(), data.data);
+    state.monthlyBudget = Number(state.monthlyBudget) || 0;
     saveLocal();
     return { found: true };
   }
@@ -637,16 +674,14 @@ function subscribeRealtime() {
       { event: '*', schema: 'public', table: 'user_data', filter: `user_id=eq.${currentUser.id}` },
       (payload) => {
         if (syncState !== 'ok') return;
-        if (payload.new?.updated_at === lastPushTimestamp) return;
+        if (lastPushAt && Date.now() - lastPushAt < 2000) return;
         const remote = payload.new?.data;
         if (!remote || typeof remote !== 'object') return;
-        state = Object.assign(
-          { transactions: [], goals: [], notes: [], currency: '€', budgets: {}, recurring: [], categoryUsage: {} },
-          remote
-        );
+        state = Object.assign(blankState(), remote);
+        state.monthlyBudget = Number(state.monthlyBudget) || 0;
         saveLocal();
         render();
-        /*toast('Обновлено с другого устройства');*/
+        toast('Обновлено с другого устройства');
       })
     .subscribe((status) => {
       if (status === 'SUBSCRIBED') console.log('[rt] subscribed');
@@ -661,7 +696,7 @@ function unsubscribeRealtime() {
 }
 
 /* =====================================================================
-   REGULAR TRANSACTIONS
+   RECURRING
    ===================================================================== */
 function runRecurring() {
   const now = new Date();
@@ -677,7 +712,7 @@ function runRecurring() {
     state.transactions.push({
       id: uid(), type: r.type, amount: r.amount, category: r.category,
       note: r.note || '', date: dateStr, createdAt: new Date().toISOString(),
-      recurringId: r.id,
+      recurringId: r.id, tags: [],
     });
     state.categoryUsage[r.category] = (state.categoryUsage[r.category] || 0) + 1;
     r.lastRun = ym;
@@ -715,10 +750,7 @@ async function loadSharedGoals() {
    АУТЕНТИФИКАЦИЯ
    ===================================================================== */
 let authMode = 'login';
-function showAuth() {
-  $('#authScreen').style.display = 'flex';
-  $('#appScreen').style.display = 'none';
-}
+function showAuth() { $('#authScreen').style.display = 'flex'; $('#appScreen').style.display = 'none'; }
 function showApp() {
   $('#authScreen').style.display = 'none';
   $('#appScreen').style.display = 'flex';
@@ -862,7 +894,6 @@ backdrop.addEventListener('click', closeSheet);
 document.addEventListener('click', e => { if (e.target.closest('[data-action="close-sheet"]')) closeSheet(); });
 document.addEventListener('keydown', e => { if (e.key === 'Escape' && sheet.classList.contains('open')) closeSheet(); });
 
-/* Скролл поля ввода в видимую часть sheet при открытии клавиатуры */
 sheet.addEventListener('focusin', (e) => {
   const t = e.target;
   if (!(t instanceof HTMLInputElement || t instanceof HTMLTextAreaElement)) return;
@@ -879,7 +910,6 @@ sheet.addEventListener('focusin', (e) => {
   }, 350);
 });
 
-/* Визуальный вьюпорт (клавиатура на iOS) */
 if (window.visualViewport) {
   const vv = window.visualViewport;
   const root = document.documentElement;
@@ -922,6 +952,29 @@ VIEWS.dashboard = () => {
   const balance = income - expense;
   const savedInGoals = state.goals.reduce((a,g) => a + goalSaved(g), 0);
 
+  // Расход в день
+  let perDayText = r.label;
+  if (uiPeriod !== 'all' && expense > 0) {
+    const now = new Date();
+    const days = uiPeriod === 'month'
+      ? Math.max(1, now.getDate())
+      : new Date(now.getFullYear(), now.getMonth(), 0).getDate();
+    perDayText = `≈ ${fmt(expense / days)} в день`;
+  }
+
+  // Прошлый месяц по категориям
+  const now = new Date();
+  const prevStart = new Date(now.getFullYear(), now.getMonth()-1, 1);
+  const prevEnd = new Date(now.getFullYear(), now.getMonth(), 1, 0,0,0,0);
+  const prevByCat = {};
+  state.transactions.forEach(x => {
+    if (x.type !== 'expense') return;
+    const d = new Date(x.date + 'T00:00:00');
+    if (d >= prevStart && d < prevEnd) {
+      prevByCat[x.category] = (prevByCat[x.category] || 0) + x.amount;
+    }
+  });
+
   const byCat = {};
   t.filter(x => x.type === 'expense').forEach(x => {
     byCat[x.category] = (byCat[x.category] || 0) + x.amount;
@@ -952,7 +1005,7 @@ VIEWS.dashboard = () => {
       <div class="card stat">
         <div class="lbl">Расходы</div>
         <div class="val neg">${fmt(expense)}</div>
-        <div class="sub">${r.label}</div>
+        <div class="sub">${perDayText}</div>
       </div>
       <div class="card stat">
         <div class="lbl">Отложено</div>
@@ -961,6 +1014,7 @@ VIEWS.dashboard = () => {
       </div>
     </div>
 
+    ${renderTotalBudget()}
     ${renderBudgetsSection()}
     ${renderChartSection()}
 
@@ -980,10 +1034,18 @@ VIEWS.dashboard = () => {
             const c = catById(id);
             const pct = Math.round(sum / maxCat * 100);
             const share = expense ? Math.round(sum / expense * 100) : 0;
+            const prev = prevByCat[id] || 0;
+            let diffHtml = '';
+            if (uiPeriod === 'month' && prev > 0) {
+              const change = (sum - prev) / prev * 100;
+              if (Math.abs(change) >= 5) {
+                diffHtml = `<span class="cat-diff ${change > 0 ? 'up' : 'down'}">${change > 0 ? '+' : ''}${Math.round(change)}%</span>`;
+              }
+            }
             return `
               <div class="cat-row">
                 <div class="cat-head">
-                  <span>${c.icon} ${esc(c.name)}</span>
+                  <span>${c.icon} ${esc(c.name)}${diffHtml}</span>
                   <span class="amt">${fmt(sum)} · ${share}%</span>
                 </div>
                 <div class="bar"><div class="bar-fill" style="width:${pct}%"></div></div>
@@ -996,7 +1058,7 @@ VIEWS.dashboard = () => {
             const c = catById(x.category);
             return `
               <div class="tx-item" style="border-bottom:1px solid var(--border)">
-                <div class="tx-content" style="cursor:default;background:transparent">
+                <div class="tx-content" data-action="edit-tx" data-id="${x.id}">
                   <div class="tx-ico">${c.icon}</div>
                   <div class="tx-mid">
                     <div class="tx-title">${esc(x.note || c.name)}</div>
@@ -1024,6 +1086,30 @@ VIEWS.dashboard = () => {
   `;
 };
 
+function renderTotalBudget() {
+  if (!state.monthlyBudget || state.monthlyBudget <= 0) return '';
+  const now = new Date();
+  const spent = state.transactions
+    .filter(x => x.type === 'expense' && sameMonth(x.date, now))
+    .reduce((a, x) => a + x.amount, 0);
+  const pct = Math.min(100, spent / state.monthlyBudget * 100);
+  const over = spent > state.monthlyBudget;
+  const warn = !over && pct >= 80;
+  const color = over ? 'var(--red)' : warn ? 'var(--yellow)' : 'var(--green)';
+  const left = Math.max(0, state.monthlyBudget - spent);
+  const daysLeft = new Date(now.getFullYear(), now.getMonth()+1, 0).getDate() - now.getDate();
+  return `
+    <div class="card total-budget" data-action="edit-budgets" style="margin-top:14px">
+      <div class="cat-head">
+        <span>💼 Бюджет на месяц</span>
+        <span class="amt" style="color:${color};font-weight:600">${fmt(spent)} / ${fmt(state.monthlyBudget)}</span>
+      </div>
+      <div class="bar"><div class="bar-fill" style="width:${pct}%;background:${color}"></div></div>
+      <div class="sub">${over ? `Превышено на ${fmt(spent - state.monthlyBudget)}` : `Осталось ${fmt(left)}${daysLeft > 0 ? ` · ${daysLeft} дн.` : ''}`}</div>
+    </div>
+  `;
+}
+
 function renderBudgetsSection() {
   const now = new Date();
   const spent = {};
@@ -1032,18 +1118,19 @@ function renderBudgetsSection() {
     .forEach(x => { spent[x.category] = (spent[x.category] || 0) + x.amount; });
 
   const entries = Object.entries(state.budgets || {});
-  if (!entries.length) {
+  if (!entries.length && !state.monthlyBudget) {
     return `
       <div class="card" style="margin-top:14px">
         <div class="section-title" style="margin-top:0">Бюджеты</div>
-        <div class="hint" style="margin-top:0">Установи лимит на категории — приложение подсветит, когда подходишь к пределу.</div>
+        <div class="hint" style="margin-top:0">Установи лимит на месяц и на категории — приложение подсветит, когда подходишь к пределу.</div>
         <button class="btn primary sm block" data-action="edit-budgets" style="margin-top:12px">Настроить бюджеты</button>
       </div>
     `;
   }
+  if (!entries.length) return '';
   return `
     <div class="card" style="margin-top:14px">
-      <div class="section-title" style="margin-top:0">Бюджеты на этот месяц</div>
+      <div class="section-title" style="margin-top:0">Бюджеты по категориям</div>
       ${entries.map(([catId, limit]) => {
         const c = catById(catId);
         const s = spent[catId] || 0;
@@ -1106,52 +1193,112 @@ function renderChartSection() {
    ОПЕРАЦИИ
    ===================================================================== */
 let txFilter = 'all';
-VIEWS.transactions = () => {
-  const list = state.transactions
-    .filter(x => txFilter === 'all' || x.type === txFilter)
-    .sort((a,b) => (b.date + b.createdAt).localeCompare(a.date + a.createdAt));
+let txSearch = '';
+let txTagFilter = '';
 
+VIEWS.transactions = () => {
   return `
-    <div class="chips" style="margin-bottom:16px">
+    <div class="tx-search">
+      <input id="txSearch" type="search" placeholder="Поиск по комментарию, категории, сумме…" value="${esc(txSearch)}">
+    </div>
+    <div class="chips">
       <button class="chip ${txFilter==='all'?'active':''}" data-filter="all">Все</button>
       <button class="chip ${txFilter==='expense'?'active':''}" data-filter="expense">Расходы</button>
       <button class="chip ${txFilter==='income'?'active':''}" data-filter="income">Доходы</button>
     </div>
-    ${list.length === 0 ? `
-      <div class="card"><div class="empty">
-        <div class="big">🧾</div>
-        <p>${state.transactions.length === 0 ? 'Операций пока нет. Нажми <b>+</b> внизу.' : 'По фильтру ничего не найдено.'}</p>
-      </div></div>
-    ` : `
-      <div class="card" style="padding:0 18px">
-        ${list.map(x => {
-          const c = catById(x.category);
-          return `
-            <div class="tx-item" data-id="${x.id}">
-              <div class="tx-delete-bg" data-action="del-tx" data-id="${x.id}">🗑</div>
-              <div class="tx-content" data-action="edit-tx" data-id="${x.id}">
-                <div class="tx-ico">${c.icon}</div>
-                <div class="tx-mid">
-                  <div class="tx-title">${esc(x.note || c.name)}</div>
-                  <div class="tx-sub">${esc(c.name)} · ${humanDate(x.date)}</div>
-                </div>
-                <div class="tx-amt ${x.type === 'income' ? 'pos' : 'neg'}">
-                  ${x.type === 'income' ? '+' : '−'}${fmt(x.amount)}
-                </div>
-                <button class="icon-btn del-desktop" data-action="del-tx" data-id="${x.id}" aria-label="Удалить">✕</button>
-              </div>
-            </div>`;
-        }).join('')}
+    ${getAllTags().length ? `
+      <div class="chips" style="margin-top:-6px">
+        ${getAllTags().map(t => `<button class="chip ${txTagFilter===t?'active':''}" data-tag-filter="${esc(t)}">#${esc(t)}</button>`).join('')}
       </div>
-    `}
+    ` : ''}
+    <div id="txList">${renderTxList()}</div>
     ${renderRecurringSection()}
   `;
 };
+
+function renderTxList() {
+  let list = state.transactions.filter(x => txFilter === 'all' || x.type === txFilter);
+  if (txSearch) {
+    const q = txSearch.toLowerCase();
+    list = list.filter(x => {
+      const c = catById(x.category);
+      return (x.note || '').toLowerCase().includes(q)
+        || c.name.toLowerCase().includes(q)
+        || String(x.amount).includes(q)
+        || (x.tags || []).some(t => t.toLowerCase().includes(q));
+    });
+  }
+  if (txTagFilter) {
+    list = list.filter(x => (x.tags || []).includes(txTagFilter));
+  }
+  list.sort((a,b) => (b.date + b.createdAt).localeCompare(a.date + a.createdAt));
+
+  if (!list.length) {
+    return `<div class="card"><div class="empty">
+      <div class="big">🧾</div>
+      <p>${state.transactions.length === 0 ? 'Операций пока нет. Нажми <b>+</b> внизу.' : 'Ничего не найдено.'}</p>
+    </div></div>`;
+  }
+  return `<div class="card" style="padding:0 18px">
+    ${list.map(x => {
+      const c = catById(x.category);
+      const tagsHtml = (x.tags || []).length
+        ? `<div class="tx-tags">${(x.tags||[]).map(t => `<span class="tx-tag">#${esc(t)}</span>`).join('')}</div>`
+        : '';
+      return `
+        <div class="tx-item" data-id="${x.id}">
+          <div class="tx-delete-bg" data-action="del-tx" data-id="${x.id}">🗑</div>
+          <div class="tx-content" data-action="edit-tx" data-id="${x.id}">
+            <div class="tx-ico">${c.icon}</div>
+            <div class="tx-mid">
+              <div class="tx-title">${esc(x.note || c.name)}</div>
+              <div class="tx-sub">${esc(c.name)} · ${humanDate(x.date)}</div>
+              ${tagsHtml}
+            </div>
+            <div class="tx-amt ${x.type === 'income' ? 'pos' : 'neg'}">
+              ${x.type === 'income' ? '+' : '−'}${fmt(x.amount)}
+            </div>
+            <button class="icon-btn del-desktop" data-action="del-tx" data-id="${x.id}" aria-label="Удалить">✕</button>
+          </div>
+        </div>`;
+    }).join('')}
+  </div>`;
+}
+
 MOUNTS.transactions = () => {
   document.querySelectorAll('[data-filter]').forEach(b => {
     b.addEventListener('click', () => { txFilter = b.dataset.filter; haptic(5); render(); });
   });
+  document.querySelectorAll('[data-tag-filter]').forEach(b => {
+    b.addEventListener('click', () => {
+      txTagFilter = b.dataset.tagFilter === txTagFilter ? '' : b.dataset.tagFilter;
+      haptic(5);
+      const list = $('#txList');
+      if (list) list.innerHTML = renderTxList();
+      document.querySelectorAll('[data-tag-filter]').forEach(x =>
+        x.classList.toggle('active', x.dataset.tagFilter === txTagFilter));
+      mountSwipe();
+      mountLongPress();
+    });
+  });
+
+  const inp = $('#txSearch');
+  if (inp) {
+    let timer;
+    inp.addEventListener('input', () => {
+      clearTimeout(timer);
+      timer = setTimeout(() => {
+        txSearch = inp.value;
+        const list = $('#txList');
+        if (list) list.innerHTML = renderTxList();
+        mountSwipe();
+        mountLongPress();
+      }, 150);
+    });
+  }
+
   mountSwipe();
+  mountLongPress();
 };
 
 function renderRecurringSection() {
@@ -1191,6 +1338,35 @@ function renderRecurringSection() {
 /* =====================================================================
    ЦЕЛИ
    ===================================================================== */
+function forecastForGoal(g) {
+  const saved = goalSaved(g);
+  const remaining = Math.max(0, g.target - saved);
+  if (remaining <= 0) return null;
+
+  const created = new Date(g.createdAt || new Date().toISOString());
+  const now = new Date();
+  const daysSinceCreated = Math.max(1, (now - created) / (1000*60*60*24));
+  const monthsSinceCreated = daysSinceCreated / 30.44;
+  if (monthsSinceCreated < 0.5) return null;
+  if (saved < 1) return null;
+
+  const rate = saved / monthsSinceCreated;
+  if (rate < 1) return null;
+
+  const monthsToFinish = remaining / rate;
+  const forecastDate = new Date(now.getTime() + monthsToFinish * 30.44 * 24*60*60*1000);
+
+  const extra = 50;
+  const monthsToFinishWithExtra = remaining / (rate + extra);
+  const savedMonths = monthsToFinish - monthsToFinishWithExtra;
+
+  return {
+    forecastDate,
+    monthsToFinish,
+    savedMonths: savedMonths >= 1 ? Math.round(savedMonths) : 0,
+  };
+}
+
 function goalCard(g, opts = {}) {
   const compact = !!opts.compact;
   const saved     = goalSaved(g);
@@ -1202,6 +1378,9 @@ function goalCard(g, opts = {}) {
   const dl = new Date(g.deadline + 'T00:00:00');
   const dlText = isNaN(dl) ? '—' : dl.toLocaleDateString('ru-RU', { day:'numeric', month:'long', year:'numeric' });
   const subSum = (g.subgoals || []).reduce((a,s) => a + (Number(s.amount) || 0), 0);
+  const forecast = !compact ? forecastForGoal(g) : null;
+  const autoPct = Number(g.autoSavePercent) || 0;
+
   return `
     <div class="card" style="margin-top:14px">
       <div class="goal-head">
@@ -1224,6 +1403,22 @@ function goalCard(g, opts = {}) {
           `<span>Осталось: <b>${fmt(remaining)}</b></span>
            <span>В месяц: <b>${fmt(perMonth)}</b></span>`}
       </div>
+
+      ${forecast ? `
+        <div class="forecast">
+          <div>Прогноз закрытия: <b>${forecast.forecastDate.toLocaleDateString('ru-RU', { day:'numeric', month:'short', year:'numeric' })}</b></div>
+          ${forecast.savedMonths > 0 ? `<div>Если +50 ${state.currency}/мес — <b>на ${forecast.savedMonths} ${plural(forecast.savedMonths,'месяц','месяца','месяцев')} раньше</b></div>` : ''}
+        </div>
+      ` : ''}
+
+      ${!compact ? `
+        <div class="auto-save-row ${autoPct > 0 ? 'on' : ''}" data-action="edit-autosave" data-id="${g.id}">
+          <span style="font-size:18px">🔄</span>
+          <span class="label">Авто-отчисление от доходов</span>
+          <span class="status">${autoPct > 0 ? autoPct + '%' : 'Выкл'}</span>
+        </div>
+      ` : ''}
+
       ${!compact && (g.subgoals && g.subgoals.length) ? `
         <div class="subgoals">
           <div class="section-title" style="margin:0 0 10px">Подцели</div>
@@ -1238,9 +1433,11 @@ function goalCard(g, opts = {}) {
           ${subSum !== g.target ? `<div class="hint">Подцели: ${fmt(subSum)} — ${subSum < g.target ? 'остаток' : 'перебор'} ${fmt(Math.abs(g.target - subSum))}</div>` : ''}
         </div>
       ` : ''}
+
       ${!compact && !(g.subgoals && g.subgoals.length) ? `
         <div class="hint">Разбей цель на подцели — виза, билеты, техника. Отмечаешь галочку → сумма уходит в «отложено».</div>
       ` : ''}
+
       ${!compact ? `
         <form class="sub-add" data-goal="${g.id}">
           <input name="title" placeholder="Подцель: виза, билеты…" required>
@@ -1317,10 +1514,10 @@ VIEWS.goals = () => {
     ${state.goals.length ? `
       <div class="stats" style="grid-template-columns:repeat(2,minmax(0,1fr));margin-bottom:8px">
         <div class="card stat">
-  		<div class="lbl">Всего нужно</div>
-  		<div class="val">${fmt(totalTarget)}</div>
-  		<div class="sub">${state.goals.length} ${plural(state.goals.length,'цель','цели','целей')}</div>
-	</div>
+          <div class="lbl">Всего нужно</div>
+          <div class="val">${fmt(totalTarget)}</div>
+          <div class="sub">${state.goals.length} ${plural(state.goals.length,'цель','цели','целей')}</div>
+        </div>
         <div class="card stat">
           <div class="lbl">Уже отложено</div>
           <div class="val pos">${fmt(totalSaved)}</div>
@@ -1408,16 +1605,16 @@ $('#fab').addEventListener('click', () => {
 /* =====================================================================
    TX SHEET
    ===================================================================== */
-let sheetTx = { type:'expense', category:'food', editId: null };
+let sheetTx = { type:'expense', category:'food', editId: null, tags: [] };
 
 function openTxSheet() {
-  sheetTx = { type:'expense', category:'food', editId: null };
+  sheetTx = { type:'expense', category:'food', editId: null, tags: [] };
   renderTxSheet();
 }
 function openTxEditSheet(id) {
   const t = state.transactions.find(x => x.id === id);
   if (!t) return;
-  sheetTx = { type: t.type, category: t.category, editId: id };
+  sheetTx = { type: t.type, category: t.category, editId: id, tags: [...(t.tags || [])] };
   renderTxSheet({ amount: t.amount, note: t.note, date: t.date });
 }
 
@@ -1441,6 +1638,12 @@ function renderTxSheet(prefill) {
                placeholder="0" inputmode="decimal" data-autofocus value="${prefill ? prefill.amount : ''}">
         <span class="amount-cur">${state.currency}</span>
       </div>
+      <div class="quick-amounts" id="quickAmounts">
+        <button type="button" class="quick-btn" data-quick="10">+10</button>
+        <button type="button" class="quick-btn" data-quick="50">+50</button>
+        <button type="button" class="quick-btn" data-quick="100">+100</button>
+        <button type="button" class="quick-btn" data-quick="500">+500</button>
+      </div>
       <div class="cat-grid" id="txCatGrid">
         ${cats.map(c => `
           <button class="cat-cell ${c.id===sheetTx.category?'active':''}" data-sheet-cat="${c.id}">
@@ -1448,6 +1651,14 @@ function renderTxSheet(prefill) {
           </button>`).join('')}
       </div>
       <div class="field"><input id="txNote" placeholder="Комментарий (необязательно)" value="${prefill ? esc(prefill.note || '') : ''}"></div>
+      <div class="field">
+        <label>Метки (необязательно)</label>
+        <div class="tags-input-wrap">
+          <div class="tags-selected" id="tagsSelected"></div>
+          <input id="tagInput" placeholder="Введи и Enter — добавить" autocomplete="off">
+          <div class="tags-suggest" id="tagsSuggest"></div>
+        </div>
+      </div>
       <div class="field" style="margin-bottom:0"><input id="txDate" type="date" value="${prefill?.date || todayStr()}"></div>
     </div>
     <div class="sheet-footer">
@@ -1471,6 +1682,19 @@ function mountTxSheet() {
   };
   amountEl.addEventListener('input', updateBtn); updateBtn();
 
+  // Быстрые суммы
+  const quickWrap = $('#quickAmounts');
+  if (quickWrap) {
+    quickWrap.addEventListener('click', e => {
+      const b = e.target.closest('[data-quick]');
+      if (!b) return;
+      const cur = parseFloat(amountEl.value) || 0;
+      amountEl.value = cur + parseFloat(b.dataset.quick);
+      amountEl.dispatchEvent(new Event('input'));
+      haptic(8);
+    });
+  }
+
   document.querySelectorAll('[data-sheet-type]').forEach(b => {
     b.addEventListener('click', () => {
       sheetTx.type = b.dataset.sheetType;
@@ -1492,6 +1716,56 @@ function mountTxSheet() {
     haptic(5);
   });
 
+  // Теги
+  const tagsSelected = $('#tagsSelected');
+  const tagsSuggest = $('#tagsSuggest');
+  const tagInput = $('#tagInput');
+  const renderTags = () => {
+    tagsSelected.innerHTML = sheetTx.tags.map(t => `
+      <span class="tag-chip">#${esc(t)}<button type="button" data-tag-remove="${esc(t)}">✕</button></span>
+    `).join('');
+  };
+  const renderSuggest = () => {
+    const all = getAllTags().filter(t => !sheetTx.tags.includes(t));
+    if (!all.length) { tagsSuggest.innerHTML = ''; return; }
+    tagsSuggest.innerHTML = all.slice(0, 12).map(t =>
+      `<button type="button" class="tag-suggest" data-tag-add="${esc(t)}">#${esc(t)}</button>`
+    ).join('');
+  };
+  const addTag = (t) => {
+    t = String(t || '').trim().replace(/^#/, '').replace(/\s+/g, '_').toLowerCase();
+    if (!t) return;
+    if (sheetTx.tags.includes(t)) { tagInput.value = ''; return; }
+    sheetTx.tags.push(t);
+    renderTags(); renderSuggest();
+    tagInput.value = '';
+  };
+  const removeTag = (t) => {
+    sheetTx.tags = sheetTx.tags.filter(x => x !== t);
+    renderTags(); renderSuggest();
+  };
+  if (tagInput) {
+    tagInput.addEventListener('keydown', e => {
+      if (e.key === 'Enter' || e.key === ',') {
+        e.preventDefault();
+        addTag(tagInput.value);
+      } else if (e.key === 'Backspace' && !tagInput.value && sheetTx.tags.length) {
+        removeTag(sheetTx.tags[sheetTx.tags.length - 1]);
+      }
+    });
+    tagsSelected.addEventListener('click', e => {
+      const b = e.target.closest('[data-tag-remove]');
+      if (!b) return;
+      removeTag(b.dataset.tagRemove);
+    });
+    tagsSuggest.addEventListener('click', e => {
+      const b = e.target.closest('[data-tag-add]');
+      if (!b) return;
+      addTag(b.dataset.tagAdd);
+    });
+    renderTags(); renderSuggest();
+  }
+
   const saveTx = () => {
     const amount = parseFloat(amountEl.value);
     if (!amount || amount <= 0) {
@@ -1500,21 +1774,47 @@ function mountTxSheet() {
       setTimeout(() => amountEl.style.borderColor = '', 800);
       return;
     }
+    // Уточняем теги — на случай, если в поле остался необработанный текст
+    const rawTag = tagInput?.value.trim();
+    if (rawTag) addTag(rawTag);
+
     const data = {
       type: sheetTx.type, amount, category: sheetTx.category,
       note: $('#txNote').value.trim(),
       date: $('#txDate').value || todayStr(),
+      tags: [...sheetTx.tags],
     };
+
+    let autoSaveMessage = null;
+
     if (editing) {
       const t = state.transactions.find(x => x.id === sheetTx.editId);
       if (t) Object.assign(t, data);
     } else {
       state.transactions.push({ id: uid(), ...data, createdAt: new Date().toISOString() });
       state.categoryUsage[sheetTx.category] = (state.categoryUsage[sheetTx.category] || 0) + 1;
+
+      // Авто-отчисление в цели при доходе
+      if (data.type === 'income') {
+        let totalAuto = 0;
+        state.goals.forEach(g => {
+          const pct = Number(g.autoSavePercent) || 0;
+          if (pct > 0) {
+            const add = amount * pct / 100;
+            g.deposits = (Number(g.deposits) || 0) + add;
+            totalAuto += add;
+          }
+        });
+        if (totalAuto > 0) {
+          autoSaveMessage = `Автоотчислено ${fmt(totalAuto)} в цели`;
+        }
+      }
     }
+
     save(); haptic(15); closeSheet();
     setTimeout(() => {
       toast(editing ? 'Сохранено' : (data.type === 'income' ? `Доход ${fmt(amount)} записан` : `Расход ${fmt(amount)} записан`));
+      if (autoSaveMessage) setTimeout(() => toast(autoSaveMessage), 800);
       render();
     }, 180);
   };
@@ -1534,39 +1834,131 @@ function mountTxSheet() {
 }
 
 /* =====================================================================
+   LONG PRESS MENU
+   ===================================================================== */
+let suppressEditClick = false;
+
+function showTxMenu(id) {
+  const t = state.transactions.find(x => x.id === id);
+  if (!t) return;
+  const c = catById(t.category);
+  const tagsHtml = (t.tags || []).length
+    ? `<div class="tx-tags" style="margin-top:6px">${t.tags.map(tag => `<span class="tx-tag">#${esc(tag)}</span>`).join('')}</div>`
+    : '';
+  openSheet(`
+    <div class="sheet-handle-wrap"><div class="sheet-handle"></div></div>
+    <div class="sheet-header"><h2>Операция</h2>
+      <button class="sheet-close" data-action="close-sheet">✕</button></div>
+    <div class="sheet-body">
+      <div style="display:flex;align-items:center;gap:12px;padding:14px;background:var(--panel2);border-radius:14px;margin-bottom:16px">
+        <div class="tx-ico">${c.icon}</div>
+        <div class="tx-mid">
+          <div class="tx-title">${esc(t.note || c.name)}</div>
+          <div class="tx-sub">${esc(c.name)} · ${humanDate(t.date)}</div>
+          ${tagsHtml}
+        </div>
+        <div class="tx-amt ${t.type === 'income' ? 'pos' : 'neg'}">${t.type === 'income' ? '+' : '−'}${fmt(t.amount)}</div>
+      </div>
+      <button class="ctx-item" data-action="dup-tx" data-id="${id}">
+        <span class="ico">📋</span><span>Дублировать</span>
+      </button>
+      <button class="ctx-item" data-action="open-edit-tx" data-id="${id}">
+        <span class="ico">✏️</span><span>Редактировать</span>
+      </button>
+      <button class="ctx-item danger" data-action="del-tx-from-menu" data-id="${id}">
+        <span class="ico">🗑</span><span>Удалить</span>
+      </button>
+    </div>
+  `);
+}
+
+function mountLongPress() {
+  document.querySelectorAll('.tx-content[data-action="edit-tx"]').forEach(el => {
+    if (el._longPressMounted) return;
+    el._longPressMounted = true;
+    const id = el.dataset.id;
+    if (!id) return;
+
+    let timer = null;
+    let moved = false;
+
+    const cancel = () => { clearTimeout(timer); timer = null; };
+    const startTimer = () => {
+      moved = false;
+      cancel();
+      timer = setTimeout(() => {
+        if (!moved) {
+          suppressEditClick = true;
+          setTimeout(() => { suppressEditClick = false; }, 800);
+          haptic(20);
+          showTxMenu(id);
+        }
+      }, 500);
+    };
+    const onMove = () => { moved = true; cancel(); };
+
+    el.addEventListener('touchstart', startTimer, { passive: true });
+    el.addEventListener('touchend', cancel);
+    el.addEventListener('touchmove', onMove, { passive: true });
+    el.addEventListener('touchcancel', cancel);
+
+    el.addEventListener('mousedown', e => {
+      if (e.button !== 0) return;
+      startTimer();
+    });
+    el.addEventListener('mouseup', cancel);
+    el.addEventListener('mouseleave', cancel);
+
+    el.addEventListener('contextmenu', e => {
+      e.preventDefault();
+      suppressEditClick = true;
+      setTimeout(() => { suppressEditClick = false; }, 800);
+      showTxMenu(id);
+    });
+  });
+}
+
+/* =====================================================================
    SWIPE
    ===================================================================== */
 function mountSwipe() {
-  let touch = null;
   document.querySelectorAll('.tx-item').forEach(item => {
+    if (item._swipeMounted) return;
+    item._swipeMounted = true;
+    const content = item.querySelector('.tx-content');
+    if (!content) return;
+
+    let start = null;
     item.addEventListener('touchstart', e => {
-      const content = e.target.closest('.tx-content');
-      if (!content || e.target.closest('[data-action="del-tx"]')) return;
-      touch = { content, item, x: e.touches[0].clientX, y: e.touches[0].clientY, swiped: false };
+      if (e.target.closest('[data-action="del-tx"]')) return;
+      start = { x: e.touches[0].clientX, y: e.touches[0].clientY, swiped: false, moved: false };
     }, { passive: true });
     item.addEventListener('touchmove', e => {
-      if (!touch || touch.item !== item) return;
-      const dx = e.touches[0].clientX - touch.x;
-      const dy = e.touches[0].clientY - touch.y;
-      if (Math.abs(dy) > Math.abs(dx) && Math.abs(dy) > 12) { touch = null; return; }
+      if (!start) return;
+      const dx = e.touches[0].clientX - start.x;
+      const dy = e.touches[0].clientY - start.y;
+      if (Math.abs(dy) > Math.abs(dx) && Math.abs(dy) > 12) { start = null; return; }
       if (Math.abs(dx) > 8) {
-        touch.swiped = true;
-        touch.content.classList.add('dragging');
+        start.swiped = true;
+        start.moved = true;
+        content.classList.add('dragging');
         const shift = Math.max(-72, Math.min(0, dx));
-        touch.content.style.transform = `translateX(${shift}px)`;
+        content.style.transform = `translateX(${shift}px)`;
       }
     }, { passive: true });
     item.addEventListener('touchend', e => {
-      if (!touch || touch.item !== item) return;
-      const dx = (e.changedTouches[0]?.clientX || 0) - touch.x;
-      touch.content.classList.remove('dragging');
-      touch.content.style.transform = '';
+      if (!start) return;
+      const dx = (e.changedTouches[0]?.clientX || 0) - start.x;
+      content.classList.remove('dragging');
+      content.style.transform = '';
       document.querySelectorAll('.tx-item').forEach(i => i.classList.remove('swiped'));
-      if (touch.swiped && dx < -40) { item.classList.add('swiped'); haptic(6); }
-      if (touch.swiped) {
-        item.addEventListener('click', ev => { ev.stopPropagation(); ev.preventDefault(); }, { capture: true, once: true });
+      if (start.swiped && dx < -40) {
+        item.classList.add('swiped');
+        haptic(6);
+        suppressEditClick = true;
+        setTimeout(() => { suppressEditClick = false; }, 300);
       }
-      touch = null;
+      start = null;
     });
   });
   document.addEventListener('touchstart', e => {
@@ -1614,9 +2006,51 @@ function openGoalSheet() {
       if (!title) { titleEl.focus(); return; }
       if (!target || target <= 0) { targetEl.focus(); return; }
       if (!deadline) { dlEl.focus(); return; }
-      state.goals.push({ id: uid(), title, target, deadline, deposits: 0, subgoals: [], createdAt: new Date().toISOString() });
+      state.goals.push({ id: uid(), title, target, deadline, deposits: 0, subgoals: [],
+        autoSavePercent: 0, createdAt: new Date().toISOString() });
       save(); haptic(15); closeSheet();
       setTimeout(() => { toast('Цель создана'); render(); }, 180);
+    });
+  });
+}
+
+/* =====================================================================
+   AUTOSAVE SHEET
+   ===================================================================== */
+function openAutoSaveSheet(goalId) {
+  const g = state.goals.find(x => x.id === goalId);
+  if (!g) return;
+  const current = Number(g.autoSavePercent) || 0;
+  const html = `
+    <div class="sheet-handle-wrap"><div class="sheet-handle"></div></div>
+    <div class="sheet-header"><h2>Авто-отчисление</h2>
+      <button class="sheet-close" data-action="close-sheet">✕</button></div>
+    <div class="sheet-body">
+      <div class="field">
+        <label>Процент от каждого дохода</label>
+        <input id="asPercent" type="number" min="0" max="100" step="1" inputmode="numeric"
+          value="${current || ''}" placeholder="0" data-autofocus>
+      </div>
+      <div class="hint">Каждый раз, когда ты записываешь доход, эта доля автоматически уйдёт в цель «${esc(g.title)}».</div>
+      <div class="hint">Например: 10% от зарплаты 1200 ${state.currency} — это 120 ${state.currency} в цель.</div>
+    </div>
+    <div class="sheet-footer">
+      <button class="btn primary block" id="asSave">Сохранить</button>
+      ${current > 0 ? `<button class="btn ghost block" id="asDisable" style="margin-top:8px">Выключить</button>` : ''}
+    </div>
+  `;
+  openSheet(html, () => {
+    $('#asSave').addEventListener('click', () => {
+      const v = Math.max(0, Math.min(100, parseFloat($('#asPercent').value) || 0));
+      g.autoSavePercent = v;
+      save(); haptic(10); closeSheet();
+      setTimeout(() => { toast(v > 0 ? `Авто ${v}% сохранено` : 'Авто-отчисление выключено'); render(); }, 180);
+    });
+    const dis = $('#asDisable');
+    if (dis) dis.addEventListener('click', () => {
+      g.autoSavePercent = 0;
+      save(); haptic(10); closeSheet();
+      setTimeout(() => { toast('Авто-отчисление выключено'); render(); }, 180);
     });
   });
 }
@@ -1632,9 +2066,17 @@ function openBudgetSheet() {
     .forEach(x => { spent[x.category] = (spent[x.category] || 0) + x.amount; });
   const html = `
     <div class="sheet-handle-wrap"><div class="sheet-handle"></div></div>
-    <div class="sheet-header"><h2>Бюджеты на месяц</h2>
+    <div class="sheet-header"><h2>Бюджеты</h2>
       <button class="sheet-close" data-action="close-sheet">✕</button></div>
     <div class="sheet-body">
+      <div class="field" style="margin-bottom:8px">
+        <label>Общий бюджет на месяц</label>
+        <input id="totalBudget" type="number" inputmode="decimal" min="0" step="1"
+          value="${state.monthlyBudget || ''}" placeholder="Например, 2000" data-autofocus>
+      </div>
+      <div class="hint" style="margin-top:0;margin-bottom:18px">Учитываются все расходы за текущий месяц. Пусто = выключено.</div>
+
+      <div class="section-title" style="margin-top:0">Бюджеты по категориям</div>
       ${EXPENSE_CATS.map(c => {
         const v = state.budgets?.[c.id] || '';
         const s = spent[c.id] || 0;
@@ -1665,6 +2107,8 @@ function openBudgetSheet() {
         if (v && v > 0) next[inp.dataset.budgetCat] = v;
       });
       state.budgets = next;
+      const tb = parseFloat($('#totalBudget').value);
+      state.monthlyBudget = tb > 0 ? tb : 0;
       save(); haptic(12); closeSheet();
       setTimeout(() => { toast('Бюджеты сохранены'); render(); }, 180);
     });
@@ -1838,10 +2282,33 @@ document.addEventListener('click', async e => {
     save(); haptic(10); render();
     toast('Удалено');
   }
+  if (a === 'del-tx-from-menu') {
+    if (!confirm('Удалить операцию?')) return;
+    state.transactions = state.transactions.filter(x => x.id !== el.dataset.id);
+    save(); haptic(12); closeSheet();
+    setTimeout(() => { toast('Удалено'); render(); }, 180);
+  }
   if (a === 'edit-tx') {
+    if (suppressEditClick) return;
     const item = el.closest('.tx-item');
-    if (item?.classList.contains('swiped')) return;
+    if (item?.classList.contains('swiped')) {
+      item.classList.remove('swiped');
+      return;
+    }
     openTxEditSheet(el.dataset.id);
+  }
+  if (a === 'open-edit-tx') {
+    closeSheet();
+    setTimeout(() => openTxEditSheet(el.dataset.id), 240);
+  }
+  if (a === 'dup-tx') {
+    const t = state.transactions.find(x => x.id === el.dataset.id);
+    if (!t) return;
+    closeSheet();
+    setTimeout(() => {
+      sheetTx = { type: t.type, category: t.category, editId: null, tags: [...(t.tags || [])] };
+      renderTxSheet({ amount: t.amount, note: t.note, date: todayStr() });
+    }, 240);
   }
   if (a === 'del-goal') {
     if (confirm('Удалить цель?')) {
@@ -1864,18 +2331,19 @@ document.addEventListener('click', async e => {
   }
   if (a === 'reset') {
     if (confirm('Удалить ВСЕ данные? Это необратимо.')) {
-      state = { transactions: [], goals: [], notes: [], currency: state.currency, budgets: {}, recurring: [], categoryUsage: {} };
+      state = blankState();
       save(); render();
     }
   }
   if (a === 'demo') loadDemo();
-  if (a === 'force-sync') { closeSheet(); pushToCloud().then(() => toast('Синхронизировано')); }
+  if (a === 'force-sync') { closeSheet(); pushToCloud(); }
   if (a === 'logout') {
     if (confirm('Выйти? Данные останутся в облаке.')) {
       closeSheet(); unsubscribeRealtime(); sb.auth.signOut();
     }
   }
   if (a === 'edit-budgets') openBudgetSheet();
+  if (a === 'edit-autosave') openAutoSaveSheet(el.dataset.id);
   if (a === 'new-recurring') openRecurringSheet();
   if (a === 'toggle-recurring') {
     const r = state.recurring.find(x => x.id === el.dataset.id);
@@ -1985,19 +2453,21 @@ document.addEventListener('submit', async e => {
 function loadDemo() {
   const d = (offset) => new Date(Date.now() - offset*86400000).toISOString().slice(0,10);
   state.transactions = [
-    { id: uid(), type:'income', amount: 1200, category:'salary', note:'Зарплата', date: d(20), createdAt: new Date().toISOString() },
-    { id: uid(), type:'income', amount: 250, category:'freelance', note:'Лендинг', date: d(12), createdAt: new Date().toISOString() },
-    { id: uid(), type:'expense', amount: 320, category:'food', note:'Продукты', date: d(10), createdAt: new Date().toISOString() },
-    { id: uid(), type:'expense', amount: 90, category:'smoke', note:'Сигареты', date: d(8), createdAt: new Date().toISOString() },
-    { id: uid(), type:'expense', amount: 150, category:'fun', note:'Кино и бар', date: d(5), createdAt: new Date().toISOString() },
-    { id: uid(), type:'expense', amount: 400, category:'tech', note:'Наушники', date: d(3), createdAt: new Date().toISOString() },
-    { id: uid(), type:'expense', amount: 60, category:'transport', note:'Проездной', date: d(1), createdAt: new Date().toISOString() },
+    { id: uid(), type:'income', amount: 1200, category:'salary', note:'Зарплата', date: d(20), tags: ['работа'], createdAt: new Date().toISOString() },
+    { id: uid(), type:'income', amount: 250, category:'freelance', note:'Лендинг', date: d(12), tags: [], createdAt: new Date().toISOString() },
+    { id: uid(), type:'expense', amount: 320, category:'food', note:'Продукты', date: d(10), tags: ['пятёрочка'], createdAt: new Date().toISOString() },
+    { id: uid(), type:'expense', amount: 90, category:'smoke', note:'Сигареты', date: d(8), tags: [], createdAt: new Date().toISOString() },
+    { id: uid(), type:'expense', amount: 150, category:'fun', note:'Кино и бар', date: d(5), tags: ['с_друзьями'], createdAt: new Date().toISOString() },
+    { id: uid(), type:'expense', amount: 400, category:'tech', note:'Наушники', date: d(3), tags: [], createdAt: new Date().toISOString() },
+    { id: uid(), type:'expense', amount: 60, category:'transport', note:'Проездной', date: d(1), tags: [], createdAt: new Date().toISOString() },
   ];
   state.budgets = { food: 400, fun: 200, smoke: 100 };
+  state.monthlyBudget = 2000;
   state.categoryUsage = { food: 5, fun: 3, tech: 1, transport: 4, smoke: 2 };
   const deadline = new Date(Date.now() + 300*86400000).toISOString().slice(0,10);
   state.goals = [{
     id: uid(), title: 'Поездка в Европу', target: 1500, deadline, deposits: 200,
+    autoSavePercent: 10,
     subgoals: [
       { id: uid(), title: 'Виза', amount: 100, done: true },
       { id: uid(), title: 'Фотоаппарат', amount: 200, done: false },
@@ -2005,7 +2475,7 @@ function loadDemo() {
       { id: uid(), title: 'Жильё', amount: 500, done: false },
       { id: uid(), title: 'На жизнь', amount: 300, done: false },
     ],
-    createdAt: new Date().toISOString(),
+    createdAt: new Date(Date.now() - 60*86400000).toISOString(),
   }];
   state.recurring = [
     { id: uid(), type:'income', amount: 1200, category:'salary', note:'Зарплата', dayOfMonth: 5, active: true, lastRun: null, createdAt: new Date().toISOString() },
@@ -2029,7 +2499,7 @@ async function handleSession(session) {
   if (currentUser && !wasUser) {
     const lastUser = localStorage.getItem(LAST_USER_KEY);
     if (lastUser && lastUser !== currentUser.id) {
-      state = { transactions: [], goals: [], notes: [], currency: '€', budgets: {}, recurring: [], categoryUsage: {} };
+      state = blankState();
       sharedGoals = [];
       saveLocalShared();
     }
