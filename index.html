@@ -7,6 +7,7 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="manifest" id="manifestLink">
 <title>Финансы</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
@@ -17,120 +18,73 @@
   --nav-h:62px;--safe-b:env(safe-area-inset-bottom,0px);--kb:0px;
 }
 html,body{height:100%}
-body{
-  background:var(--bg);color:var(--text);
+body{background:var(--bg);color:var(--text);
   font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Inter,system-ui,sans-serif;
-  font-size:15px;line-height:1.45;-webkit-font-smoothing:antialiased;
-  overscroll-behavior-y:none;
-}
+  font-size:15px;line-height:1.45;-webkit-font-smoothing:antialiased;overscroll-behavior-y:none}
 button,input,select,textarea{font:inherit;color:inherit;touch-action:manipulation}
 button{cursor:pointer;border:0;background:none}
 input,textarea,select{font-family:inherit}
 
-/* ============ AUTH ============ */
-.auth-screen{
-  position:fixed;inset:0;display:flex;align-items:center;justify-content:center;
-  padding:24px;background:
-    radial-gradient(1200px 600px at 50% -10%,rgba(79,140,255,.10),transparent 60%),
-    var(--bg);
-  z-index:500;overflow-y:auto;
-}
-.auth-card{
-  width:100%;max-width:400px;background:var(--panel);border:1px solid var(--border);
-  border-radius:20px;padding:28px 24px;
-  box-shadow:0 30px 80px -20px rgba(0,0,0,.6);
-}
+/* AUTH */
+.auth-screen{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;padding:24px;
+  background:radial-gradient(1200px 600px at 50% -10%,rgba(79,140,255,.10),transparent 60%),var(--bg);
+  z-index:500;overflow-y:auto}
+.auth-card{width:100%;max-width:400px;background:var(--panel);border:1px solid var(--border);
+  border-radius:20px;padding:28px 24px;box-shadow:0 30px 80px -20px rgba(0,0,0,.6)}
 .auth-logo{font-size:26px;font-weight:700;display:flex;align-items:center;gap:10px;margin-bottom:6px}
 .auth-sub{color:var(--muted);font-size:14px;margin-bottom:22px;line-height:1.5}
 .auth-tabs{display:flex;gap:5px;background:var(--panel2);padding:5px;border-radius:14px;margin-bottom:18px}
-.auth-tab{flex:1;padding:10px;border-radius:10px;background:transparent;color:var(--muted);
-  font-weight:600;font-size:14px;transition:.15s}
+.auth-tab{flex:1;padding:10px;border-radius:10px;background:transparent;color:var(--muted);font-weight:600;font-size:14px;transition:.15s}
 .auth-tab.active{background:var(--panel);color:var(--text);box-shadow:0 2px 8px rgba(0,0,0,.3)}
 .auth-field{display:flex;flex-direction:column;gap:6px;margin-bottom:12px}
 .auth-field label{font-size:12.5px;color:var(--muted);font-weight:500}
-.auth-field input{
-  background:var(--panel2);border:1.5px solid var(--border);border-radius:12px;
-  padding:13px 14px;outline:none;transition:border-color .15s,box-shadow .15s;width:100%;
-  font-size:16px;
-}
+.auth-field input{background:var(--panel2);border:1.5px solid var(--border);border-radius:12px;padding:13px 14px;outline:none;width:100%;font-size:16px}
 .auth-field input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(79,140,255,.15)}
-.auth-btn{
-  width:100%;padding:14px;border-radius:12px;background:var(--accent);color:#fff;
-  font-weight:600;font-size:15px;margin-top:6px;transition:transform .1s,background .15s;
-  display:flex;align-items:center;justify-content:center;gap:8px;
-}
+.auth-btn{width:100%;padding:14px;border-radius:12px;background:var(--accent);color:#fff;font-weight:600;font-size:15px;margin-top:6px}
 .auth-btn:active{transform:scale(.98)}
-.auth-btn:hover{background:var(--accent-d)}
 .auth-btn:disabled{opacity:.6;cursor:not-allowed}
-.auth-msg{
-  margin-top:14px;padding:11px 13px;border-radius:11px;font-size:13.5px;line-height:1.45;
-  display:none;
-}
+.auth-msg{margin-top:14px;padding:11px 13px;border-radius:11px;font-size:13.5px;line-height:1.45;display:none}
 .auth-msg.show{display:block}
 .auth-msg.err{background:rgba(255,92,122,.12);color:#ff8da1;border:1px solid rgba(255,92,122,.25)}
-.auth-msg.ok{background:rgba(61,220,151,.12);color:#7eecbb;border:1px solid rgba(61,220,151,.25)}
 .auth-msg.info{background:rgba(79,140,255,.12);color:#9ec0ff;border:1px solid rgba(79,140,255,.25)}
 
-/* ============ LAYOUT ============ */
+/* LAYOUT */
 .app{display:flex;min-height:100vh}
 .main{flex:1;min-width:0;padding:24px 28px 80px;max-width:1080px;margin:0 auto;width:100%}
 
-/* ============ SIDEBAR / BOTTOM NAV ============ */
-.sidebar{
-  width:228px;flex:0 0 228px;background:var(--panel);border-right:1px solid var(--border);
-  padding:18px 12px;display:flex;flex-direction:column;gap:3px;
-  position:sticky;top:0;height:100vh;z-index:40;
-}
+/* SIDEBAR / BOTTOM NAV */
+.sidebar{width:228px;flex:0 0 228px;background:var(--panel);border-right:1px solid var(--border);
+  padding:18px 12px;display:flex;flex-direction:column;gap:3px;position:sticky;top:0;height:100vh;z-index:40}
 .logo{font-size:17px;font-weight:700;padding:4px 10px 18px;display:flex;align-items:center;gap:9px}
-.nav-btn{
-  display:flex;align-items:center;gap:11px;padding:11px 12px;border-radius:12px;
-  background:transparent;color:var(--muted);cursor:pointer;width:100%;text-align:left;
-  transition:background .15s,color .15s;font-size:14.5px;font-weight:500;
-}
-.nav-btn i{font-style:normal;font-size:17px;width:20px;text-align:center;transition:transform .2s}
+.nav-btn{display:flex;align-items:center;gap:11px;padding:11px 12px;border-radius:12px;background:transparent;
+  color:var(--muted);cursor:pointer;width:100%;text-align:left;transition:.15s;font-size:14.5px;font-weight:500}
+.nav-btn i{font-style:normal;font-size:17px;width:20px;text-align:center}
 .nav-btn:hover{background:var(--panel2);color:var(--text)}
-.nav-btn.active{background:var(--accent);color:#fff;font-weight:600;
-  box-shadow:0 8px 20px -10px var(--accent)}
+.nav-btn.active{background:var(--accent);color:#fff;font-weight:600;box-shadow:0 8px 20px -10px var(--accent)}
 
-/* ============ TOPBAR ============ */
+/* TOPBAR */
 .topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:22px}
 .topbar h1{font-size:23px;font-weight:700;letter-spacing:-.015em}
 .topbar-right{display:flex;align-items:center;gap:8px}
-.cur{
-  background:var(--panel);border:1px solid var(--border);color:var(--muted);
-  border-radius:10px;padding:7px 10px;cursor:pointer;font-size:13px;font-weight:500;
-}
-.user-badge{
-  display:flex;align-items:center;gap:8px;padding:5px;
-  background:var(--panel);border:1px solid var(--border);border-radius:99px;
-  position:relative;transition:.15s;
-}
-.user-badge:hover{border-color:#39415a}
-.user-avatar{
-  width:32px;height:32px;border-radius:50%;
-  background:linear-gradient(135deg,#4f8cff,#7aa8ff);
-  color:#fff;font-weight:700;font-size:13px;
-  display:flex;align-items:center;justify-content:center;
-  text-transform:uppercase;
-}
-.sync-dot{
-  position:absolute;top:2px;right:2px;width:11px;height:11px;border-radius:50%;
-  border:2px solid var(--panel);transition:background .25s;
-}
+.cur{background:var(--panel);border:1px solid var(--border);color:var(--muted);border-radius:10px;padding:7px 10px;cursor:pointer;font-size:13px;font-weight:500}
+.user-badge{display:flex;align-items:center;gap:8px;padding:5px;background:var(--panel);
+  border:1px solid var(--border);border-radius:99px;position:relative;transition:.15s}
+.user-avatar{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#4f8cff,#7aa8ff);
+  color:#fff;font-weight:700;font-size:13px;display:flex;align-items:center;justify-content:center;text-transform:uppercase}
+.sync-dot{position:absolute;top:2px;right:2px;width:11px;height:11px;border-radius:50%;border:2px solid var(--panel);transition:background .25s}
 .sync-dot.ok{background:var(--green)}
-.sync-dot.syncing{background:var(--yellow);animation:pulse 1s infinite}
+.sync-dot.syncing,.sync-dot.pending{background:var(--yellow);animation:pulse 1s infinite}
 .sync-dot.error{background:var(--red)}
-.sync-dot.pending{background:var(--yellow)}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
 
-/* ============ CARDS ============ */
+/* CARDS */
 .card{background:var(--panel);border:1px solid var(--border);border-radius:var(--r);padding:18px}
 .card + .card{margin-top:14px}
-.section-title{font-size:12.5px;text-transform:uppercase;letter-spacing:.07em;
-  color:var(--muted);font-weight:700;margin:26px 0 12px}
+.section-title{font-size:12.5px;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);
+  font-weight:700;margin:26px 0 12px}
 .section-title:first-child{margin-top:0}
 
-/* ============ DASHBOARD ============ */
+/* DASHBOARD */
 .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
 .stat .lbl{font-size:12.5px;color:var(--muted);margin-bottom:6px;font-weight:500}
 .stat .val{font-size:21px;font-weight:700;letter-spacing:-.02em}
@@ -142,12 +96,19 @@ input,textarea,select{font-family:inherit}
 .cat-head{display:flex;justify-content:space-between;font-size:13.5px;margin-bottom:7px;gap:10px}
 .cat-head .amt{color:var(--muted);white-space:nowrap;font-variant-numeric:tabular-nums}
 .bar{height:7px;border-radius:99px;background:var(--panel2);overflow:hidden}
-.bar-fill{height:100%;border-radius:99px;
-  background:linear-gradient(90deg,var(--accent),#7aa8ff);
+.bar-fill{height:100%;border-radius:99px;background:linear-gradient(90deg,var(--accent),#7aa8ff);
   transition:width .5s cubic-bezier(.2,.7,.2,1)}
 .bar-fill.green{background:linear-gradient(90deg,#2fbf85,var(--green))}
-.tx-item{display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid var(--border)}
+
+/* TX ITEM (со свайпом) */
+.tx-item{position:relative;overflow:hidden;border-bottom:1px solid var(--border)}
 .tx-item:last-child{border-bottom:0}
+.tx-content{position:relative;background:var(--panel);display:flex;align-items:center;gap:12px;
+  padding:11px 0;transition:transform .2s ease;will-change:transform;cursor:pointer}
+.tx-item.swiped .tx-content{transform:translateX(-72px)}
+.tx-content.dragging{transition:none}
+.tx-delete-bg{position:absolute;right:0;top:0;bottom:0;width:72px;background:var(--red);color:#fff;
+  display:flex;align-items:center;justify-content:center;font-size:20px;cursor:pointer}
 .tx-ico{width:38px;height:38px;flex:0 0 38px;border-radius:12px;background:var(--panel2);
   display:flex;align-items:center;justify-content:center;font-size:17px}
 .tx-mid{flex:1;min-width:0}
@@ -157,229 +118,158 @@ input,textarea,select{font-family:inherit}
 .icon-btn{background:transparent;border:0;color:var(--muted);cursor:pointer;font-size:16px;
   padding:6px 8px;border-radius:9px;line-height:1;transition:.15s;flex:0 0 auto}
 .icon-btn:hover{background:var(--panel2);color:var(--red)}
-.icon-btn:active{transform:scale(.9)}
 
-/* ============ FORMS ============ */
+/* CHART */
+.chart{display:flex;gap:8px;align-items:flex-end;padding:14px 0 0;min-height:140px}
+.chart-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;min-width:0}
+.chart-bar{width:100%;max-width:44px;background:linear-gradient(180deg,var(--accent),#2a5fc9);
+  border-radius:6px 6px 2px 2px;min-height:4px;transition:height .4s;position:relative}
+.chart-bar.current{background:linear-gradient(180deg,#ffcc66,#d99e2e)}
+.chart-label{font-size:11px;color:var(--muted);text-transform:lowercase}
+
+/* FORMS */
 .field{display:flex;flex-direction:column;gap:6px;margin-bottom:12px}
 .field label{font-size:12.5px;color:var(--muted);font-weight:500}
-input,textarea,select{
-  background:var(--panel2);border:1.5px solid var(--border);border-radius:12px;
-  padding:12px 14px;outline:none;transition:border-color .15s,box-shadow .15s;width:100%;
-}
+input,textarea,select{background:var(--panel2);border:1.5px solid var(--border);border-radius:12px;
+  padding:12px 14px;outline:none;transition:.15s;width:100%}
 input:focus,textarea:focus,select:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(79,140,255,.15)}
 input::placeholder,textarea::placeholder{color:#5a6277}
 textarea{resize:vertical;min-height:80px;line-height:1.5}
 .row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.btn{
-  border:0;border-radius:12px;padding:12px 18px;cursor:pointer;font-weight:600;
-  background:var(--panel2);color:var(--text);transition:transform .1s,filter .15s;
-  font-size:14.5px;display:inline-flex;align-items:center;justify-content:center;gap:8px;
-}
+.btn{border:0;border-radius:12px;padding:12px 18px;cursor:pointer;font-weight:600;background:var(--panel2);
+  color:var(--text);transition:.15s;font-size:14.5px;display:inline-flex;align-items:center;justify-content:center;gap:8px}
 .btn:active{transform:scale(.97)}
 .btn:hover{filter:brightness(1.15)}
 .btn.primary{background:var(--accent);color:#fff;box-shadow:0 8px 22px -10px var(--accent)}
 .btn.primary:hover{background:var(--accent-d)}
 .btn.ghost{background:transparent;border:1px solid var(--border);color:var(--muted)}
+.btn.danger{background:rgba(255,92,122,.15);color:#ff8da1}
 .btn.block{width:100%}
 .btn.sm{padding:8px 13px;font-size:13.5px;border-radius:10px}
 .hint{font-size:12.5px;color:var(--muted);margin-top:8px;line-height:1.5}
 
-/* ============ SEGMENTED ============ */
+/* SEGMENTED */
 .seg{display:flex;gap:5px;background:var(--panel2);padding:5px;border-radius:14px;margin-bottom:16px}
-.seg-btn{flex:1;border:0;background:transparent;color:var(--muted);padding:11px;
-  border-radius:10px;cursor:pointer;font-weight:600;font-size:14.5px;transition:.15s}
+.seg-btn{flex:1;border:0;background:transparent;color:var(--muted);padding:11px;border-radius:10px;
+  cursor:pointer;font-weight:600;font-size:14.5px;transition:.15s}
 .seg-btn.active{background:var(--panel);color:var(--text);box-shadow:0 2px 8px rgba(0,0,0,.3)}
-.seg-btn.active[data-type="income"]{color:var(--green)}
-.seg-btn.active[data-type="expense"]{color:var(--red)}
+.seg-btn.active[data-type="income"],.seg-btn.active[data-sheet-type="income"]{color:var(--green)}
+.seg-btn.active[data-type="expense"],.seg-btn.active[data-sheet-type="expense"]{color:var(--red)}
 
-/* ============ AMOUNT INPUT ============ */
+/* AMOUNT */
 .amount-wrap{position:relative;margin-bottom:16px}
-.amount-input{
-  width:100%;font-size:34px;font-weight:700;letter-spacing:-.02em;
-  padding:14px 58px 14px 18px;background:var(--panel2);
-  border:1.5px solid var(--border);border-radius:16px;
-  -moz-appearance:textfield;
-}
+.amount-input{width:100%;font-size:34px;font-weight:700;letter-spacing:-.02em;padding:14px 58px 14px 18px;
+  background:var(--panel2);border:1.5px solid var(--border);border-radius:16px;-moz-appearance:textfield}
 .amount-input::-webkit-outer-spin-button,.amount-input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
-.amount-input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(79,140,255,.15)}
-.amount-cur{position:absolute;right:18px;top:50%;transform:translateY(-50%);
-  color:var(--muted);font-size:20px;font-weight:600;pointer-events:none}
+.amount-cur{position:absolute;right:18px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:20px;font-weight:600;pointer-events:none}
 
-/* ============ CATEGORY GRID ============ */
+/* CATEGORY GRID */
 .cat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px}
 @media (min-width:520px){.cat-grid{grid-template-columns:repeat(4,1fr)}}
-.cat-cell{
-  display:flex;flex-direction:column;align-items:center;gap:5px;
-  padding:12px 6px;border-radius:14px;background:var(--panel2);
-  border:1.5px solid transparent;transition:transform .12s,background .15s,border-color .15s;
-  min-height:74px;justify-content:center;
-}
+.cat-cell{display:flex;flex-direction:column;align-items:center;gap:5px;padding:12px 6px;border-radius:14px;
+  background:var(--panel2);border:1.5px solid transparent;transition:.15s;min-height:74px;justify-content:center}
 .cat-cell:active{transform:scale(.94)}
 .cat-cell .ci{font-size:23px;line-height:1}
 .cat-cell .cn{font-size:11px;color:var(--muted);text-align:center;line-height:1.2;font-weight:500}
 .cat-cell.active{background:rgba(79,140,255,.14);border-color:var(--accent)}
 .cat-cell.active .cn{color:var(--text);font-weight:600}
 
-/* ============ CHIPS ============ */
+/* CHIPS */
 .chips{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:14px}
-.chip{
-  border:1.5px solid var(--border);background:var(--panel2);color:var(--muted);
-  padding:9px 14px;border-radius:99px;cursor:pointer;font-size:13.5px;font-weight:500;transition:.15s;
-}
-.chip:active{transform:scale(.96)}
+.chip{border:1.5px solid var(--border);background:var(--panel2);color:var(--muted);padding:9px 14px;
+  border-radius:99px;cursor:pointer;font-size:13.5px;font-weight:500;transition:.15s}
 .chip.active{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:600}
 
-/* ============ GOALS ============ */
+/* GOALS */
 .goal-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:14px}
 .goal-title{font-size:17px;font-weight:700;letter-spacing:-.01em}
 .goal-deadline{font-size:12.5px;color:var(--muted);margin-top:3px}
 .goal-nums{display:flex;justify-content:space-between;font-size:13.5px;margin-bottom:8px;gap:10px}
 .goal-nums b{font-weight:700;font-variant-numeric:tabular-nums}
-.goal-plan{
-  display:flex;flex-wrap:wrap;gap:8px 18px;font-size:13px;color:var(--muted);
-  margin-top:14px;padding-top:14px;border-top:1px dashed var(--border);
-}
+.goal-plan{display:flex;flex-wrap:wrap;gap:8px 18px;font-size:13px;color:var(--muted);
+  margin-top:14px;padding-top:14px;border-top:1px dashed var(--border)}
 .goal-plan b{color:var(--text);font-variant-numeric:tabular-nums}
 .deposit-row{display:flex;gap:8px;margin-top:12px}
 .deposit-row input{flex:1}
 .subgoals{margin-top:14px;padding-top:14px;border-top:1px dashed var(--border)}
-.subgoal{
-  display:flex;align-items:center;gap:11px;padding:11px 12px;border-radius:12px;
-  background:var(--panel2);margin-bottom:7px;transition:background .15s,border-color .15s;
-  cursor:pointer;border:1px solid transparent;
-}
-.subgoal:active{transform:scale(.99)}
-.subgoal input[type=checkbox]{width:19px;height:19px;flex:0 0 19px;accent-color:var(--green);
-  cursor:pointer;padding:0;border-radius:6px}
-.subgoal .t{flex:1;font-size:14px;transition:.15s}
+.subgoal{display:flex;align-items:center;gap:11px;padding:11px 12px;border-radius:12px;background:var(--panel2);
+  margin-bottom:7px;transition:.15s;cursor:pointer;border:1px solid transparent}
+.subgoal input[type=checkbox]{width:19px;height:19px;flex:0 0 19px;accent-color:var(--green);cursor:pointer;padding:0}
+.subgoal .t{flex:1;font-size:14px}
 .subgoal .a{font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums;font-weight:500}
 .subgoal.done{background:rgba(61,220,151,.09);border-color:rgba(61,220,151,.25)}
-.subgoal.done .t{color:var(--green);text-decoration:line-through;text-decoration-color:rgba(61,220,151,.5)}
+.subgoal.done .t{color:var(--green);text-decoration:line-through}
 .subgoal.done .a{color:var(--green)}
 .sub-add{display:flex;gap:6px;margin-top:10px}
 .sub-add input:first-child{flex:1.6}
 .sub-add input:nth-child(2){flex:1;min-width:0}
-.sub-add button{flex:0 0 auto}
-.goal-done-badge{
-  display:inline-block;background:rgba(61,220,151,.15);color:var(--green);
-  padding:4px 11px;border-radius:99px;font-size:12px;font-weight:600;
-}
+.goal-done-badge{display:inline-block;background:rgba(61,220,151,.15);color:var(--green);
+  padding:4px 11px;border-radius:99px;font-size:12px;font-weight:600}
+.badge{display:inline-block;font-size:11.5px;color:var(--muted);background:var(--panel2);padding:3px 9px;border-radius:99px;font-weight:500}
 
-/* ============ NOTES ============ */
+/* NOTES */
 .note-card{position:relative;padding-top:16px}
-.note-card input.note-title{
-  background:transparent;border:0;padding:0 32px 8px 0;font-size:16px;font-weight:700;
-  border-bottom:1px solid transparent;border-radius:0;
-}
-.note-card input.note-title:focus{border-bottom-color:var(--accent);box-shadow:none}
-.note-card textarea{
-  background:transparent;border:0;padding:10px 0 0;min-height:100px;font-size:14px;
-  border-radius:0;line-height:1.55;
-}
+.note-card input.note-title{background:transparent;border:0;padding:0 32px 8px 0;font-size:16px;font-weight:700;border-radius:0}
+.note-card input.note-title:focus{border-bottom:1px solid var(--accent);box-shadow:none}
+.note-card textarea{background:transparent;border:0;padding:10px 0 0;min-height:100px;font-size:14px;border-radius:0;line-height:1.55}
 .note-card textarea:focus{box-shadow:none}
 .note-del{position:absolute;top:12px;right:10px}
 
-/* ============ EMPTY ============ */
+/* EMPTY */
 .empty{text-align:center;padding:42px 20px;color:var(--muted)}
 .empty .big{font-size:38px;margin-bottom:12px;opacity:.75;line-height:1}
 .empty p{font-size:14px;max-width:400px;margin:0 auto 16px;line-height:1.6}
 
-/* ============ FAB ============ */
-.fab{
-  position:fixed;right:18px;bottom:calc(20px + var(--safe-b));
-  width:58px;height:58px;border-radius:50%;
-  background:var(--accent);color:#fff;
-  display:none;align-items:center;justify-content:center;
-  box-shadow:0 10px 28px -6px rgba(79,140,255,.55),0 4px 12px rgba(0,0,0,.35);
-  z-index:45;transition:transform .15s,box-shadow .15s;
-  font-size:30px;font-weight:300;line-height:1;
-}
+/* FAB */
+.fab{position:fixed;right:18px;bottom:calc(20px + var(--safe-b));width:58px;height:58px;border-radius:50%;
+  background:var(--accent);color:#fff;display:none;align-items:center;justify-content:center;
+  box-shadow:0 10px 28px -6px rgba(79,140,255,.55),0 4px 12px rgba(0,0,0,.35);z-index:45;transition:.15s}
 .fab:active{transform:scale(.9)}
 .fab svg{width:26px;height:26px;stroke-width:2.5}
 
-/* ============ SHEET ============ */
-.sheet-backdrop{
-  position:fixed;inset:0;background:rgba(0,0,0,.55);
-  opacity:0;pointer-events:none;transition:opacity .25s;
-  z-index:100;backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);
-}
+/* SHEET */
+.sheet-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.55);opacity:0;pointer-events:none;
+  transition:opacity .25s;z-index:100;backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px)}
 .sheet-backdrop.open{opacity:1;pointer-events:auto}
-.sheet{
-  position:fixed;left:0;right:0;bottom:0;
-  background:var(--panel);border-radius:22px 22px 0 0;
-  transform:translateY(100%);
-  transition:transform .34s cubic-bezier(.32,.72,0,1);
-  z-index:101;max-height:92vh;
-  display:flex;flex-direction:column;
-  padding-bottom:var(--safe-b);
-  border-top:1px solid var(--border);
-  bottom:var(--kb);
-  will-change:transform;
-}
+.sheet{position:fixed;left:0;right:0;bottom:0;background:var(--panel);border-radius:22px 22px 0 0;
+  transform:translateY(100%);transition:transform .34s cubic-bezier(.32,.72,0,1);z-index:101;max-height:92vh;
+  display:flex;flex-direction:column;padding-bottom:var(--safe-b);border-top:1px solid var(--border);
+  bottom:var(--kb);will-change:transform}
 .sheet.open{transform:translateY(0)}
 .sheet-handle-wrap{padding:10px 0 6px;display:flex;justify-content:center;flex:0 0 auto}
 .sheet-handle{width:42px;height:4px;border-radius:99px;background:#3a4152}
-.sheet-header{
-  display:flex;align-items:center;justify-content:space-between;
-  padding:4px 18px 12px;flex:0 0 auto;
-}
+.sheet-header{display:flex;align-items:center;justify-content:space-between;padding:4px 18px 12px;flex:0 0 auto}
 .sheet-header h2{font-size:17px;font-weight:700}
-.sheet-close{
-  width:34px;height:34px;border-radius:50%;background:var(--panel2);
-  color:var(--muted);display:flex;align-items:center;justify-content:center;
-  font-size:15px;transition:.15s;
-}
-.sheet-close:active{transform:scale(.9)}
+.sheet-close{width:34px;height:34px;border-radius:50%;background:var(--panel2);color:var(--muted);
+  display:flex;align-items:center;justify-content:center;font-size:15px}
 .sheet-body{flex:1;overflow-y:auto;padding:0 18px 4px;-webkit-overflow-scrolling:touch}
-.sheet-footer{
-  padding:14px 18px 18px;flex:0 0 auto;border-top:1px solid var(--border);
-  background:var(--panel);
-}
+.sheet-footer{padding:14px 18px 18px;flex:0 0 auto;border-top:1px solid var(--border);background:var(--panel)}
 
-/* ============ TOAST ============ */
-.toast{
-  position:fixed;bottom:calc(var(--nav-h) + var(--safe-b) + 80px);
-  left:50%;transform:translate(-50%,16px);
-  background:var(--panel3);border:1px solid var(--border);
-  color:var(--text);padding:12px 20px;border-radius:14px;
-  font-size:14px;font-weight:500;z-index:200;
-  opacity:0;transition:opacity .25s,transform .25s;
-  pointer-events:none;box-shadow:0 16px 40px rgba(0,0,0,.5);
-  white-space:nowrap;max-width:90vw;overflow:hidden;text-overflow:ellipsis;
-}
+/* TOAST */
+.toast{position:fixed;bottom:calc(var(--nav-h) + var(--safe-b) + 80px);left:50%;
+  transform:translate(-50%,16px);background:var(--panel3);border:1px solid var(--border);color:var(--text);
+  padding:12px 20px;border-radius:14px;font-size:14px;font-weight:500;z-index:200;opacity:0;
+  transition:.25s;pointer-events:none;box-shadow:0 16px 40px rgba(0,0,0,.5);
+  white-space:nowrap;max-width:90vw;overflow:hidden;text-overflow:ellipsis}
 .toast.show{opacity:1;transform:translate(-50%,0)}
 .toast .tick{color:var(--green);margin-right:6px}
 
-/* ============ MOBILE ============ */
+/* MOBILE */
 @media (max-width:768px){
   .app{flex-direction:column}
-  .sidebar{
-    position:fixed;bottom:0;left:0;right:0;top:auto;
-    width:100%;height:auto;flex:none;
+  .sidebar{position:fixed;bottom:0;left:0;right:0;top:auto;width:100%;height:auto;flex:none;
     flex-direction:row;justify-content:space-around;align-items:stretch;
-    padding:6px 4px calc(6px + var(--safe-b));
-    border-right:0;border-top:1px solid var(--border);
-    background:rgba(22,26,34,.92);
-    backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px);
-    z-index:40;gap:0;
-  }
+    padding:6px 4px calc(6px + var(--safe-b));border-right:0;border-top:1px solid var(--border);
+    background:rgba(22,26,34,.92);backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px);z-index:40;gap:0}
   .logo{display:none}
-  .nav-btn{
-    flex-direction:column;gap:2px;padding:8px 4px 6px;border-radius:12px;
-    font-size:10px;font-weight:500;flex:1;max-width:84px;
-    justify-content:center;align-items:center;text-align:center;
-    background:transparent!important;box-shadow:none!important;
-  }
-  .nav-btn i{font-size:21px;width:auto;line-height:1;transition:transform .2s}
+  .nav-btn{flex-direction:column;gap:2px;padding:8px 4px 6px;border-radius:12px;font-size:10px;
+    font-weight:500;flex:1;max-width:84px;justify-content:center;align-items:center;text-align:center;
+    background:transparent!important;box-shadow:none!important}
+  .nav-btn i{font-size:21px;width:auto;line-height:1}
   .nav-btn.active{color:var(--accent)}
-  .nav-btn.active i{transform:translateY(-1px) scale(1.05)}
-  .nav-btn span{letter-spacing:.01em}
   .main{padding:8px 14px calc(var(--nav-h) + var(--safe-b) + 90px);max-width:none}
-  .topbar{
-    position:sticky;top:0;z-index:30;
-    background:linear-gradient(180deg,var(--bg) 70%,rgba(14,16,20,0));
-    padding:8px 0 14px;margin-bottom:8px;
-  }
+  .topbar{position:sticky;top:0;z-index:30;background:linear-gradient(180deg,var(--bg) 70%,rgba(14,16,20,0));
+    padding:8px 0 14px;margin-bottom:8px}
   .topbar h1{font-size:22px}
   .fab{display:flex}
   .stats{grid-template-columns:1fr 1fr;gap:10px}
@@ -391,58 +281,45 @@ textarea{resize:vertical;min-height:80px;line-height:1.5}
   .sub-add{flex-wrap:wrap}
   .sub-add input:first-child{flex:1 1 100%}
   .sub-add input:nth-child(2){flex:1 1 auto}
-  .sub-add button{flex:0 0 44px}
   .toast{bottom:calc(var(--nav-h) + var(--safe-b) + 100px)}
 }
 @media (min-width:769px){
-  .sheet{
-    left:50%;top:50%;right:auto;bottom:auto;
-    transform:translate(-50%,-46%) scale(.97);
-    opacity:0;width:480px;max-height:85vh;border-radius:20px;
-    transition:opacity .2s,transform .24s cubic-bezier(.32,.72,0,1);
-    border:1px solid var(--border);
-    padding-bottom:0;
-  }
+  .sheet{left:50%;top:50%;right:auto;bottom:auto;transform:translate(-50%,-46%) scale(.97);opacity:0;
+    width:480px;max-height:85vh;border-radius:20px;transition:.24s cubic-bezier(.32,.72,0,1);
+    border:1px solid var(--border);padding-bottom:0}
   .sheet.open{transform:translate(-50%,-50%) scale(1);opacity:1}
   .sheet-handle-wrap{display:none}
   .sheet-header{padding-top:20px}
   .sheet-footer{border-radius:0 0 20px 20px}
+  .tx-delete-bg{display:none}
+  .tx-item .icon-btn.del-desktop{display:inline-flex}
 }
-@media (prefers-reduced-motion:reduce){
-  *,*::before,*::after{transition-duration:.01ms!important;animation-duration:.01ms!important}
-}
+@media (min-width:769px){ .tx-item .icon-btn.del-desktop{display:inline-flex} }
+@media (max-width:768px){ .tx-item .icon-btn.del-desktop{display:none} }
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{transition-duration:.01ms!important;animation-duration:.01ms!important}}
 </style>
 </head>
 <body>
 
-<!-- ================= AUTH SCREEN ================= -->
 <div class="auth-screen" id="authScreen" style="display:none">
   <div class="auth-card">
     <div class="auth-logo">💸 <span>Финансы</span></div>
     <div class="auth-sub" id="authSub">Войди, чтобы данные синхронизировались между устройствами</div>
-
     <div class="auth-tabs">
       <button class="auth-tab active" data-auth-tab="login">Вход</button>
       <button class="auth-tab" data-auth-tab="register">Регистрация</button>
     </div>
-
     <form id="authForm" autocomplete="on">
-      <div class="auth-field">
-        <label>Email</label>
-        <input id="authEmail" type="email" autocomplete="email" required placeholder="you@example.com">
-      </div>
-      <div class="auth-field">
-        <label>Пароль</label>
-        <input id="authPass" type="password" autocomplete="current-password" required minlength="6" placeholder="Минимум 6 символов">
-      </div>
+      <div class="auth-field"><label>Email</label>
+        <input id="authEmail" type="email" autocomplete="email" required placeholder="you@example.com"></div>
+      <div class="auth-field"><label>Пароль</label>
+        <input id="authPass" type="password" autocomplete="current-password" required minlength="6" placeholder="Минимум 6 символов"></div>
       <button class="auth-btn" type="submit" id="authBtn">Войти</button>
     </form>
-
     <div class="auth-msg" id="authMsg"></div>
   </div>
 </div>
 
-<!-- ================= APP ================= -->
 <div class="app" id="appScreen" style="display:none">
   <aside class="sidebar">
     <div class="logo">💸 <span>Финансы</span></div>
@@ -451,17 +328,13 @@ textarea{resize:vertical;min-height:80px;line-height:1.5}
     <button class="nav-btn" data-tab="goals"><i>🎯</i><span>Цели</span></button>
     <button class="nav-btn" data-tab="notes"><i>📝</i><span>Заметки</span></button>
   </aside>
-
   <main class="main">
     <header class="topbar">
       <h1 id="pageTitle">Обзор</h1>
       <div class="topbar-right">
         <select id="currencySel" class="cur" aria-label="Валюта">
-          <option value="€">€ EUR</option>
-          <option value="₽">₽ RUB</option>
-          <option value="$">$ USD</option>
-          <option value="₸">₸ KZT</option>
-          <option value="₴">₴ UAH</option>
+          <option value="€">€ EUR</option><option value="₽">₽ RUB</option>
+          <option value="$">$ USD</option><option value="₸">₸ KZT</option><option value="₴">₴ UAH</option>
         </select>
         <button class="user-badge" id="userBadge" aria-label="Аккаунт">
           <span class="user-avatar" id="userAvatar">?</span>
@@ -475,27 +348,49 @@ textarea{resize:vertical;min-height:80px;line-height:1.5}
 
 <button class="fab" id="fab" aria-label="Добавить">
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round">
-    <line x1="12" y1="5" x2="12" y2="19"></line>
-    <line x1="5" y1="12" x2="19" y2="12"></line>
+    <line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line>
   </svg>
 </button>
-
 <div class="sheet-backdrop" id="backdrop"></div>
 <div class="sheet" id="sheet" role="dialog" aria-modal="true"></div>
 
-<!-- ================= SUPABASE ================= -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 /* =====================================================================
-   SUPABASE CONFIG — ЗАМЕНИ НА СВОИ ЗНАЧЕНИЯ
-   Где взять: Supabase Dashboard → Settings → API
+   CONFIG
    ===================================================================== */
 const SUPABASE_URL      = 'https://heramwgczjcmkoyrvevh.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhlcmFtd2djempjbWtveXJ2ZXZoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTAyNDI2MzEsImV4cCI6MjEwNTgxODYzMX0.JcgkpaPiMnIVWXGHLmQLydDmoT8D0I6P21rmmteC5lU';
-
-/* ВАЖНО: переменная клиента называется sb, а не supabase —
-   иначе конфликт с глобальной переменной из CDN. */
 const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+/* =====================================================================
+   PWA
+   ===================================================================== */
+(function setupPWA() {
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+    <rect width="512" height="512" rx="96" fill="#4f8cff"/>
+    <text x="256" y="360" font-size="280" text-anchor="middle" font-family="-apple-system,sans-serif" font-weight="700" fill="#fff">₽</text>
+  </svg>`;
+  const icon = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
+  const manifest = {
+    name: 'Финансы',
+    short_name: 'Финансы',
+    start_url: '.',
+    scope: '.',
+    display: 'standalone',
+    orientation: 'portrait',
+    background_color: '#0e1014',
+    theme_color: '#0e1014',
+    icons: [
+      { src: icon, sizes: '192x192', type: 'image/svg+xml', purpose: 'any' },
+      { src: icon, sizes: '512x512', type: 'image/svg+xml', purpose: 'any maskable' }
+    ]
+  };
+  try {
+    document.getElementById('manifestLink').href =
+      'data:application/manifest+json;charset=utf-8,' + encodeURIComponent(JSON.stringify(manifest));
+  } catch (e) { console.warn('manifest setup failed', e); }
+})();
 
 /* =====================================================================
    УТИЛИТЫ
@@ -538,55 +433,69 @@ function plural(n, one, few, many) {
   if (m10 >= 2 && m10 <= 4 && (m100 < 10 || m100 >= 20)) return few;
   return many;
 }
-function haptic(ms=8) {
-  if (navigator.vibrate) try { navigator.vibrate(ms); } catch(e) {}
-}
+function haptic(ms=8) { if (navigator.vibrate) try { navigator.vibrate(ms); } catch(e) {} }
 
 /* =====================================================================
    КАТЕГОРИИ
    ===================================================================== */
 const EXPENSE_CATS = [
-  { id:'food',      name:'Еда',          icon:'🍔' },
-  { id:'tech',      name:'Техника',      icon:'💻' },
-  { id:'smoke',     name:'Курение',      icon:'🚬' },
-  { id:'fun',       name:'Развлечения',  icon:'🎮' },
-  { id:'transport', name:'Транспорт',    icon:'🚗' },
-  { id:'home',      name:'Жильё',        icon:'🏠' },
-  { id:'health',    name:'Здоровье',     icon:'💊' },
-  { id:'clothes',   name:'Одежда',       icon:'👕' },
-  { id:'other',     name:'Другое',       icon:'📦' },
+  { id:'food',name:'Еда',icon:'🍔' },{ id:'tech',name:'Техника',icon:'💻' },
+  { id:'smoke',name:'Курение',icon:'🚬' },{ id:'fun',name:'Развлечения',icon:'🎮' },
+  { id:'transport',name:'Транспорт',icon:'🚗' },{ id:'home',name:'Жильё',icon:'🏠' },
+  { id:'health',name:'Здоровье',icon:'💊' },{ id:'clothes',name:'Одежда',icon:'👕' },
+  { id:'other',name:'Другое',icon:'📦' },
 ];
 const INCOME_CATS = [
-  { id:'salary',    name:'Зарплата',     icon:'💰' },
-  { id:'freelance', name:'Фриланс',      icon:'🧑‍💻' },
-  { id:'gift',      name:'Подарок',      icon:'🎁' },
-  { id:'other_in',  name:'Другое',       icon:'✨' },
+  { id:'salary',name:'Зарплата',icon:'💰' },{ id:'freelance',name:'Фриланс',icon:'🧑‍💻' },
+  { id:'gift',name:'Подарок',icon:'🎁' },{ id:'other_in',name:'Другое',icon:'✨' },
 ];
 const ALL_CATS = [...EXPENSE_CATS, ...INCOME_CATS];
 const catById = id => ALL_CATS.find(c => c.id === id) || { name:'Без категории', icon:'❓' };
+
+/* Сортировка категорий по частоте использования у пользователя */
+function sortCatsByUsage(cats) {
+  const usage = state.categoryUsage || {};
+  const any = cats.some(c => (usage[c.id] || 0) > 0);
+  if (!any) return cats.slice();
+  return cats.slice().sort((a, b) => (usage[b.id] || 0) - (usage[a.id] || 0));
+}
 
 /* =====================================================================
    СОСТОЯНИЕ
    ===================================================================== */
 const LS_KEY = 'finance_app_v2';
+const SHARED_LS_KEY = 'finance_app_shared_v1';
 const LAST_USER_KEY = 'finance_app_last_user';
-let state = { transactions: [], goals: [], notes: [], currency: '€' };
+
+let state = {
+  transactions: [], goals: [], notes: [], currency: '€',
+  budgets: {}, recurring: [], categoryUsage: {},
+};
+let sharedGoals = [];
 let currentUser = null;
 
-function saveLocal() {
-  try { localStorage.setItem(LS_KEY, JSON.stringify(state)); } catch(e) {}
-}
+function saveLocal() { try { localStorage.setItem(LS_KEY, JSON.stringify(state)); } catch(e) {} }
 function loadLocal() {
   try {
     const raw = localStorage.getItem(LS_KEY);
     if (raw) {
-      const parsed = JSON.parse(raw);
-      state = Object.assign(state, parsed);
+      const p = JSON.parse(raw);
+      state = Object.assign(state, p);
       state.transactions = state.transactions || [];
       state.goals = state.goals || [];
       state.notes = state.notes || [];
+      state.budgets = state.budgets || {};
+      state.recurring = state.recurring || [];
+      state.categoryUsage = state.categoryUsage || {};
     }
-  } catch(e) { console.warn('load error', e); }
+  } catch(e) { console.warn(e); }
+}
+function saveLocalShared() { try { localStorage.setItem(SHARED_LS_KEY, JSON.stringify(sharedGoals)); } catch(e) {} }
+function loadLocalShared() {
+  try {
+    const raw = localStorage.getItem(SHARED_LS_KEY);
+    if (raw) sharedGoals = JSON.parse(raw) || [];
+  } catch(e) {}
 }
 function goalSaved(g) {
   const subs = (g.subgoals || []).filter(s => s.done).reduce((a, s) => a + (Number(s.amount) || 0), 0);
@@ -594,66 +503,73 @@ function goalSaved(g) {
 }
 
 /* =====================================================================
+   PERIOD (для обзора)
+   ===================================================================== */
+let uiPeriod = 'month'; // month | prev | all
+
+function periodRange() {
+  const now = new Date();
+  if (uiPeriod === 'month') {
+    return { start: new Date(now.getFullYear(), now.getMonth(), 1),
+             end: new Date(now.getFullYear(), now.getMonth()+1, 1, 0,0,0,0),
+             label: 'этот месяц' };
+  }
+  if (uiPeriod === 'prev') {
+    return { start: new Date(now.getFullYear(), now.getMonth()-1, 1),
+             end: new Date(now.getFullYear(), now.getMonth(), 1, 0,0,0,0),
+             label: 'прошлый месяц' };
+  }
+  return { start: new Date(0), end: new Date(8640000000000000), label: 'всё время' };
+}
+function inPeriod(dateStr, r) {
+  const d = new Date(dateStr + 'T00:00:00');
+  return d >= r.start && d < r.end;
+}
+
+/* =====================================================================
    ОБЛАЧНАЯ СИНХРОНИЗАЦИЯ
    ===================================================================== */
 let syncTimer = null;
-let syncState = 'ok'; // ok | pending | syncing | error
+let syncState = 'ok';
+let lastPushTimestamp = null;
+let realtimeChannel = null;
 
 function setSyncStatus(s) {
   syncState = s;
   const dot = $('#syncDot');
   if (!dot) return;
   dot.className = 'sync-dot ' + s;
-  dot.title =
-    s === 'ok'      ? 'Синхронизировано' :
-    s === 'pending' ? 'Ожидает сохранения' :
-    s === 'syncing' ? 'Сохраняю…' :
-                      'Ошибка синхронизации';
+  dot.title = s === 'ok' ? 'Синхронизировано' :
+              s === 'pending' ? 'Ожидает сохранения' :
+              s === 'syncing' ? 'Сохраняю…' : 'Ошибка синхронизации';
 }
-
-/* Сохранить: сначала локально, потом в облако с дебаунсом */
 function save() {
   saveLocal();
   if (!currentUser) return;
-
   setSyncStatus('pending');
   clearTimeout(syncTimer);
   syncTimer = setTimeout(pushToCloud, 700);
 }
-
 async function pushToCloud() {
   if (!currentUser) return;
   setSyncStatus('syncing');
+  const ts = new Date().toISOString();
+  const snapshot = JSON.parse(JSON.stringify(state));
   const { error } = await sb.from('user_data').upsert({
-    user_id: currentUser.id,
-    data: state,
-    updated_at: new Date().toISOString(),
+    user_id: currentUser.id, data: snapshot, updated_at: ts,
   }, { onConflict: 'user_id' });
-
-  if (error) {
-    console.warn('sync push error', error);
-    setSyncStatus('error');
-    return;
-  }
+  if (error) { console.warn('push error', error); setSyncStatus('error'); return; }
+  lastPushTimestamp = ts;
   setSyncStatus('ok');
 }
-
 async function pullFromCloud() {
   if (!currentUser) return { found: false };
-  const { data, error } = await sb
-    .from('user_data')
-    .select('data')
-    .eq('user_id', currentUser.id)
-    .maybeSingle();
-
-  if (error) {
-    console.warn('sync pull error', error);
-    return { found: false, error };
-  }
-
+  const { data, error } = await sb.from('user_data')
+    .select('data').eq('user_id', currentUser.id).maybeSingle();
+  if (error) { console.warn('pull error', error); return { found: false, error }; }
   if (data && data.data && typeof data.data === 'object') {
     state = Object.assign(
-      { transactions: [], goals: [], notes: [], currency: '€' },
+      { transactions: [], goals: [], notes: [], currency: '€', budgets: {}, recurring: [], categoryUsage: {} },
       data.data
     );
     saveLocal();
@@ -663,29 +579,113 @@ async function pullFromCloud() {
 }
 
 /* =====================================================================
+   REALTIME
+   ===================================================================== */
+function subscribeRealtime() {
+  if (!currentUser || realtimeChannel) return;
+  realtimeChannel = sb.channel('user_data_rt')
+    .on('postgres_changes',
+      { event: '*', schema: 'public', table: 'user_data', filter: `user_id=eq.${currentUser.id}` },
+      (payload) => {
+        if (syncState !== 'ok') return;                    // есть локальные несинхронизированные изменения
+        if (payload.new?.updated_at === lastPushTimestamp) return; // эхо нашего же пуша
+        const remote = payload.new?.data;
+        if (!remote || typeof remote !== 'object') return;
+        state = Object.assign(
+          { transactions: [], goals: [], notes: [], currency: '€', budgets: {}, recurring: [], categoryUsage: {} },
+          remote
+        );
+        saveLocal();
+        render();
+        toast('Обновлено с другого устройства');
+      })
+    .subscribe((status) => {
+      if (status === 'SUBSCRIBED') console.log('[rt] subscribed');
+      if (status === 'CHANNEL_ERROR') console.warn('[rt] channel error');
+    });
+}
+function unsubscribeRealtime() {
+  if (realtimeChannel) {
+    try { sb.removeChannel(realtimeChannel); } catch(e) {}
+    realtimeChannel = null;
+  }
+}
+
+/* =====================================================================
+   REGULAR TRANSACTIONS
+   ===================================================================== */
+function runRecurring() {
+  const now = new Date();
+  const ym = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
+  let changed = false;
+  (state.recurring || []).forEach(r => {
+    if (!r.active) return;
+    if (r.lastRun === ym) return;
+    if (now.getDate() < (r.dayOfMonth || 1)) return;
+    const daysInMonth = new Date(now.getFullYear(), now.getMonth()+1, 0).getDate();
+    const day = Math.min(r.dayOfMonth, daysInMonth);
+    const dateStr = `${ym}-${String(day).padStart(2,'0')}`;
+    state.transactions.push({
+      id: uid(), type: r.type, amount: r.amount, category: r.category,
+      note: r.note || '', date: dateStr, createdAt: new Date().toISOString(),
+      recurringId: r.id,
+    });
+    state.categoryUsage[r.category] = (state.categoryUsage[r.category] || 0) + 1;
+    r.lastRun = ym;
+    changed = true;
+  });
+  if (changed) save();
+}
+
+/* =====================================================================
+   SHARED GOALS
+   ===================================================================== */
+async function loadSharedGoals() {
+  if (!currentUser) { sharedGoals = []; return; }
+  const { data: goals, error } = await sb.from('shared_goals').select('*')
+    .order('created_at', { ascending: false });
+  if (error) { console.warn('shared goals load', error); return; }
+  if (!goals || !goals.length) { sharedGoals = []; saveLocalShared(); return; }
+
+  const ids = goals.map(g => g.id);
+  const [mRes, dRes] = await Promise.all([
+    sb.from('shared_goal_members').select('*').in('goal_id', ids),
+    sb.from('shared_goal_deposits').select('*').in('goal_id', ids).order('date', { ascending: false }),
+  ]);
+  const members = mRes.data || [];
+  const deposits = dRes.data || [];
+
+  sharedGoals = goals.map(g => {
+    const gm = members.filter(m => m.goal_id === g.id);
+    const gd = deposits.filter(d => d.goal_id === g.id);
+    return {
+      ...g,
+      members: gm,
+      deposits: gd,
+      total: gd.reduce((a, d) => a + Number(d.amount || 0), 0),
+    };
+  });
+  saveLocalShared();
+}
+
+/* =====================================================================
    АУТЕНТИФИКАЦИЯ
    ===================================================================== */
 let authMode = 'login';
-
 function showAuth() {
   $('#authScreen').style.display = 'flex';
   $('#appScreen').style.display = 'none';
-  document.body.style.overflow = '';
 }
 function showApp() {
   $('#authScreen').style.display = 'none';
   $('#appScreen').style.display = 'flex';
-
   const email = currentUser?.email || '';
-  const initial = (email[0] || '?').toUpperCase();
-  $('#userAvatar').textContent = initial;
+  $('#userAvatar').textContent = (email[0] || '?').toUpperCase();
 }
-
 document.querySelectorAll('[data-auth-tab]').forEach(b => {
   b.addEventListener('click', () => {
     authMode = b.dataset.authTab;
-    document.querySelectorAll('[data-auth-tab]').forEach(x =>
-      x.classList.toggle('active', x === b));
+    document.querySelectorAll('[data-auth-tab]').forEach(x => x.classList.toggle('active', x === b));
     $('#authBtn').textContent = authMode === 'login' ? 'Войти' : 'Создать аккаунт';
     $('#authSub').textContent = authMode === 'login'
       ? 'Войди, чтобы данные синхронизировались между устройствами'
@@ -694,78 +694,54 @@ document.querySelectorAll('[data-auth-tab]').forEach(b => {
     hideAuthMsg();
   });
 });
-
 function showAuthMsg(text, kind = 'info') {
-  const el = $('#authMsg');
-  el.textContent = text;
-  el.className = 'auth-msg show ' + kind;
+  const el = $('#authMsg'); el.textContent = text; el.className = 'auth-msg show ' + kind;
 }
-function hideAuthMsg() {
-  const el = $('#authMsg');
-  el.className = 'auth-msg';
-  el.textContent = '';
-}
+function hideAuthMsg() { const el = $('#authMsg'); el.className = 'auth-msg'; el.textContent = ''; }
 
 $('#authForm').addEventListener('submit', async (e) => {
-  e.preventDefault();
-  hideAuthMsg();
-
+  e.preventDefault(); hideAuthMsg();
   const email = $('#authEmail').value.trim();
   const password = $('#authPass').value;
   if (!email || !password) return;
-
-  const btn = $('#authBtn');
-  const original = btn.textContent;
+  const btn = $('#authBtn'); const original = btn.textContent;
   btn.disabled = true;
   btn.textContent = authMode === 'login' ? 'Вход…' : 'Создаю…';
-
   try {
     if (authMode === 'login') {
-      const { data, error } = await sb.auth.signInWithPassword({ email, password });
+      const { error } = await sb.auth.signInWithPassword({ email, password });
       if (error) throw error;
-      // onAuthStateChange подхватит и загрузит данные
     } else {
       const { data, error } = await sb.auth.signUp({ email, password });
       if (error) throw error;
-
       if (data.user && !data.session) {
         showAuthMsg('Аккаунт создан. Проверь почту и перейди по ссылке для входа.', 'info');
-        btn.disabled = false;
-        btn.textContent = original;
-        return;
+        btn.disabled = false; btn.textContent = original; return;
       }
     }
   } catch (err) {
-    console.warn(err);
-    const msg = (err && err.message) ? err.message : 'Что-то пошло не так';
+    const msg = err?.message || 'Что-то пошло не так';
     let ru = msg;
     if (/Invalid login credentials/i.test(msg)) ru = 'Неверный email или пароль';
-    else if (/User already registered/i.test(msg)) ru = 'Такой email уже зарегистрирован — попробуй войти';
+    else if (/User already registered/i.test(msg)) ru = 'Такой email уже зарегистрирован';
     else if (/Password should be at least/i.test(msg)) ru = 'Пароль слишком короткий';
-    else if (/Email not confirmed/i.test(msg)) ru = 'Подтверди email — мы прислали ссылку на почту';
-    else if (/rate limit/i.test(msg)) ru = 'Слишком много попыток, подожди немного';
+    else if (/Email not confirmed/i.test(msg)) ru = 'Подтверди email';
+    else if (/rate limit/i.test(msg)) ru = 'Слишком много попыток';
     showAuthMsg(ru, 'err');
-    btn.disabled = false;
-    btn.textContent = original;
+    btn.disabled = false; btn.textContent = original;
   }
 });
 
-/* User badge → sheet с email и logout */
 $('#userBadge').addEventListener('click', () => {
   haptic(8);
   const email = currentUser?.email || '—';
-  const syncText =
-    syncState === 'ok'      ? 'Все данные в облаке' :
-    syncState === 'pending' ? 'Ждёт сохранения…' :
-    syncState === 'syncing' ? 'Сохраняю…' :
-                              'Ошибка синхронизации';
-
+  const syncText = syncState === 'ok' ? 'Все данные в облаке'
+    : syncState === 'pending' ? 'Ждёт сохранения…'
+    : syncState === 'syncing' ? 'Сохраняю…' : 'Ошибка синхронизации';
   openSheet(`
     <div class="sheet-handle-wrap"><div class="sheet-handle"></div></div>
-    <div class="sheet-header">
-      <h2>Аккаунт</h2>
-      <button class="sheet-close" data-action="close-sheet">✕</button>
-    </div>
+    <div class="sheet-header"><h2>Аккаунт</h2>
+      <button class="sheet-close" data-action="close-sheet">✕</button></div>
     <div class="sheet-body">
       <div class="card" style="margin:0 0 12px">
         <div class="hint" style="margin:0 0 4px">Email</div>
@@ -778,13 +754,11 @@ $('#userBadge').addEventListener('click', () => {
           <span>${syncText}</span>
         </div>
       </div>
-      <div class="hint" style="margin-top:14px">
-        Заходи с любого устройства под этим email — все операции, цели и заметки подтянутся автоматически.
-      </div>
+      <div class="hint" style="margin-top:14px">Realtime включён: изменения с других устройств появятся сами.</div>
     </div>
     <div class="sheet-footer">
       <button class="btn ghost block" data-action="force-sync" style="margin-bottom:8px">Синхронизировать сейчас</button>
-      <button class="btn block" data-action="logout" style="background:rgba(255,92,122,.15);color:#ff8da1">Выйти из аккаунта</button>
+      <button class="btn danger block" data-action="logout">Выйти из аккаунта</button>
     </div>
   `);
 });
@@ -798,7 +772,7 @@ const TITLES = { dashboard:'Обзор', transactions:'Операции', goals:
 document.querySelectorAll('.nav-btn').forEach(btn => {
   btn.addEventListener('click', () => {
     const tab = btn.dataset.tab;
-    if (tab === currentTab) { window.scrollTo({ top: 0, behavior: 'smooth' }); return; }
+    if (tab === currentTab) { window.scrollTo({ top:0, behavior:'smooth' }); return; }
     currentTab = tab;
     document.querySelectorAll('.nav-btn').forEach(b => b.classList.toggle('active', b === btn));
     $('#pageTitle').textContent = TITLES[currentTab];
@@ -806,11 +780,7 @@ document.querySelectorAll('.nav-btn').forEach(btn => {
     render(true);
   });
 });
-
-$('#currencySel').addEventListener('change', e => {
-  state.currency = e.target.value;
-  save(); render();
-});
+$('#currencySel').addEventListener('change', e => { state.currency = e.target.value; save(); render(); });
 
 /* =====================================================================
    TOAST
@@ -818,11 +788,7 @@ $('#currencySel').addEventListener('change', e => {
 let toastTimer;
 function toast(msg, withTick=true) {
   let el = document.querySelector('.toast');
-  if (!el) {
-    el = document.createElement('div');
-    el.className = 'toast';
-    document.body.appendChild(el);
-  }
+  if (!el) { el = document.createElement('div'); el.className = 'toast'; document.body.appendChild(el); }
   el.innerHTML = (withTick ? '<span class="tick">✓</span>' : '') + esc(msg);
   requestAnimationFrame(() => el.classList.add('show'));
   clearTimeout(toastTimer);
@@ -832,46 +798,33 @@ function toast(msg, withTick=true) {
 /* =====================================================================
    SHEET
    ===================================================================== */
-const sheet = $('#sheet');
-const backdrop = $('#backdrop');
+const sheet = $('#sheet'); const backdrop = $('#backdrop');
 let sheetMount = null;
-
 function openSheet(html, mount) {
-  sheet.innerHTML = html;
-  sheetMount = mount || null;
+  sheet.innerHTML = html; sheetMount = mount || null;
   void sheet.offsetHeight;
-  sheet.classList.add('open');
-  backdrop.classList.add('open');
+  sheet.classList.add('open'); backdrop.classList.add('open');
   document.body.style.overflow = 'hidden';
   if (sheetMount) sheetMount();
-  const firstInput = sheet.querySelector('[data-autofocus]');
-  if (firstInput) setTimeout(() => firstInput.focus({ preventScroll: true }), 340);
+  const f = sheet.querySelector('[data-autofocus]');
+  if (f) setTimeout(() => f.focus({ preventScroll: true }), 340);
 }
 function closeSheet() {
-  sheet.classList.remove('open');
-  backdrop.classList.remove('open');
-  document.body.style.overflow = '';
-  sheetMount = null;
+  sheet.classList.remove('open'); backdrop.classList.remove('open');
+  document.body.style.overflow = ''; sheetMount = null;
   setTimeout(() => { if (!sheet.classList.contains('open')) sheet.innerHTML = ''; }, 350);
 }
 backdrop.addEventListener('click', closeSheet);
-document.addEventListener('click', e => {
-  if (e.target.closest('[data-action="close-sheet"]')) closeSheet();
-});
-document.addEventListener('keydown', e => {
-  if (e.key === 'Escape' && sheet.classList.contains('open')) closeSheet();
-});
+document.addEventListener('click', e => { if (e.target.closest('[data-action="close-sheet"]')) closeSheet(); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape' && sheet.classList.contains('open')) closeSheet(); });
 
-/* Клавиатура на iOS */
 if (window.visualViewport) {
   const vv = window.visualViewport;
-  const update = () => {
+  const upd = () => {
     const kb = Math.max(0, window.innerHeight - vv.height - vv.offsetTop);
     document.documentElement.style.setProperty('--kb', kb + 'px');
   };
-  vv.addEventListener('resize', update);
-  vv.addEventListener('scroll', update);
-  update();
+  vv.addEventListener('resize', upd); vv.addEventListener('scroll', upd); upd();
 }
 
 /* =====================================================================
@@ -886,22 +839,18 @@ function render(resetScroll=false) {
   if (resetScroll || lastTab !== currentTab) window.scrollTo(0, 0);
   lastTab = currentTab;
 }
-const VIEWS = {};
-const MOUNTS = {};
+const VIEWS = {}; const MOUNTS = {};
 
 /* =====================================================================
    ОБЗОР
    ===================================================================== */
 VIEWS.dashboard = () => {
-  const t = state.transactions;
+  const r = periodRange();
+  const t = state.transactions.filter(x => inPeriod(x.date, r));
   const income  = t.filter(x => x.type === 'income').reduce((a,b) => a + b.amount, 0);
   const expense = t.filter(x => x.type === 'expense').reduce((a,b) => a + b.amount, 0);
   const balance = income - expense;
   const savedInGoals = state.goals.reduce((a,g) => a + goalSaved(g), 0);
-
-  const now = new Date();
-  const mIncome  = t.filter(x => x.type === 'income'  && sameMonth(x.date, now)).reduce((a,b) => a + b.amount, 0);
-  const mExpense = t.filter(x => x.type === 'expense' && sameMonth(x.date, now)).reduce((a,b) => a + b.amount, 0);
 
   const byCat = {};
   t.filter(x => x.type === 'expense').forEach(x => {
@@ -909,24 +858,31 @@ VIEWS.dashboard = () => {
   });
   const cats = Object.entries(byCat).sort((a,b) => b[1] - a[1]);
   const maxCat = cats.length ? cats[0][1] : 1;
-  const recent = [...t].sort((a,b) => (b.date + b.createdAt).localeCompare(a.date + a.createdAt)).slice(0, 6);
+  const recent = [...state.transactions]
+    .sort((a,b) => (b.date + b.createdAt).localeCompare(a.date + a.createdAt)).slice(0, 6);
 
   return `
+    <div class="chips" style="margin-bottom:16px">
+      <button class="chip ${uiPeriod==='month'?'active':''}" data-period="month">Этот месяц</button>
+      <button class="chip ${uiPeriod==='prev'?'active':''}" data-period="prev">Прошлый</button>
+      <button class="chip ${uiPeriod==='all'?'active':''}" data-period="all">Всё время</button>
+    </div>
+
     <div class="stats">
       <div class="card stat">
         <div class="lbl">Баланс</div>
         <div class="val ${balance >= 0 ? 'pos' : 'neg'}">${fmt(balance)}</div>
-        <div class="sub">доходы − расходы</div>
+        <div class="sub">${r.label}</div>
       </div>
       <div class="card stat">
         <div class="lbl">Доходы</div>
         <div class="val pos">${fmt(income)}</div>
-        <div class="sub">в этом месяце: ${fmt(mIncome)}</div>
+        <div class="sub">${r.label}</div>
       </div>
       <div class="card stat">
         <div class="lbl">Расходы</div>
         <div class="val neg">${fmt(expense)}</div>
-        <div class="sub">в этом месяце: ${fmt(mExpense)}</div>
+        <div class="sub">${r.label}</div>
       </div>
       <div class="card stat">
         <div class="lbl">Отложено</div>
@@ -935,7 +891,10 @@ VIEWS.dashboard = () => {
       </div>
     </div>
 
-    ${t.length === 0 ? `
+    ${renderBudgetsSection()}
+    ${renderChartSection()}
+
+    ${state.transactions.length === 0 ? `
       <div class="card" style="margin-top:14px">
         <div class="empty">
           <div class="big">👋</div>
@@ -947,7 +906,7 @@ VIEWS.dashboard = () => {
       <div class="grid2">
         <div class="card">
           <div class="section-title" style="margin-top:0">Расходы по категориям</div>
-          ${cats.length === 0 ? `<div class="hint">Расходов ещё нет.</div>` : cats.map(([id, sum]) => {
+          ${cats.length === 0 ? `<div class="hint">За этот период расходов нет.</div>` : cats.map(([id, sum]) => {
             const c = catById(id);
             const pct = Math.round(sum / maxCat * 100);
             const share = expense ? Math.round(sum / expense * 100) : 0;
@@ -961,20 +920,21 @@ VIEWS.dashboard = () => {
               </div>`;
           }).join('')}
         </div>
-
         <div class="card">
           <div class="section-title" style="margin-top:0">Последние операции</div>
           ${recent.length === 0 ? `<div class="hint">Пусто.</div>` : recent.map(x => {
             const c = catById(x.category);
             return `
-              <div class="tx-item">
-                <div class="tx-ico">${c.icon}</div>
-                <div class="tx-mid">
-                  <div class="tx-title">${esc(x.note || c.name)}</div>
-                  <div class="tx-sub">${esc(c.name)} · ${humanDate(x.date)}</div>
-                </div>
-                <div class="tx-amt ${x.type === 'income' ? 'pos' : 'neg'}">
-                  ${x.type === 'income' ? '+' : '−'}${fmt(x.amount)}
+              <div class="tx-item" style="border-bottom:1px solid var(--border)">
+                <div class="tx-content" style="cursor:default;background:transparent">
+                  <div class="tx-ico">${c.icon}</div>
+                  <div class="tx-mid">
+                    <div class="tx-title">${esc(x.note || c.name)}</div>
+                    <div class="tx-sub">${esc(c.name)} · ${humanDate(x.date)}</div>
+                  </div>
+                  <div class="tx-amt ${x.type === 'income' ? 'pos' : 'neg'}">
+                    ${x.type === 'income' ? '+' : '−'}${fmt(x.amount)}
+                  </div>
                 </div>
               </div>`;
           }).join('')}
@@ -993,11 +953,88 @@ VIEWS.dashboard = () => {
   `;
 };
 
+function renderBudgetsSection() {
+  const now = new Date();
+  const spent = {};
+  state.transactions
+    .filter(x => x.type === 'expense' && sameMonth(x.date, now))
+    .forEach(x => { spent[x.category] = (spent[x.category] || 0) + x.amount; });
+
+  const entries = Object.entries(state.budgets || {});
+  if (!entries.length) {
+    return `
+      <div class="card" style="margin-top:14px">
+        <div class="section-title" style="margin-top:0">Бюджеты</div>
+        <div class="hint" style="margin-top:0">Установи лимит на категории — приложение подсветит, когда подходишь к пределу.</div>
+        <button class="btn primary sm block" data-action="edit-budgets" style="margin-top:12px">Настроить бюджеты</button>
+      </div>
+    `;
+  }
+  return `
+    <div class="card" style="margin-top:14px">
+      <div class="section-title" style="margin-top:0">Бюджеты на этот месяц</div>
+      ${entries.map(([catId, limit]) => {
+        const c = catById(catId);
+        const s = spent[catId] || 0;
+        const pct = Math.min(100, s / limit * 100);
+        const over = s > limit;
+        const warn = !over && pct >= 80;
+        const color = over ? 'var(--red)' : warn ? 'var(--yellow)' : 'var(--green)';
+        const left = Math.max(0, limit - s);
+        return `
+          <div class="cat-row">
+            <div class="cat-head">
+              <span>${c.icon} ${esc(c.name)}</span>
+              <span class="amt" style="color:${color}">${fmt(s)} / ${fmt(limit)}</span>
+            </div>
+            <div class="bar"><div class="bar-fill" style="width:${pct}%;background:${color}"></div></div>
+            ${over ? `<div class="hint" style="color:var(--red);margin-top:4px">Превышено на ${fmt(s-limit)}</div>`
+                    : `<div class="hint" style="margin-top:4px">Осталось ${fmt(left)}</div>`}
+          </div>
+        `;
+      }).join('')}
+      <button class="btn ghost sm block" data-action="edit-budgets" style="margin-top:6px">Настроить</button>
+    </div>
+  `;
+}
+
+function renderChartSection() {
+  const now = new Date();
+  const months = [];
+  for (let i = 5; i >= 0; i--) months.push(new Date(now.getFullYear(), now.getMonth() - i, 1));
+  const data = months.map(m => {
+    const sum = state.transactions
+      .filter(x => x.type === 'expense' && sameMonth(x.date, m))
+      .reduce((a, x) => a + x.amount, 0);
+    return { date: m, sum };
+  });
+  const maxSum = Math.max(1, ...data.map(d => d.sum));
+  const barH = 100;
+  const avg = data.reduce((a, d) => a + d.sum, 0) / 6;
+  return `
+    <div class="card" style="margin-top:14px">
+      <div class="section-title" style="margin-top:0">Расходы за 6 месяцев</div>
+      <div class="chart">
+        ${data.map((d, i) => {
+          const h = Math.max(4, Math.round(d.sum / maxSum * barH));
+          const label = d.date.toLocaleDateString('ru-RU', { month: 'short' });
+          const cur = i === data.length - 1;
+          return `
+            <div class="chart-col">
+              <div class="chart-bar ${cur ? 'current' : ''}" style="height:${h}px" title="${fmt(d.sum)}"></div>
+              <div class="chart-label">${label}</div>
+            </div>`;
+        }).join('')}
+      </div>
+      <div class="hint" style="margin-top:14px">Средние траты в месяц: <b style="color:var(--text)">${fmt(avg)}</b></div>
+    </div>
+  `;
+}
+
 /* =====================================================================
    ОПЕРАЦИИ
    ===================================================================== */
 let txFilter = 'all';
-
 VIEWS.transactions = () => {
   const list = state.transactions
     .filter(x => txFilter === 'all' || x.type === txFilter)
@@ -1005,45 +1042,80 @@ VIEWS.transactions = () => {
 
   return `
     <div class="chips" style="margin-bottom:16px">
-      <button class="chip ${txFilter === 'all' ? 'active' : ''}" data-filter="all">Все</button>
-      <button class="chip ${txFilter === 'expense' ? 'active' : ''}" data-filter="expense">Расходы</button>
-      <button class="chip ${txFilter === 'income' ? 'active' : ''}" data-filter="income">Доходы</button>
+      <button class="chip ${txFilter==='all'?'active':''}" data-filter="all">Все</button>
+      <button class="chip ${txFilter==='expense'?'active':''}" data-filter="expense">Расходы</button>
+      <button class="chip ${txFilter==='income'?'active':''}" data-filter="income">Доходы</button>
     </div>
-
     ${list.length === 0 ? `
-      <div class="card">
-        <div class="empty">
-          <div class="big">🧾</div>
-          <p>${state.transactions.length === 0 ? 'Операций пока нет. Нажми <b>+</b> внизу, чтобы добавить первую.' : 'По фильтру ничего не найдено.'}</p>
-        </div>
-      </div>
+      <div class="card"><div class="empty">
+        <div class="big">🧾</div>
+        <p>${state.transactions.length === 0 ? 'Операций пока нет. Нажми <b>+</b> внизу.' : 'По фильтру ничего не найдено.'}</p>
+      </div></div>
     ` : `
-      <div class="card">
+      <div class="card" style="padding:0 18px">
         ${list.map(x => {
           const c = catById(x.category);
           return `
-            <div class="tx-item">
-              <div class="tx-ico">${c.icon}</div>
-              <div class="tx-mid">
-                <div class="tx-title">${esc(x.note || c.name)}</div>
-                <div class="tx-sub">${esc(c.name)} · ${humanDate(x.date)}</div>
+            <div class="tx-item" data-id="${x.id}">
+              <div class="tx-delete-bg" data-action="del-tx" data-id="${x.id}">🗑</div>
+              <div class="tx-content" data-action="edit-tx" data-id="${x.id}">
+                <div class="tx-ico">${c.icon}</div>
+                <div class="tx-mid">
+                  <div class="tx-title">${esc(x.note || c.name)}</div>
+                  <div class="tx-sub">${esc(c.name)} · ${humanDate(x.date)}</div>
+                </div>
+                <div class="tx-amt ${x.type === 'income' ? 'pos' : 'neg'}">
+                  ${x.type === 'income' ? '+' : '−'}${fmt(x.amount)}
+                </div>
+                <button class="icon-btn del-desktop" data-action="del-tx" data-id="${x.id}" aria-label="Удалить">✕</button>
               </div>
-              <div class="tx-amt ${x.type === 'income' ? 'pos' : 'neg'}">
-                ${x.type === 'income' ? '+' : '−'}${fmt(x.amount)}
-              </div>
-              <button class="icon-btn" data-action="del-tx" data-id="${x.id}" aria-label="Удалить">✕</button>
             </div>`;
         }).join('')}
       </div>
     `}
+    ${renderRecurringSection()}
   `;
 };
-
 MOUNTS.transactions = () => {
   document.querySelectorAll('[data-filter]').forEach(b => {
     b.addEventListener('click', () => { txFilter = b.dataset.filter; haptic(5); render(); });
   });
+  mountSwipe();
 };
+
+function renderRecurringSection() {
+  const list = state.recurring || [];
+  return `
+    <div class="section-title">Регулярные платежи</div>
+    ${list.length === 0 ? `
+      <div class="card"><div class="empty" style="padding:24px 12px">
+        <div class="big" style="font-size:28px">🔁</div>
+        <p style="font-size:13px">Зарплата, подписки, аренда — добавь один раз, дальше создастся само.</p>
+        <button class="btn primary sm" data-action="new-recurring">+ Добавить</button>
+      </div></div>
+    ` : `
+      <div class="card" style="padding:0 18px">
+        ${list.map(r => {
+          const c = catById(r.category);
+          return `
+            <div style="display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid var(--border)">
+              <div class="tx-ico">${c.icon}</div>
+              <div class="tx-mid">
+                <div class="tx-title">${esc(r.note || c.name)}</div>
+                <div class="tx-sub">каждый ${r.dayOfMonth}-го · ${r.active ? 'активно' : 'выключено'}</div>
+              </div>
+              <div class="tx-amt ${r.type === 'income' ? 'pos' : 'neg'}">
+                ${r.type === 'income' ? '+' : '−'}${fmt(r.amount)}
+              </div>
+              <button class="icon-btn" data-action="toggle-recurring" data-id="${r.id}">${r.active ? '⏸' : '▶'}</button>
+              <button class="icon-btn" data-action="del-recurring" data-id="${r.id}">✕</button>
+            </div>`;
+        }).join('')}
+      </div>
+      <button class="btn ghost sm block" data-action="new-recurring" style="margin-top:10px">+ Добавить регулярный</button>
+    `}
+  `;
+}
 
 /* =====================================================================
    ЦЕЛИ
@@ -1055,11 +1127,9 @@ function goalCard(g) {
   const months    = monthsUntil(g.deadline);
   const perMonth  = months > 0 ? remaining / months : remaining;
   const done      = remaining <= 0;
-
   const dl = new Date(g.deadline + 'T00:00:00');
   const dlText = isNaN(dl) ? '—' : dl.toLocaleDateString('ru-RU', { day:'numeric', month:'long', year:'numeric' });
   const subSum = (g.subgoals || []).reduce((a,s) => a + (Number(s.amount) || 0), 0);
-
   return `
     <div class="card" style="margin-top:14px">
       <div class="goal-head">
@@ -1069,52 +1139,38 @@ function goalCard(g) {
         </div>
         <div style="display:flex;align-items:center;gap:6px;flex:0 0 auto">
           ${done ? `<span class="goal-done-badge">Готово 🎉</span>` : ''}
-          <button class="icon-btn" data-action="del-goal" data-id="${g.id}" aria-label="Удалить цель">✕</button>
+          <button class="icon-btn" data-action="del-goal" data-id="${g.id}">✕</button>
         </div>
       </div>
-
       <div class="goal-nums">
         <span><b>${fmt(saved)}</b> <span style="color:var(--muted)">из ${fmt(g.target)}</span></span>
         <span style="color:var(--muted)">${Math.round(pct)}%</span>
       </div>
       <div class="bar"><div class="bar-fill ${done ? 'green' : ''}" style="width:${pct}%"></div></div>
-
       <div class="goal-plan">
-        ${done ? `
-          <span>Цель закрыта. Можно тратить 🎉</span>
-        ` : `
-          <span>Осталось: <b>${fmt(remaining)}</b></span>
-          <span>В месяц: <b>${fmt(perMonth)}</b></span>
-        `}
+        ${done ? `<span>Цель закрыта. Можно тратить 🎉</span>` :
+          `<span>Осталось: <b>${fmt(remaining)}</b></span>
+           <span>В месяц: <b>${fmt(perMonth)}</b></span>`}
       </div>
-
       ${(g.subgoals && g.subgoals.length) ? `
         <div class="subgoals">
           <div class="section-title" style="margin:0 0 10px">Подцели</div>
           ${g.subgoals.map(s => `
             <label class="subgoal ${s.done ? 'done' : ''}">
-              <input type="checkbox" data-action="toggle-sub"
-                     data-goal="${g.id}" data-sub="${s.id}" ${s.done ? 'checked' : ''}>
+              <input type="checkbox" data-action="toggle-sub" data-goal="${g.id}" data-sub="${s.id}" ${s.done ? 'checked' : ''}>
               <span class="t">${esc(s.title)}</span>
               <span class="a">${fmt(s.amount)}</span>
-              <button class="icon-btn" data-action="del-sub"
-                      data-goal="${g.id}" data-sub="${s.id}" aria-label="Удалить">✕</button>
+              <button class="icon-btn" data-action="del-sub" data-goal="${g.id}" data-sub="${s.id}">✕</button>
             </label>
           `).join('')}
-          ${subSum !== g.target ? `
-            <div class="hint">Подцели: ${fmt(subSum)} — ${subSum < g.target ? 'остаток' : 'перебор'} ${fmt(Math.abs(g.target - subSum))}</div>
-          ` : ''}
+          ${subSum !== g.target ? `<div class="hint">Подцели: ${fmt(subSum)} — ${subSum < g.target ? 'остаток' : 'перебор'} ${fmt(Math.abs(g.target - subSum))}</div>` : ''}
         </div>
-      ` : `
-        <div class="hint">Разбей цель на подцели — виза, билеты, техника. Отмечаешь галочку → сумма автоматически уходит в «отложено».</div>
-      `}
-
+      ` : `<div class="hint">Разбей цель на подцели — виза, билеты, техника. Отмечаешь галочку → сумма уходит в «отложено».</div>`}
       <form class="sub-add" data-goal="${g.id}">
         <input name="title" placeholder="Подцель: виза, билеты…" required>
         <input name="amount" type="number" step="0.01" min="0" inputmode="decimal" placeholder="сумма" required>
-        <button class="btn sm" type="submit" aria-label="Добавить подцель">+</button>
+        <button class="btn sm" type="submit">+</button>
       </form>
-
       <form class="deposit-row" data-goal="${g.id}">
         <input name="amount" type="number" step="0.01" inputmode="decimal" placeholder="Отложить сумму…">
         <button class="btn primary sm" type="submit">Отложить</button>
@@ -1123,10 +1179,63 @@ function goalCard(g) {
   `;
 }
 
+function sharedGoalCard(g) {
+  const total = g.total || 0;
+  const remaining = Math.max(0, g.target - total);
+  const pct = Math.min(100, total / g.target * 100);
+  const isOwner = g.owner_id === currentUser?.id;
+  const done = remaining <= 0;
+  const dl = g.deadline ? new Date(g.deadline + 'T00:00:00') : null;
+  const dlText = dl && !isNaN(dl) ? dl.toLocaleDateString('ru-RU', { day:'numeric', month:'long', year:'numeric' }) : '—';
+  const months = g.deadline ? monthsUntil(g.deadline) : 0;
+  const perMonth = months > 0 ? remaining / months : remaining;
+  return `
+    <div class="card" style="margin-top:14px">
+      <div class="goal-head">
+        <div style="min-width:0">
+          <div class="goal-title">${esc(g.title)} <span class="badge" style="margin-left:6px">👥 ${g.members.length}</span></div>
+          <div class="goal-deadline">до ${dlText} · ${months > 0 ? months + ' ' + plural(months,'месяц','месяца','месяцев') : 'срок вышел'}</div>
+        </div>
+        <button class="icon-btn" data-action="${isOwner ? 'del-shared' : 'leave-shared'}" data-id="${g.id}" title="${isOwner ? 'Удалить' : 'Выйти'}">✕</button>
+      </div>
+      <div class="goal-nums">
+        <span><b>${fmt(total)}</b> <span style="color:var(--muted)">из ${fmt(g.target)}</span></span>
+        <span style="color:var(--muted)">${Math.round(pct)}%</span>
+      </div>
+      <div class="bar"><div class="bar-fill ${done ? 'green' : ''}" style="width:${pct}%"></div></div>
+      <div class="goal-plan">
+        ${done ? `<span>🎉 Цель закрыта</span>` :
+          `<span>Осталось: <b>${fmt(remaining)}</b></span>
+           ${months > 0 ? `<span>В месяц: <b>${fmt(perMonth)}</b></span>` : ''}`}
+      </div>
+      <div class="subgoals" style="border-top:1px dashed var(--border)">
+        <div class="section-title" style="margin:0 0 10px">Вклады</div>
+        ${g.deposits.length === 0 ? `<div class="hint">Пока никто не отложил.</div>` :
+          g.deposits.slice(0, 12).map(d => {
+            const m = g.members.find(x => x.user_id === d.user_id);
+            const name = (m?.email || '?').split('@')[0];
+            return `
+              <div style="display:flex;align-items:center;gap:11px;padding:8px 0;border-bottom:1px solid var(--border)">
+                <span style="flex:1;font-size:13.5px">${esc(name)}${d.note ? ` · ${esc(d.note)}` : ''}</span>
+                <span style="font-size:13px;font-variant-numeric:tabular-nums">${fmt(d.amount)}</span>
+                ${d.user_id === currentUser?.id ? `<button class="icon-btn" data-action="del-shared-deposit" data-goal="${g.id}" data-id="${d.id}">✕</button>` : ''}
+              </div>`;
+          }).join('')}
+      </div>
+      <form class="deposit-row" data-shared="${g.id}" style="margin-top:12px">
+        <input name="amount" type="number" step="0.01" min="0.01" inputmode="decimal" placeholder="Сумма">
+        <button class="btn primary sm" type="submit">Отложить</button>
+      </form>
+      <button class="btn ghost sm block" data-action="show-invite" data-code="${g.invite_code}" style="margin-top:10px">
+        Пригласить · код ${g.invite_code}
+      </button>
+    </div>
+  `;
+}
+
 VIEWS.goals = () => {
   const totalTarget = state.goals.reduce((a,g) => a + g.target, 0);
   const totalSaved  = state.goals.reduce((a,g) => a + goalSaved(g), 0);
-
   return `
     ${state.goals.length ? `
       <div class="stats" style="grid-template-columns:1fr 1fr;margin-bottom:8px">
@@ -1143,11 +1252,27 @@ VIEWS.goals = () => {
       <div class="section-title">Мои цели</div>
       ${state.goals.map(g => goalCard(g)).join('')}
     ` : `
-      <div class="card">
-        <div class="empty">
-          <div class="big">🎯</div>
-          <p>Целей пока нет. Нажми <b>+</b> внизу — приложение само посчитает, сколько откладывать в месяц.</p>
+      <div class="card"><div class="empty">
+        <div class="big">🎯</div>
+        <p>Целей пока нет. Нажми <b>+</b> внизу — приложение само посчитает, сколько откладывать в месяц.</p>
+      </div></div>
+    `}
+
+    <div class="section-title">Общие цели</div>
+    ${sharedGoals.length === 0 ? `
+      <div class="card"><div class="empty" style="padding:28px 16px">
+        <div class="big" style="font-size:30px">👥</div>
+        <p style="font-size:13.5px">Копите вместе с друзьями: создай общую цель и отправь код, или присоединись по чужому коду.</p>
+        <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap">
+          <button class="btn primary sm" data-action="new-shared">+ Создать</button>
+          <button class="btn ghost sm" data-action="join-shared">Присоединиться</button>
         </div>
+      </div></div>
+    ` : `
+      ${sharedGoals.map(g => sharedGoalCard(g)).join('')}
+      <div style="display:flex;gap:8px;margin-top:12px">
+        <button class="btn primary sm" data-action="new-shared" style="flex:1">+ Создать</button>
+        <button class="btn ghost sm" data-action="join-shared" style="flex:1">Присоединиться</button>
       </div>
     `}
   `;
@@ -1159,30 +1284,24 @@ VIEWS.goals = () => {
 VIEWS.notes = () => {
   if (state.notes.length === 0) {
     return `
-      <div class="card">
-        <div class="empty">
-          <div class="big">📝</div>
-          <p>Заметки — про всё, что не деньги: что взять в поездку, какой язык подтянуть, к какому числу сделать визу.</p>
-          <button class="btn primary" data-action="new-note">+ Создать заметку</button>
-        </div>
-      </div>
+      <div class="card"><div class="empty">
+        <div class="big">📝</div>
+        <p>Заметки — про всё, что не деньги: что взять в поездку, какой язык подтянуть, к какому числу сделать визу.</p>
+        <button class="btn primary" data-action="new-note">+ Создать заметку</button>
+      </div></div>
     `;
   }
-
   return `
     <button class="btn primary" data-action="new-note" style="margin-bottom:16px">+ Новая заметка</button>
     ${state.notes.map(n => `
       <div class="card note-card" data-note="${n.id}">
-        <button class="icon-btn note-del" data-action="del-note" data-id="${n.id}" aria-label="Удалить">✕</button>
-        <input class="note-title" data-note-field="title" data-id="${n.id}"
-               value="${esc(n.title)}" placeholder="Заголовок">
-        <textarea data-note-field="text" data-id="${n.id}"
-                  placeholder="Текст…">${esc(n.text)}</textarea>
+        <button class="icon-btn note-del" data-action="del-note" data-id="${n.id}">✕</button>
+        <input class="note-title" data-note-field="title" data-id="${n.id}" value="${esc(n.title)}" placeholder="Заголовок">
+        <textarea data-note-field="text" data-id="${n.id}" placeholder="Текст…">${esc(n.text)}</textarea>
       </div>
     `).join('')}
   `;
 };
-
 MOUNTS.notes = () => {
   document.querySelectorAll('[data-note-field]').forEach(el => {
     el.addEventListener('input', () => {
@@ -1190,7 +1309,7 @@ MOUNTS.notes = () => {
       if (!n) return;
       n[el.dataset.noteField] = el.value;
       n.updated = new Date().toISOString();
-      save(); /* без ре-рендера — чтобы не терять фокус */
+      save();
     });
   });
 };
@@ -1204,82 +1323,76 @@ $('#fab').addEventListener('click', () => {
   else if (currentTab === 'notes') {
     state.notes.unshift({ id: uid(), title: '', text: '', updated: new Date().toISOString() });
     save(); render();
-    setTimeout(() => {
-      const first = document.querySelector('.note-card input.note-title');
-      if (first) first.focus();
-    }, 40);
-  } else {
-    openTxSheet();
-  }
+    setTimeout(() => { const f = document.querySelector('.note-card input.note-title'); if (f) f.focus(); }, 40);
+  } else openTxSheet();
 });
 
 /* =====================================================================
-   SHEET: ТРАНЗАКЦИЯ
+   TX SHEET (создание и редактирование)
    ===================================================================== */
-let sheetTx = { type:'expense', category:'food' };
+let sheetTx = { type:'expense', category:'food', editId: null };
 
 function openTxSheet() {
-  sheetTx = { type:'expense', category:'food' };
+  sheetTx = { type:'expense', category:'food', editId: null };
   renderTxSheet();
 }
+function openTxEditSheet(id) {
+  const t = state.transactions.find(x => x.id === id);
+  if (!t) return;
+  sheetTx = { type: t.type, category: t.category, editId: id };
+  renderTxSheet({ amount: t.amount, note: t.note, date: t.date });
+}
 
-function renderTxSheet() {
-  const cats = sheetTx.type === 'expense' ? EXPENSE_CATS : INCOME_CATS;
+function renderTxSheet(prefill) {
+  const cats = sortCatsByUsage(sheetTx.type === 'expense' ? EXPENSE_CATS : INCOME_CATS);
   if (!cats.some(c => c.id === sheetTx.category)) sheetTx.category = cats[0].id;
+  const editing = !!sheetTx.editId;
 
   const html = `
     <div class="sheet-handle-wrap"><div class="sheet-handle"></div></div>
     <div class="sheet-header">
-      <h2>Новая операция</h2>
-      <button class="sheet-close" data-action="close-sheet" aria-label="Закрыть">✕</button>
+      <h2>${editing ? 'Редактировать' : 'Новая операция'}</h2>
+      <button class="sheet-close" data-action="close-sheet">✕</button>
     </div>
     <div class="sheet-body">
       <div class="seg">
-        <button class="seg-btn ${sheetTx.type === 'expense' ? 'active' : ''}" data-sheet-type="expense">− Расход</button>
-        <button class="seg-btn ${sheetTx.type === 'income'  ? 'active' : ''}" data-sheet-type="income">+ Доход</button>
+        <button class="seg-btn ${sheetTx.type==='expense'?'active':''}" data-sheet-type="expense">− Расход</button>
+        <button class="seg-btn ${sheetTx.type==='income'?'active':''}" data-sheet-type="income">+ Доход</button>
       </div>
-
       <div class="amount-wrap">
         <input id="txAmount" class="amount-input" type="number" step="0.01" min="0"
-               placeholder="0" inputmode="decimal" data-autofocus>
+               placeholder="0" inputmode="decimal" data-autofocus value="${prefill ? prefill.amount : ''}">
         <span class="amount-cur">${state.currency}</span>
       </div>
-
       <div class="cat-grid" id="txCatGrid">
         ${cats.map(c => `
-          <button class="cat-cell ${c.id === sheetTx.category ? 'active' : ''}" data-sheet-cat="${c.id}">
-            <span class="ci">${c.icon}</span>
-            <span class="cn">${esc(c.name)}</span>
-          </button>
-        `).join('')}
+          <button class="cat-cell ${c.id===sheetTx.category?'active':''}" data-sheet-cat="${c.id}">
+            <span class="ci">${c.icon}</span><span class="cn">${esc(c.name)}</span>
+          </button>`).join('')}
       </div>
-
-      <div class="field">
-        <input id="txNote" placeholder="Комментарий (необязательно)">
-      </div>
-      <div class="field" style="margin-bottom:0">
-        <input id="txDate" type="date" value="${todayStr()}">
-      </div>
+      <div class="field"><input id="txNote" placeholder="Комментарий (необязательно)" value="${prefill ? esc(prefill.note || '') : ''}"></div>
+      <div class="field" style="margin-bottom:0"><input id="txDate" type="date" value="${prefill?.date || todayStr()}"></div>
     </div>
     <div class="sheet-footer">
-      <button class="btn primary block" id="txAddBtn">Добавить</button>
+      ${editing ? `<button class="btn danger block" id="txDelBtn" style="margin-bottom:8px">Удалить</button>` : ''}
+      <button class="btn primary block" id="txAddBtn">${editing ? 'Сохранить' : 'Добавить'}</button>
     </div>
   `;
-
-  openSheet(html, mountTxSheet);
+  openSheet(html, () => mountTxSheet(prefill));
 }
 
 function mountTxSheet() {
   const amountEl = $('#txAmount');
   const addBtn   = $('#txAddBtn');
   const catGrid  = $('#txCatGrid');
+  const editing = !!sheetTx.editId;
 
   const updateBtn = () => {
     const v = parseFloat(amountEl.value);
-    addBtn.textContent = v > 0 ? `Добавить ${fmt(v)}` : 'Добавить';
+    const base = editing ? 'Сохранить' : 'Добавить';
+    addBtn.textContent = v > 0 ? `${base} ${fmt(v)}` : base;
   };
-  amountEl.addEventListener('input', updateBtn);
-  updateBtn();
+  amountEl.addEventListener('input', updateBtn); updateBtn();
 
   document.querySelectorAll('[data-sheet-type]').forEach(b => {
     b.addEventListener('click', () => {
@@ -1290,13 +1403,7 @@ function mountTxSheet() {
       const d = $('#txDate')?.value || todayStr();
       const cats = sheetTx.type === 'expense' ? EXPENSE_CATS : INCOME_CATS;
       if (!cats.some(c => c.id === sheetTx.category)) sheetTx.category = cats[0].id;
-      renderTxSheet();
-      setTimeout(() => {
-        const a2 = $('#txAmount');
-        if (a2) { a2.value = v; a2.dispatchEvent(new Event('input')); }
-        const n2 = $('#txNote'); if (n2) n2.value = n;
-        const d2 = $('#txDate'); if (d2) d2.value = d;
-      }, 0);
+      renderTxSheet({ amount: v, note: n, date: d });
     });
   });
 
@@ -1308,7 +1415,7 @@ function mountTxSheet() {
     haptic(5);
   });
 
-  const add = () => {
+  const saveTx = () => {
     const amount = parseFloat(amountEl.value);
     if (!amount || amount <= 0) {
       amountEl.focus();
@@ -1316,27 +1423,90 @@ function mountTxSheet() {
       setTimeout(() => amountEl.style.borderColor = '', 800);
       return;
     }
-    state.transactions.push({
-      id: uid(),
-      type: sheetTx.type,
-      amount,
-      category: sheetTx.category,
+    const data = {
+      type: sheetTx.type, amount, category: sheetTx.category,
       note: $('#txNote').value.trim(),
       date: $('#txDate').value || todayStr(),
-      createdAt: new Date().toISOString(),
-    });
-    save();
-    haptic(15);
-    closeSheet();
+    };
+    if (editing) {
+      const t = state.transactions.find(x => x.id === sheetTx.editId);
+      if (t) Object.assign(t, data);
+    } else {
+      state.transactions.push({ id: uid(), ...data, createdAt: new Date().toISOString() });
+      state.categoryUsage[sheetTx.category] = (state.categoryUsage[sheetTx.category] || 0) + 1;
+    }
+    save(); haptic(15); closeSheet();
     setTimeout(() => {
-      toast(sheetTx.type === 'income' ? `Доход ${fmt(amount)} записан` : `Расход ${fmt(amount)} записан`);
+      toast(editing ? 'Сохранено' : (data.type === 'income' ? `Доход ${fmt(amount)} записан` : `Расход ${fmt(amount)} записан`));
       render();
     }, 180);
   };
+  addBtn.addEventListener('click', saveTx);
+  amountEl.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); saveTx(); } });
+  $('#txNote').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); saveTx(); } });
 
-  addBtn.addEventListener('click', add);
-  amountEl.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); add(); } });
-  $('#txNote').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); add(); } });
+  if (editing) {
+    $('#txDelBtn').addEventListener('click', () => {
+      if (confirm('Удалить операцию?')) {
+        state.transactions = state.transactions.filter(x => x.id !== sheetTx.editId);
+        save(); haptic(12); closeSheet();
+        setTimeout(() => { toast('Удалено'); render(); }, 180);
+      }
+    });
+  }
+}
+
+/* =====================================================================
+   SWIPE TO DELETE
+   ===================================================================== */
+function mountSwipe() {
+  let touch = null;
+  const items = document.querySelectorAll('.tx-item');
+
+  items.forEach(item => {
+    item.addEventListener('touchstart', e => {
+      const content = e.target.closest('.tx-content');
+      if (!content || e.target.closest('[data-action="del-tx"]')) return;
+      touch = { content, item, x: e.touches[0].clientX, y: e.touches[0].clientY, swiped: false };
+    }, { passive: true });
+
+    item.addEventListener('touchmove', e => {
+      if (!touch || touch.item !== item) return;
+      const dx = e.touches[0].clientX - touch.x;
+      const dy = e.touches[0].clientY - touch.y;
+      if (Math.abs(dy) > Math.abs(dx) && Math.abs(dy) > 12) { touch = null; return; }
+      if (Math.abs(dx) > 8) {
+        touch.swiped = true;
+        touch.content.classList.add('dragging');
+        const shift = Math.max(-72, Math.min(0, dx));
+        touch.content.style.transform = `translateX(${shift}px)`;
+      }
+    }, { passive: true });
+
+    item.addEventListener('touchend', e => {
+      if (!touch || touch.item !== item) return;
+      const dx = (e.changedTouches[0]?.clientX || 0) - touch.x;
+      touch.content.classList.remove('dragging');
+      touch.content.style.transform = '';
+      document.querySelectorAll('.tx-item').forEach(i => i.classList.remove('swiped'));
+      if (touch.swiped && dx < -40) {
+        item.classList.add('swiped');
+        haptic(6);
+      }
+      // предотвращаем клик-переход в edit если был свайп
+      if (touch.swiped) {
+        item.addEventListener('click', ev => { ev.stopPropagation(); ev.preventDefault(); }, { capture: true, once: true });
+      }
+      touch = null;
+    });
+  });
+
+  // Тап в любое место (кроме свайпнутого) — закрываем открытые свайпы
+  document.addEventListener('touchstart', e => {
+    if (!e.target.closest('.tx-item.swiped')) {
+      document.querySelectorAll('.tx-item.swiped').forEach(i => i.classList.remove('swiped'));
+    }
+  }, { passive: true });
 }
 
 /* =====================================================================
@@ -1344,145 +1514,359 @@ function mountTxSheet() {
    ===================================================================== */
 function openGoalSheet() {
   const defDeadline = new Date(Date.now() + 180*86400000).toISOString().slice(0,10);
-
   const html = `
     <div class="sheet-handle-wrap"><div class="sheet-handle"></div></div>
-    <div class="sheet-header">
-      <h2>Новая цель</h2>
-      <button class="sheet-close" data-action="close-sheet" aria-label="Закрыть">✕</button>
-    </div>
+    <div class="sheet-header"><h2>Новая цель</h2>
+      <button class="sheet-close" data-action="close-sheet">✕</button></div>
     <div class="sheet-body">
-      <div class="field">
-        <label>На что копим</label>
-        <input id="gTitle" placeholder="Например: Поездка в Европу" data-autofocus>
-      </div>
-      <div class="field">
-        <label>Нужная сумма</label>
-        <input id="gTarget" type="number" step="0.01" min="0" inputmode="decimal" placeholder="1500">
-      </div>
-      <div class="field">
-        <label>Срок</label>
-        <input id="gDeadline" type="date" value="${defDeadline}">
-      </div>
+      <div class="field"><label>На что копим</label>
+        <input id="gTitle" placeholder="Например: Поездка в Европу" data-autofocus></div>
+      <div class="field"><label>Нужная сумма</label>
+        <input id="gTarget" type="number" step="0.01" min="0" inputmode="decimal" placeholder="1500"></div>
+      <div class="field"><label>Срок</label>
+        <input id="gDeadline" type="date" value="${defDeadline}"></div>
       <div class="hint" id="gPreview">Введи сумму и срок — покажу, сколько откладывать в месяц.</div>
     </div>
-    <div class="sheet-footer">
-      <button class="btn primary block" id="gAddBtn">Создать цель</button>
-    </div>
+    <div class="sheet-footer"><button class="btn primary block" id="gAddBtn">Создать цель</button></div>
   `;
-
-  openSheet(html, mountGoalSheet);
+  openSheet(html, () => {
+    const titleEl = $('#gTitle'), targetEl = $('#gTarget'), dlEl = $('#gDeadline');
+    const preview = $('#gPreview'), addBtn = $('#gAddBtn');
+    const upd = () => {
+      const target = parseFloat(targetEl.value), dl = dlEl.value;
+      if (!target || !dl) { preview.textContent = 'Введи сумму и срок — покажу, сколько откладывать в месяц.'; addBtn.textContent = 'Создать цель'; return; }
+      const m = monthsUntil(dl);
+      if (m <= 0) { preview.textContent = 'Срок уже прошёл — выбери дату в будущем.'; return; }
+      preview.innerHTML = `Нужно откладывать <b style="color:var(--accent)">${fmt(target/m)}</b> в месяц в течение ${m} ${plural(m,'месяца','месяцев','месяцев')}.`;
+      addBtn.textContent = `Создать · ${fmt(target/m)}/мес`;
+    };
+    targetEl.addEventListener('input', upd); dlEl.addEventListener('change', upd);
+    addBtn.addEventListener('click', () => {
+      const title = titleEl.value.trim();
+      const target = parseFloat(targetEl.value), deadline = dlEl.value;
+      if (!title) { titleEl.focus(); return; }
+      if (!target || target <= 0) { targetEl.focus(); return; }
+      if (!deadline) { dlEl.focus(); return; }
+      state.goals.push({ id: uid(), title, target, deadline, deposits: 0, subgoals: [], createdAt: new Date().toISOString() });
+      save(); haptic(15); closeSheet();
+      setTimeout(() => { toast('Цель создана'); render(); }, 180);
+    });
+  });
 }
 
-function mountGoalSheet() {
-  const titleEl  = $('#gTitle');
-  const targetEl = $('#gTarget');
-  const dlEl     = $('#gDeadline');
-  const preview  = $('#gPreview');
-  const addBtn   = $('#gAddBtn');
-
-  const update = () => {
-    const target = parseFloat(targetEl.value);
-    const dl = dlEl.value;
-    if (!target || !dl) {
-      preview.textContent = 'Введи сумму и срок — покажу, сколько откладывать в месяц.';
-      addBtn.textContent = 'Создать цель';
-      return;
-    }
-    const m = monthsUntil(dl);
-    if (m <= 0) { preview.textContent = 'Срок уже прошёл — выбери дату в будущем.'; return; }
-    preview.innerHTML = `Нужно откладывать <b style="color:var(--accent)">${fmt(target/m)}</b> в месяц в течение ${m} ${plural(m,'месяца','месяцев','месяцев')}.`;
-    addBtn.textContent = `Создать · ${fmt(target/m)}/мес`;
-  };
-  targetEl.addEventListener('input', update);
-  dlEl.addEventListener('change', update);
-
-  addBtn.addEventListener('click', () => {
-    const title = titleEl.value.trim();
-    const target = parseFloat(targetEl.value);
-    const deadline = dlEl.value;
-    if (!title) { titleEl.focus(); return; }
-    if (!target || target <= 0) { targetEl.focus(); return; }
-    if (!deadline) { dlEl.focus(); return; }
-
-    state.goals.push({
-      id: uid(), title, target, deadline,
-      deposits: 0, subgoals: [],
-      createdAt: new Date().toISOString(),
+/* =====================================================================
+   SHEET: БЮДЖЕТЫ
+   ===================================================================== */
+function openBudgetSheet() {
+  const now = new Date();
+  const spent = {};
+  state.transactions
+    .filter(x => x.type === 'expense' && sameMonth(x.date, now))
+    .forEach(x => { spent[x.category] = (spent[x.category] || 0) + x.amount; });
+  const html = `
+    <div class="sheet-handle-wrap"><div class="sheet-handle"></div></div>
+    <div class="sheet-header"><h2>Бюджеты на месяц</h2>
+      <button class="sheet-close" data-action="close-sheet">✕</button></div>
+    <div class="sheet-body">
+      ${EXPENSE_CATS.map(c => {
+        const v = state.budgets?.[c.id] || '';
+        const s = spent[c.id] || 0;
+        return `
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px">
+            <div style="flex:1;display:flex;align-items:center;gap:10px;min-width:0">
+              <span style="font-size:20px">${c.icon}</span>
+              <div style="min-width:0">
+                <div style="font-weight:500">${c.name}</div>
+                <div class="hint" style="margin:0">Потрачено: ${fmt(s)}</div>
+              </div>
+            </div>
+            <input type="number" inputmode="decimal" min="0" step="1"
+              data-budget-cat="${c.id}" value="${v}" placeholder="—"
+              style="width:110px;text-align:right;font-weight:600;flex:0 0 auto">
+          </div>
+        `;
+      }).join('')}
+      <div class="hint" style="margin-top:14px">Оставь пустым, чтобы убрать бюджет. Только расходы, только текущий месяц.</div>
+    </div>
+    <div class="sheet-footer"><button class="btn primary block" id="saveBudgets">Сохранить</button></div>
+  `;
+  openSheet(html, () => {
+    $('#saveBudgets').addEventListener('click', () => {
+      const next = {};
+      document.querySelectorAll('[data-budget-cat]').forEach(inp => {
+        const v = parseFloat(inp.value);
+        if (v && v > 0) next[inp.dataset.budgetCat] = v;
+      });
+      state.budgets = next;
+      save(); haptic(12); closeSheet();
+      setTimeout(() => { toast('Бюджеты сохранены'); render(); }, 180);
     });
-    save();
-    haptic(15);
-    closeSheet();
-    setTimeout(() => { toast('Цель создана'); render(); }, 180);
   });
+}
+
+/* =====================================================================
+   SHEET: РЕГУЛЯРНЫЙ ПЛАТЁЖ
+   ===================================================================== */
+let recSheet = { type:'expense', category:'food' };
+function openRecurringSheet() {
+  recSheet = { type:'expense', category:'food' };
+  renderRecSheet();
+}
+function renderRecSheet() {
+  const cats = sortCatsByUsage(recSheet.type === 'expense' ? EXPENSE_CATS : INCOME_CATS);
+  if (!cats.some(c => c.id === recSheet.category)) recSheet.category = cats[0].id;
+  const html = `
+    <div class="sheet-handle-wrap"><div class="sheet-handle"></div></div>
+    <div class="sheet-header"><h2>Регулярный платёж</h2>
+      <button class="sheet-close" data-action="close-sheet">✕</button></div>
+    <div class="sheet-body">
+      <div class="seg">
+        <button class="seg-btn ${recSheet.type==='expense'?'active':''}" data-rec-type="expense">− Расход</button>
+        <button class="seg-btn ${recSheet.type==='income'?'active':''}" data-rec-type="income">+ Доход</button>
+      </div>
+      <div class="amount-wrap">
+        <input id="recAmount" class="amount-input" type="number" step="0.01" min="0" placeholder="0" inputmode="decimal" data-autofocus>
+        <span class="amount-cur">${state.currency}</span>
+      </div>
+      <div class="cat-grid" id="recCatGrid">
+        ${cats.map(c => `
+          <button class="cat-cell ${c.id===recSheet.category?'active':''}" data-rec-cat="${c.id}">
+            <span class="ci">${c.icon}</span><span class="cn">${esc(c.name)}</span>
+          </button>`).join('')}
+      </div>
+      <div class="field"><input id="recNote" placeholder="Комментарий (например, «Зарплата»)"></div>
+      <div class="field"><label>День месяца</label>
+        <input id="recDay" type="number" min="1" max="31" value="1" inputmode="numeric"></div>
+      <div class="hint">Транзакция создастся автоматически при заходе в этот день или позже.</div>
+    </div>
+    <div class="sheet-footer"><button class="btn primary block" id="recAddBtn">Добавить</button></div>
+  `;
+  openSheet(html, mountRecSheet);
+}
+function mountRecSheet() {
+  document.querySelectorAll('[data-rec-type]').forEach(b => {
+    b.addEventListener('click', () => { recSheet.type = b.dataset.recType; haptic(5); renderRecSheet(); });
+  });
+  $('#recCatGrid').addEventListener('click', e => {
+    const c = e.target.closest('[data-rec-cat]');
+    if (!c) return;
+    recSheet.category = c.dataset.recCat;
+    $('#recCatGrid').querySelectorAll('.cat-cell').forEach(x => x.classList.toggle('active', x === c));
+    haptic(5);
+  });
+  $('#recAddBtn').addEventListener('click', () => {
+    const amount = parseFloat($('#recAmount').value);
+    if (!amount || amount <= 0) { $('#recAmount').focus(); return; }
+    const day = Math.max(1, Math.min(31, parseInt($('#recDay').value) || 1));
+    state.recurring.push({
+      id: uid(), type: recSheet.type, amount, category: recSheet.category,
+      note: $('#recNote').value.trim(), dayOfMonth: day,
+      active: true, lastRun: null, createdAt: new Date().toISOString(),
+    });
+    save(); haptic(12); closeSheet();
+    setTimeout(() => { toast('Регулярный добавлен'); render(); }, 180);
+  });
+}
+
+/* =====================================================================
+   SHEET: СОЗДАТЬ / ПРИСОЕДИНИТЬСЯ К ОБЩЕЙ ЦЕЛИ
+   ===================================================================== */
+function openSharedGoalSheet() {
+  const defDeadline = new Date(Date.now() + 180*86400000).toISOString().slice(0,10);
+  const html = `
+    <div class="sheet-handle-wrap"><div class="sheet-handle"></div></div>
+    <div class="sheet-header"><h2>Новая общая цель</h2>
+      <button class="sheet-close" data-action="close-sheet">✕</button></div>
+    <div class="sheet-body">
+      <div class="field"><label>Название</label>
+        <input id="sgTitle" placeholder="Например: Поездка на Байкал" data-autofocus></div>
+      <div class="field"><label>Сумма</label>
+        <input id="sgTarget" type="number" step="0.01" min="0" inputmode="decimal" placeholder="7000"></div>
+      <div class="field"><label>Срок</label>
+        <input id="sgDeadline" type="date" value="${defDeadline}"></div>
+      <div class="hint">После создания ты получишь 6-значный код — отправь его друзьям.</div>
+    </div>
+    <div class="sheet-footer"><button class="btn primary block" id="sgAddBtn">Создать</button></div>
+  `;
+  openSheet(html, () => {
+    $('#sgAddBtn').addEventListener('click', async () => {
+      const title = $('#sgTitle').value.trim();
+      const target = parseFloat($('#sgTarget').value);
+      const deadline = $('#sgDeadline').value || null;
+      if (!title) { $('#sgTitle').focus(); return; }
+      if (!target || target <= 0) { $('#sgTarget').focus(); return; }
+      const btn = $('#sgAddBtn'); btn.disabled = true; btn.textContent = 'Создаю…';
+      const { error } = await sb.rpc('create_shared_goal', { title, target, deadline });
+      if (error) { console.warn(error); toast('Ошибка: ' + error.message, false); btn.disabled = false; btn.textContent = 'Создать'; return; }
+      await loadSharedGoals();
+      haptic(15); closeSheet();
+      setTimeout(() => { toast('Общая цель создана'); render(); }, 180);
+    });
+  });
+}
+
+function openJoinSharedSheet() {
+  const html = `
+    <div class="sheet-handle-wrap"><div class="sheet-handle"></div></div>
+    <div class="sheet-header"><h2>Присоединиться</h2>
+      <button class="sheet-close" data-action="close-sheet">✕</button></div>
+    <div class="sheet-body">
+      <div class="field"><label>Код приглашения</label>
+        <input id="sgCode" placeholder="ABC123" data-autofocus maxlength="8"
+          style="text-transform:uppercase;text-align:center;font-size:22px;font-weight:700;letter-spacing:.15em"></div>
+      <div class="hint">Спроси код у того, кто создал цель.</div>
+    </div>
+    <div class="sheet-footer"><button class="btn primary block" id="sgJoinBtn">Присоединиться</button></div>
+  `;
+  openSheet(html, () => {
+    const codeEl = $('#sgCode');
+    setTimeout(() => codeEl.focus(), 350);
+    $('#sgJoinBtn').addEventListener('click', async () => {
+      const code = codeEl.value.trim().toUpperCase();
+      if (!code) { codeEl.focus(); return; }
+      const btn = $('#sgJoinBtn'); btn.disabled = true; btn.textContent = 'Ищу…';
+      const { error } = await sb.rpc('join_shared_goal', { code });
+      if (error) {
+        const msg = /не найдена/i.test(error.message) ? 'Цель с таким кодом не найдена' : error.message;
+        toast(msg, false);
+        btn.disabled = false; btn.textContent = 'Присоединиться';
+        return;
+      }
+      await loadSharedGoals();
+      haptic(15); closeSheet();
+      setTimeout(() => { toast('Присоединился!'); render(); }, 180);
+    });
+  });
+}
+
+function openInviteSheet(code) {
+  openSheet(`
+    <div class="sheet-handle-wrap"><div class="sheet-handle"></div></div>
+    <div class="sheet-header"><h2>Код приглашения</h2>
+      <button class="sheet-close" data-action="close-sheet">✕</button></div>
+    <div class="sheet-body">
+      <div style="text-align:center;padding:20px 0">
+        <div style="font-size:40px;font-weight:800;letter-spacing:.18em;color:var(--accent)">${esc(code)}</div>
+      </div>
+      <div class="hint" style="text-align:center">Отправь этот код другу — он введёт его в разделе «Общие цели».</div>
+    </div>
+    <div class="sheet-footer">
+      <button class="btn primary block" data-action="copy-code" data-code="${esc(code)}" style="margin-bottom:8px">Скопировать</button>
+      <button class="btn ghost block" data-action="share-code" data-code="${esc(code)}">Поделиться</button>
+    </div>
+  `);
 }
 
 /* =====================================================================
    ГЛОБАЛЬНЫЕ ДЕЙСТВИЯ
    ===================================================================== */
-document.addEventListener('click', e => {
+document.addEventListener('click', async e => {
   const el = e.target.closest('[data-action]');
   if (!el) return;
   const a = el.dataset.action;
 
   if (a === 'del-tx') {
+    e.stopPropagation();
     state.transactions = state.transactions.filter(x => x.id !== el.dataset.id);
     save(); haptic(10); render();
+    toast('Удалено');
   }
-
+  if (a === 'edit-tx') {
+    // не открываем если строка свайпнута
+    const item = el.closest('.tx-item');
+    if (item?.classList.contains('swiped')) return;
+    openTxEditSheet(el.dataset.id);
+  }
   if (a === 'del-goal') {
     if (confirm('Удалить цель?')) {
       state.goals = state.goals.filter(g => g.id !== el.dataset.id);
       save(); render();
     }
   }
-
   if (a === 'del-sub') {
     e.preventDefault(); e.stopPropagation();
     const g = state.goals.find(x => x.id === el.dataset.goal);
-    if (g) {
-      g.subgoals = g.subgoals.filter(s => s.id !== el.dataset.sub);
-      save(); haptic(10); render();
-    }
+    if (g) { g.subgoals = g.subgoals.filter(s => s.id !== el.dataset.sub); save(); haptic(10); render(); }
   }
-
   if (a === 'new-note') {
     state.notes.unshift({ id: uid(), title: '', text: '', updated: new Date().toISOString() });
     save(); render();
-    setTimeout(() => {
-      const first = document.querySelector('.note-card input.note-title');
-      if (first) first.focus();
-    }, 30);
+    setTimeout(() => { const f = document.querySelector('.note-card input.note-title'); if (f) f.focus(); }, 30);
   }
-
   if (a === 'del-note') {
-    state.notes = state.notes.filter(n => n.id !== el.dataset.id);
-    save(); haptic(10); render();
+    state.notes = state.notes.filter(n => n.id !== el.dataset.id); save(); haptic(10); render();
   }
-
   if (a === 'reset') {
-    if (confirm('Точно удалить все данные? Это необратимо.')) {
-      state = { transactions: [], goals: [], notes: [], currency: state.currency };
+    if (confirm('Удалить ВСЕ данные? Это необратимо.')) {
+      state = { transactions: [], goals: [], notes: [], currency: state.currency, budgets: {}, recurring: [], categoryUsage: {} };
       save(); render();
     }
   }
-
-  if (a === 'demo') { loadDemo(); }
-
-  if (a === 'force-sync') {
-    closeSheet();
-    pushToCloud().then(() => toast('Синхронизировано'));
-  }
-
+  if (a === 'demo') loadDemo();
+  if (a === 'force-sync') { closeSheet(); pushToCloud().then(() => toast('Синхронизировано')); }
   if (a === 'logout') {
-    if (confirm('Выйти из аккаунта? Данные останутся в облаке.')) {
-      closeSheet();
-      sb.auth.signOut();
+    if (confirm('Выйти? Данные останутся в облаке.')) {
+      closeSheet(); unsubscribeRealtime(); sb.auth.signOut();
     }
+  }
+  if (a === 'edit-budgets') openBudgetSheet();
+  if (a === 'new-recurring') openRecurringSheet();
+  if (a === 'toggle-recurring') {
+    const r = state.recurring.find(x => x.id === el.dataset.id);
+    if (r) { r.active = !r.active; save(); haptic(8); render(); }
+  }
+  if (a === 'del-recurring') {
+    if (confirm('Удалить регулярный платёж?')) {
+      state.recurring = state.recurring.filter(x => x.id !== el.dataset.id);
+      save(); render();
+    }
+  }
+  if (a === 'new-shared') openSharedGoalSheet();
+  if (a === 'join-shared') openJoinSharedSheet();
+  if (a === 'show-invite') openInviteSheet(el.dataset.code);
+  if (a === 'copy-code') {
+    const code = el.dataset.code;
+    try { await navigator.clipboard.writeText(code); toast('Код скопирован'); }
+    catch { toast('Не удалось скопировать', false); }
+  }
+  if (a === 'share-code') {
+    const code = el.dataset.code;
+    if (navigator.share) {
+      try { await navigator.share({ title: 'Код для общей цели', text: `Присоединяйся: ${code}` }); }
+      catch {}
+    } else {
+      try { await navigator.clipboard.writeText(code); toast('Код скопирован'); } catch {}
+    }
+  }
+  if (a === 'leave-shared') {
+    if (!confirm('Выйти из общей цели?')) return;
+    const { error } = await sb.from('shared_goal_members')
+      .delete().eq('goal_id', el.dataset.id).eq('user_id', currentUser.id);
+    if (error) { toast('Ошибка: ' + error.message, false); return; }
+    await loadSharedGoals(); haptic(12); toast('Вышел'); render();
+  }
+  if (a === 'del-shared') {
+    if (!confirm('Удалить общую цель для всех участников?')) return;
+    const { error } = await sb.from('shared_goals').delete().eq('id', el.dataset.id);
+    if (error) { toast('Ошибка: ' + error.message, false); return; }
+    await loadSharedGoals(); haptic(12); toast('Удалено'); render();
+  }
+  if (a === 'del-shared-deposit') {
+    const { error } = await sb.from('shared_goal_deposits').delete().eq('id', el.dataset.id);
+    if (error) { toast('Ошибка: ' + error.message, false); return; }
+    await loadSharedGoals(); render();
   }
 });
 
-/* чекбоксы подцелей */
+/* Period chips */
+document.addEventListener('click', e => {
+  const c = e.target.closest('[data-period]');
+  if (!c) return;
+  uiPeriod = c.dataset.period;
+  haptic(5); render();
+});
+
+/* Checkbox подцелей */
 document.addEventListener('change', e => {
   const cb = e.target.closest('[data-action="toggle-sub"]');
   if (!cb) return;
@@ -1490,13 +1874,12 @@ document.addEventListener('change', e => {
   if (!g) return;
   const s = g.subgoals.find(x => x.id === cb.dataset.sub);
   if (!s) return;
-  s.done = cb.checked;
-  save(); haptic(8);
+  s.done = cb.checked; save(); haptic(8);
   setTimeout(render, 220);
 });
 
-/* отправка форм подцелей и вкладов */
-document.addEventListener('submit', e => {
+/* Формы */
+document.addEventListener('submit', async e => {
   const form = e.target;
 
   if (form.classList.contains('sub-add')) {
@@ -1514,11 +1897,25 @@ document.addEventListener('submit', e => {
   if (form.classList.contains('deposit-row')) {
     e.preventDefault();
     const g = state.goals.find(x => x.id === form.dataset.goal);
-    if (!g) return;
-    const amount = parseFloat(form.querySelector('[name=amount]').value);
-    if (!amount) return;
-    g.deposits = (Number(g.deposits) || 0) + amount;
-    save(); haptic(12); toast(`Отложено ${fmt(amount)}`); render();
+    if (g) {
+      const amount = parseFloat(form.querySelector('[name=amount]').value);
+      if (!amount) return;
+      g.deposits = (Number(g.deposits) || 0) + amount;
+      save(); haptic(12); toast(`Отложено ${fmt(amount)}`); render();
+      return;
+    }
+    // общая цель
+    const sgId = form.dataset.shared;
+    if (sgId) {
+      const amount = parseFloat(form.querySelector('[name=amount]').value);
+      if (!amount || amount <= 0) return;
+      const { error } = await sb.from('shared_goal_deposits').insert({
+        goal_id: sgId, user_id: currentUser.id, amount,
+        date: todayStr(),
+      });
+      if (error) { toast('Ошибка: ' + error.message, false); return; }
+      await loadSharedGoals(); haptic(12); toast(`Отложено ${fmt(amount)}`); render();
+    }
   }
 });
 
@@ -1528,49 +1925,53 @@ document.addEventListener('submit', e => {
 function loadDemo() {
   const d = (offset) => new Date(Date.now() - offset*86400000).toISOString().slice(0,10);
   state.transactions = [
-    { id: uid(), type:'income',  amount: 1200, category:'salary',    note:'Зарплата',   date: d(20), createdAt: new Date().toISOString() },
-    { id: uid(), type:'income',  amount: 250,  category:'freelance', note:'Лендинг',    date: d(12), createdAt: new Date().toISOString() },
-    { id: uid(), type:'expense', amount: 320,  category:'food',      note:'Продукты',   date: d(10), createdAt: new Date().toISOString() },
-    { id: uid(), type:'expense', amount: 90,   category:'smoke',     note:'Сигареты',   date: d(8),  createdAt: new Date().toISOString() },
-    { id: uid(), type:'expense', amount: 150,  category:'fun',       note:'Кино и бар', date: d(5),  createdAt: new Date().toISOString() },
-    { id: uid(), type:'expense', amount: 400,  category:'tech',      note:'Наушники',   date: d(3),  createdAt: new Date().toISOString() },
-    { id: uid(), type:'expense', amount: 60,   category:'transport', note:'Проездной',  date: d(1),  createdAt: new Date().toISOString() },
+    { id: uid(), type:'income', amount: 1200, category:'salary', note:'Зарплата', date: d(20), createdAt: new Date().toISOString() },
+    { id: uid(), type:'income', amount: 250, category:'freelance', note:'Лендинг', date: d(12), createdAt: new Date().toISOString() },
+    { id: uid(), type:'expense', amount: 320, category:'food', note:'Продукты', date: d(10), createdAt: new Date().toISOString() },
+    { id: uid(), type:'expense', amount: 90, category:'smoke', note:'Сигареты', date: d(8), createdAt: new Date().toISOString() },
+    { id: uid(), type:'expense', amount: 150, category:'fun', note:'Кино и бар', date: d(5), createdAt: new Date().toISOString() },
+    { id: uid(), type:'expense', amount: 400, category:'tech', note:'Наушники', date: d(3), createdAt: new Date().toISOString() },
+    { id: uid(), type:'expense', amount: 60, category:'transport', note:'Проездной', date: d(1), createdAt: new Date().toISOString() },
   ];
+  state.budgets = { food: 400, fun: 200, smoke: 100 };
+  state.categoryUsage = { food: 5, fun: 3, tech: 1, transport: 4, smoke: 2 };
   const deadline = new Date(Date.now() + 300*86400000).toISOString().slice(0,10);
   state.goals = [{
-    id: uid(), title: 'Поездка в Европу', target: 1500, deadline,
-    deposits: 200,
+    id: uid(), title: 'Поездка в Европу', target: 1500, deadline, deposits: 200,
     subgoals: [
-      { id: uid(), title: 'Виза',        amount: 100, done: true  },
+      { id: uid(), title: 'Виза', amount: 100, done: true },
       { id: uid(), title: 'Фотоаппарат', amount: 200, done: false },
-      { id: uid(), title: 'Билеты',      amount: 400, done: false },
-      { id: uid(), title: 'Жильё',       amount: 500, done: false },
-      { id: uid(), title: 'На жизнь',    amount: 300, done: false },
+      { id: uid(), title: 'Билеты', amount: 400, done: false },
+      { id: uid(), title: 'Жильё', amount: 500, done: false },
+      { id: uid(), title: 'На жизнь', amount: 300, done: false },
     ],
     createdAt: new Date().toISOString(),
   }];
+  state.recurring = [
+    { id: uid(), type:'income', amount: 1200, category:'salary', note:'Зарплата', dayOfMonth: 5, active: true, lastRun: null, createdAt: new Date().toISOString() },
+  ];
   state.notes = [
-    { id: uid(), title: 'Подготовка к поездке',
-      text: '— подтянуть английский до B1\n— сделать загранпаспорт\n— узнать про страховку\n— забронировать жильё заранее',
-      updated: new Date().toISOString() },
+    { id: uid(), title: 'Подготовка к поездке', text: '— подтянуть английский до B1\n— сделать загранпаспорт\n— узнать про страховку', updated: new Date().toISOString() },
   ];
   save(); haptic(15); toast('Пример загружен'); render(true);
 }
 
 /* =====================================================================
-   СТАРТ + АВТОРИЗАЦИЯ
+   СТАРТ
    ===================================================================== */
-loadLocal();  /* кэш мгновенно, чтобы не мигало пустотой */
+loadLocal();
+loadLocalShared();
 
 async function handleSession(session) {
   const wasUser = !!currentUser;
   currentUser = session?.user || null;
 
   if (currentUser && !wasUser) {
-    /* Сменился ли пользователь — сбросить кэш, если другой аккаунт */
     const lastUser = localStorage.getItem(LAST_USER_KEY);
     if (lastUser && lastUser !== currentUser.id) {
-      state = { transactions: [], goals: [], notes: [], currency: '€' };
+      state = { transactions: [], goals: [], notes: [], currency: '€', budgets: {}, recurring: [], categoryUsage: {} };
+      sharedGoals = [];
+      saveLocalShared();
     }
     localStorage.setItem(LAST_USER_KEY, currentUser.id);
 
@@ -1579,27 +1980,27 @@ async function handleSession(session) {
     setSyncStatus('syncing');
 
     const { found } = await pullFromCloud();
-    if (!found) {
-      /* Первый вход — пушим локальное (если что-то было) */
-      await pushToCloud();
-    }
+    if (!found) await pushToCloud();
+
+    runRecurring();
+    await loadSharedGoals();
+
     setSyncStatus('ok');
+    subscribeRealtime();
     render(true);
 
   } else if (!currentUser && wasUser) {
-    /* Выход */
+    unsubscribeRealtime();
     showAuth();
   } else if (!currentUser) {
     showAuth();
   }
 }
 
-/* Инициализация: сначала получить сессию, потом слушать изменения */
 (async () => {
   try {
     const { data: { session } } = await sb.auth.getSession();
     await handleSession(session);
-
     sb.auth.onAuthStateChange((event, session) => {
       if (event === 'SIGNED_IN' || event === 'SIGNED_OUT' || event === 'USER_UPDATED') {
         handleSession(session);
@@ -1608,21 +2009,23 @@ async function handleSession(session) {
   } catch (e) {
     console.error('Auth init error:', e);
     showAuth();
-    showAuthMsg('Не удалось подключиться к серверу. Проверь SUPABASE_URL и ключ.', 'err');
+    showAuthMsg('Не удалось подключиться. Проверь SUPABASE_URL и ключ.', 'err');
   }
 })();
 
-/* При возврате на вкладку — подтянуть свежие данные (если изменилось на другом устройстве) */
+/* Подтягиваем свежие общие цели при возврате на вкладку */
 let lastFocus = Date.now();
 document.addEventListener('visibilitychange', async () => {
   if (document.visibilityState !== 'visible') return;
   if (!currentUser) return;
-  if (syncState !== 'ok') return;
-  if (Date.now() - lastFocus < 30000) return;
-
+  if (Date.now() - lastFocus < 60000) return;
   lastFocus = Date.now();
-  const { found } = await pullFromCloud();
-  if (found) render();
+  if (syncState === 'ok') {
+    const { found } = await pullFromCloud();
+    if (found) render();
+  }
+  await loadSharedGoals();
+  if (currentTab === 'goals') render();
 });
 </script>
 </body>
