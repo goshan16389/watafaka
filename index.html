@@ -15,7 +15,7 @@
   --bg:#0e1014;--panel:#161a22;--panel2:#1d222c;--panel3:#232936;--border:#262c3a;
   --text:#e7eaf0;--muted:#8b93a7;--accent:#4f8cff;--accent-d:#3a72d9;
   --green:#3ddc97;--red:#ff5c7a;--yellow:#ffcc66;--r:16px;
-  --nav-h:62px;--safe-b:env(safe-area-inset-bottom,0px);--kb:0px;
+  --nav-h:62px;--safe-b:env(safe-area-inset-bottom,0px);--kb:0px;--vvh:100vh;
 }
 html,body{height:100%}
 body{background:var(--bg);color:var(--text);
@@ -25,7 +25,7 @@ button,input,select,textarea{font:inherit;color:inherit;touch-action:manipulatio
 button{cursor:pointer;border:0;background:none}
 input,textarea,select{font-family:inherit}
 
-/* AUTH */
+/* ============ AUTH ============ */
 .auth-screen{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;padding:24px;
   background:radial-gradient(1200px 600px at 50% -10%,rgba(79,140,255,.10),transparent 60%),var(--bg);
   z-index:500;overflow-y:auto}
@@ -48,11 +48,11 @@ input,textarea,select{font-family:inherit}
 .auth-msg.err{background:rgba(255,92,122,.12);color:#ff8da1;border:1px solid rgba(255,92,122,.25)}
 .auth-msg.info{background:rgba(79,140,255,.12);color:#9ec0ff;border:1px solid rgba(79,140,255,.25)}
 
-/* LAYOUT */
+/* ============ LAYOUT ============ */
 .app{display:flex;min-height:100vh}
 .main{flex:1;min-width:0;padding:24px 28px 80px;max-width:1080px;margin:0 auto;width:100%}
 
-/* SIDEBAR / BOTTOM NAV */
+/* ============ SIDEBAR ============ */
 .sidebar{width:228px;flex:0 0 228px;background:var(--panel);border-right:1px solid var(--border);
   padding:18px 12px;display:flex;flex-direction:column;gap:3px;position:sticky;top:0;height:100vh;z-index:40}
 .logo{font-size:17px;font-weight:700;padding:4px 10px 18px;display:flex;align-items:center;gap:9px}
@@ -62,33 +62,38 @@ input,textarea,select{font-family:inherit}
 .nav-btn:hover{background:var(--panel2);color:var(--text)}
 .nav-btn.active{background:var(--accent);color:#fff;font-weight:600;box-shadow:0 8px 20px -10px var(--accent)}
 
-/* TOPBAR */
+/* ============ TOPBAR ============ */
 .topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:22px}
 .topbar h1{font-size:23px;font-weight:700;letter-spacing:-.015em}
 .topbar-right{display:flex;align-items:center;gap:8px}
-.cur{background:var(--panel);border:1px solid var(--border);color:var(--muted);border-radius:10px;padding:7px 10px;cursor:pointer;font-size:13px;font-weight:500}
-.user-badge{display:flex;align-items:center;gap:8px;padding:5px;background:var(--panel);
+.cur{background:var(--panel);border:1px solid var(--border);color:var(--muted);border-radius:10px;
+  padding:8px 12px;cursor:pointer;font-size:14px;font-weight:600;min-width:52px;text-align:center}
+.user-badge{display:flex;align-items:center;gap:8px;padding:4px;background:var(--panel);
   border:1px solid var(--border);border-radius:99px;position:relative;transition:.15s}
-.user-avatar{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#4f8cff,#7aa8ff);
-  color:#fff;font-weight:700;font-size:13px;display:flex;align-items:center;justify-content:center;text-transform:uppercase}
-.sync-dot{position:absolute;top:2px;right:2px;width:11px;height:11px;border-radius:50%;border:2px solid var(--panel);transition:background .25s}
+.user-badge:hover{border-color:#39415a}
+.user-avatar{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#4f8cff,#7aa8ff);
+  color:#fff;font-weight:700;font-size:14px;display:flex;align-items:center;justify-content:center;text-transform:uppercase}
+.sync-dot{position:absolute;top:1px;right:1px;width:12px;height:12px;border-radius:50%;border:2px solid var(--panel);transition:background .25s}
 .sync-dot.ok{background:var(--green)}
 .sync-dot.syncing,.sync-dot.pending{background:var(--yellow);animation:pulse 1s infinite}
 .sync-dot.error{background:var(--red)}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
 
-/* CARDS */
+/* ============ CARDS ============ */
 .card{background:var(--panel);border:1px solid var(--border);border-radius:var(--r);padding:18px}
 .card + .card{margin-top:14px}
 .section-title{font-size:12.5px;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);
   font-weight:700;margin:26px 0 12px}
 .section-title:first-child{margin-top:0}
 
-/* DASHBOARD */
-.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+/* ============ DASHBOARD ============ */
+.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;align-items:stretch}
+.stats > .card{min-height:0;display:flex;flex-direction:column;justify-content:space-between}
 .stat .lbl{font-size:12.5px;color:var(--muted);margin-bottom:6px;font-weight:500}
-.stat .val{font-size:21px;font-weight:700;letter-spacing:-.02em}
-.stat .sub{font-size:12px;color:var(--muted);margin-top:4px}
+.stat .val{font-size:21px;font-weight:700;letter-spacing:-.02em;line-height:1.15;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.stat .sub{font-size:12px;color:var(--muted);margin-top:4px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .pos{color:var(--green)} .neg{color:var(--red)}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px}
 .cat-row{margin-bottom:14px}
@@ -100,7 +105,7 @@ input,textarea,select{font-family:inherit}
   transition:width .5s cubic-bezier(.2,.7,.2,1)}
 .bar-fill.green{background:linear-gradient(90deg,#2fbf85,var(--green))}
 
-/* TX ITEM (со свайпом) */
+/* ============ TX ITEM ============ */
 .tx-item{position:relative;overflow:hidden;border-bottom:1px solid var(--border)}
 .tx-item:last-child{border-bottom:0}
 .tx-content{position:relative;background:var(--panel);display:flex;align-items:center;gap:12px;
@@ -116,10 +121,12 @@ input,textarea,select{font-family:inherit}
 .tx-sub{font-size:12px;color:var(--muted);margin-top:1px}
 .tx-amt{font-weight:600;font-size:14.5px;white-space:nowrap;font-variant-numeric:tabular-nums}
 .icon-btn{background:transparent;border:0;color:var(--muted);cursor:pointer;font-size:16px;
-  padding:6px 8px;border-radius:9px;line-height:1;transition:.15s;flex:0 0 auto}
+  padding:8px 10px;min-width:38px;min-height:38px;border-radius:10px;line-height:1;
+  transition:.15s;flex:0 0 auto;display:inline-flex;align-items:center;justify-content:center}
 .icon-btn:hover{background:var(--panel2);color:var(--red)}
+.icon-btn:active{transform:scale(.9)}
 
-/* CHART */
+/* ============ CHART ============ */
 .chart{display:flex;gap:8px;align-items:flex-end;padding:14px 0 0;min-height:140px}
 .chart-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;min-width:0}
 .chart-bar{width:100%;max-width:44px;background:linear-gradient(180deg,var(--accent),#2a5fc9);
@@ -127,7 +134,7 @@ input,textarea,select{font-family:inherit}
 .chart-bar.current{background:linear-gradient(180deg,#ffcc66,#d99e2e)}
 .chart-label{font-size:11px;color:var(--muted);text-transform:lowercase}
 
-/* FORMS */
+/* ============ FORMS ============ */
 .field{display:flex;flex-direction:column;gap:6px;margin-bottom:12px}
 .field label{font-size:12.5px;color:var(--muted);font-weight:500}
 input,textarea,select{background:var(--panel2);border:1.5px solid var(--border);border-radius:12px;
@@ -148,39 +155,40 @@ textarea{resize:vertical;min-height:80px;line-height:1.5}
 .btn.sm{padding:8px 13px;font-size:13.5px;border-radius:10px}
 .hint{font-size:12.5px;color:var(--muted);margin-top:8px;line-height:1.5}
 
-/* SEGMENTED */
+/* ============ SEGMENTED ============ */
 .seg{display:flex;gap:5px;background:var(--panel2);padding:5px;border-radius:14px;margin-bottom:16px}
 .seg-btn{flex:1;border:0;background:transparent;color:var(--muted);padding:11px;border-radius:10px;
   cursor:pointer;font-weight:600;font-size:14.5px;transition:.15s}
 .seg-btn.active{background:var(--panel);color:var(--text);box-shadow:0 2px 8px rgba(0,0,0,.3)}
-.seg-btn.active[data-type="income"],.seg-btn.active[data-sheet-type="income"]{color:var(--green)}
-.seg-btn.active[data-type="expense"],.seg-btn.active[data-sheet-type="expense"]{color:var(--red)}
+.seg-btn.active[data-type="income"],.seg-btn.active[data-sheet-type="income"],.seg-btn.active[data-rec-type="income"]{color:var(--green)}
+.seg-btn.active[data-type="expense"],.seg-btn.active[data-sheet-type="expense"],.seg-btn.active[data-rec-type="expense"]{color:var(--red)}
 
-/* AMOUNT */
+/* ============ AMOUNT ============ */
 .amount-wrap{position:relative;margin-bottom:16px}
 .amount-input{width:100%;font-size:34px;font-weight:700;letter-spacing:-.02em;padding:14px 58px 14px 18px;
   background:var(--panel2);border:1.5px solid var(--border);border-radius:16px;-moz-appearance:textfield}
 .amount-input::-webkit-outer-spin-button,.amount-input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
 .amount-cur{position:absolute;right:18px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:20px;font-weight:600;pointer-events:none}
 
-/* CATEGORY GRID */
-.cat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px}
-@media (min-width:520px){.cat-grid{grid-template-columns:repeat(4,1fr)}}
-.cat-cell{display:flex;flex-direction:column;align-items:center;gap:5px;padding:12px 6px;border-radius:14px;
-  background:var(--panel2);border:1.5px solid transparent;transition:.15s;min-height:74px;justify-content:center}
+/* ============ CATEGORY GRID ============ */
+.cat-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;margin-bottom:14px}
+@media (max-width:340px){.cat-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+.cat-cell{display:flex;flex-direction:column;align-items:center;gap:4px;padding:10px 4px;border-radius:13px;
+  background:var(--panel2);border:1.5px solid transparent;transition:.15s;min-height:68px;justify-content:center;min-width:0}
 .cat-cell:active{transform:scale(.94)}
-.cat-cell .ci{font-size:23px;line-height:1}
-.cat-cell .cn{font-size:11px;color:var(--muted);text-align:center;line-height:1.2;font-weight:500}
+.cat-cell .ci{font-size:22px;line-height:1}
+.cat-cell .cn{font-size:10.5px;color:var(--muted);text-align:center;line-height:1.15;font-weight:500;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;width:100%;padding:0 2px}
 .cat-cell.active{background:rgba(79,140,255,.14);border-color:var(--accent)}
 .cat-cell.active .cn{color:var(--text);font-weight:600}
 
-/* CHIPS */
+/* ============ CHIPS ============ */
 .chips{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:14px}
 .chip{border:1.5px solid var(--border);background:var(--panel2);color:var(--muted);padding:9px 14px;
   border-radius:99px;cursor:pointer;font-size:13.5px;font-weight:500;transition:.15s}
 .chip.active{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:600}
 
-/* GOALS */
+/* ============ GOALS ============ */
 .goal-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:14px}
 .goal-title{font-size:17px;font-weight:700;letter-spacing:-.01em}
 .goal-deadline{font-size:12.5px;color:var(--muted);margin-top:3px}
@@ -195,7 +203,7 @@ textarea{resize:vertical;min-height:80px;line-height:1.5}
 .subgoal{display:flex;align-items:center;gap:11px;padding:11px 12px;border-radius:12px;background:var(--panel2);
   margin-bottom:7px;transition:.15s;cursor:pointer;border:1px solid transparent}
 .subgoal input[type=checkbox]{width:19px;height:19px;flex:0 0 19px;accent-color:var(--green);cursor:pointer;padding:0}
-.subgoal .t{flex:1;font-size:14px}
+.subgoal .t{flex:1;font-size:14px;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .subgoal .a{font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums;font-weight:500}
 .subgoal.done{background:rgba(61,220,151,.09);border-color:rgba(61,220,151,.25)}
 .subgoal.done .t{color:var(--green);text-decoration:line-through}
@@ -207,66 +215,61 @@ textarea{resize:vertical;min-height:80px;line-height:1.5}
   padding:4px 11px;border-radius:99px;font-size:12px;font-weight:600}
 .badge{display:inline-block;font-size:11.5px;color:var(--muted);background:var(--panel2);padding:3px 9px;border-radius:99px;font-weight:500}
 
-/* NOTES */
+/* ============ NOTES ============ */
 .note-card{position:relative;padding-top:16px}
-.note-card input.note-title{background:transparent;border:0;padding:0 32px 8px 0;font-size:16px;font-weight:700;border-radius:0}
+.note-card input.note-title{background:transparent;border:0;padding:0 44px 8px 0;font-size:16px;font-weight:700;border-radius:0}
 .note-card input.note-title:focus{border-bottom:1px solid var(--accent);box-shadow:none}
 .note-card textarea{background:transparent;border:0;padding:10px 0 0;min-height:100px;font-size:14px;border-radius:0;line-height:1.55}
 .note-card textarea:focus{box-shadow:none}
-.note-del{position:absolute;top:12px;right:10px}
+.note-del{position:absolute;top:8px;right:6px}
 
-/* EMPTY */
+/* ============ EMPTY ============ */
 .empty{text-align:center;padding:42px 20px;color:var(--muted)}
 .empty .big{font-size:38px;margin-bottom:12px;opacity:.75;line-height:1}
 .empty p{font-size:14px;max-width:400px;margin:0 auto 16px;line-height:1.6}
 
-/* FAB */
+/* ============ FAB ============ */
 .fab{position:fixed;right:18px;bottom:calc(20px + var(--safe-b));width:58px;height:58px;border-radius:50%;
   background:var(--accent);color:#fff;display:none;align-items:center;justify-content:center;
   box-shadow:0 10px 28px -6px rgba(79,140,255,.55),0 4px 12px rgba(0,0,0,.35);z-index:45;transition:.15s}
-.fab:active{transform:scale(.9)}
+.fab:active{transform:scale(.9);box-shadow:0 6px 16px -4px rgba(79,140,255,.55)}
 .fab svg{width:26px;height:26px;stroke-width:2.5}
 
-/* SHEET */
+/* ============ SHEET ============ */
 .sheet-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.55);opacity:0;pointer-events:none;
   transition:opacity .25s;z-index:100;backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px)}
 .sheet-backdrop.open{opacity:1;pointer-events:auto}
-.sheet{
-  position:fixed;left:0;right:0;bottom:0;
-  background:var(--panel);border-radius:22px 22px 0 0;
+.sheet{position:fixed;left:0;right:0;bottom:0;background:var(--panel);border-radius:22px 22px 0 0;
   transform:translateY(100%);
-  /* margin-bottom меняется мгновенно (0s), transform — плавно для open/close */
   transition:transform .34s cubic-bezier(.32,.72,0,1), margin-bottom 0s;
   z-index:101;
-  /* max-height ограничен и видимой областью через --vvh */
   max-height:min(92vh, var(--vvh, 92vh));
   display:flex;flex-direction:column;
   padding-bottom:var(--safe-b);
   border-top:1px solid var(--border);
-  /* сдвиг над клавиатурой — через margin, а не через bottom */
   margin-bottom:var(--kb, 0);
-  will-change:transform;
-}
+  will-change:transform}
 .sheet.open{transform:translateY(0)}
 .sheet-handle-wrap{padding:10px 0 6px;display:flex;justify-content:center;flex:0 0 auto}
 .sheet-handle{width:42px;height:4px;border-radius:99px;background:#3a4152}
 .sheet-header{display:flex;align-items:center;justify-content:space-between;padding:4px 18px 12px;flex:0 0 auto}
 .sheet-header h2{font-size:17px;font-weight:700}
-.sheet-close{width:34px;height:34px;border-radius:50%;background:var(--panel2);color:var(--muted);
-  display:flex;align-items:center;justify-content:center;font-size:15px}
+.sheet-close{width:40px;height:40px;border-radius:50%;background:var(--panel2);color:var(--muted);
+  display:flex;align-items:center;justify-content:center;font-size:17px;flex:0 0 auto}
+.sheet-close:active{transform:scale(.9)}
 .sheet-body{flex:1;overflow-y:auto;padding:0 18px 4px;-webkit-overflow-scrolling:touch}
 .sheet-footer{padding:14px 18px 18px;flex:0 0 auto;border-top:1px solid var(--border);background:var(--panel)}
 
-/* TOAST */
-.toast{position:fixed;bottom:calc(var(--nav-h) + var(--safe-b) + 80px);left:50%;
-  transform:translate(-50%,16px);background:var(--panel3);border:1px solid var(--border);color:var(--text);
-  padding:12px 20px;border-radius:14px;font-size:14px;font-weight:500;z-index:200;opacity:0;
+/* ============ TOAST ============ */
+.toast{position:fixed;left:50%;transform:translate(-50%,16px);background:var(--panel3);border:1px solid var(--border);
+  color:var(--text);padding:12px 20px;border-radius:14px;font-size:14px;font-weight:500;z-index:200;opacity:0;
   transition:.25s;pointer-events:none;box-shadow:0 16px 40px rgba(0,0,0,.5);
-  white-space:nowrap;max-width:90vw;overflow:hidden;text-overflow:ellipsis}
+  white-space:nowrap;max-width:90vw;overflow:hidden;text-overflow:ellipsis;
+  bottom:90px}
 .toast.show{opacity:1;transform:translate(-50%,0)}
 .toast .tick{color:var(--green);margin-right:6px}
 
-/* MOBILE */
+/* ============ MOBILE ============ */
 @media (max-width:768px){
   .app{flex-direction:column}
   .sidebar{position:fixed;bottom:0;left:0;right:0;top:auto;width:100%;height:auto;flex:none;
@@ -283,22 +286,26 @@ textarea{resize:vertical;min-height:80px;line-height:1.5}
   .topbar{position:sticky;top:0;z-index:30;background:linear-gradient(180deg,var(--bg) 70%,rgba(14,16,20,0));
     padding:8px 0 14px;margin-bottom:8px}
   .topbar h1{font-size:22px}
-  .fab{display:flex}
-  .stats{grid-template-columns:1fr 1fr;gap:10px}
+  .stats{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
   .stat .val{font-size:19px}
   .grid2{grid-template-columns:1fr;gap:12px}
   .card{padding:16px}
   .row{grid-template-columns:1fr}
   input,textarea,select{font-size:16px}
-  .sub-add{flex-wrap:wrap}
-  .sub-add input:first-child{flex:1 1 100%}
-  .sub-add input:nth-child(2){flex:1 1 auto}
-  .toast{bottom:calc(var(--nav-h) + var(--safe-b) + 100px)}
+  /* FAB приподнят над нижним меню */
+  .fab{display:flex;bottom:calc(var(--nav-h) + var(--safe-b) + 16px);right:16px}
+  /* Подцель: заголовок на всю ширину, ниже сумма + "+" */
+  .sub-add{display:grid;grid-template-columns:1fr 44px;gap:6px;margin-top:10px}
+  .sub-add input:first-child{grid-column:1 / -1}
+  .sub-add input:nth-child(2){grid-column:1}
+  .sub-add button{grid-column:2;padding:0;height:44px;font-size:20px;line-height:1;
+    display:flex;align-items:center;justify-content:center}
+  .toast{bottom:calc(var(--nav-h) + var(--safe-b) + 96px)}
 }
 @media (min-width:769px){
   .sheet{left:50%;top:50%;right:auto;bottom:auto;transform:translate(-50%,-46%) scale(.97);opacity:0;
     width:480px;max-height:85vh;border-radius:20px;transition:.24s cubic-bezier(.32,.72,0,1);
-    border:1px solid var(--border);padding-bottom:0}
+    border:1px solid var(--border);padding-bottom:0;margin-bottom:0}
   .sheet.open{transform:translate(-50%,-50%) scale(1);opacity:1}
   .sheet-handle-wrap{display:none}
   .sheet-header{padding-top:20px}
@@ -345,8 +352,11 @@ textarea{resize:vertical;min-height:80px;line-height:1.5}
       <h1 id="pageTitle">Обзор</h1>
       <div class="topbar-right">
         <select id="currencySel" class="cur" aria-label="Валюта">
-          <option value="€">€ EUR</option><option value="₽">₽ RUB</option>
-          <option value="$">$ USD</option><option value="₸">₸ KZT</option><option value="₴">₴ UAH</option>
+          <option value="€">€</option>
+          <option value="₽">₽</option>
+          <option value="$">$</option>
+          <option value="₸">₸</option>
+          <option value="₴">₴</option>
         </select>
         <button class="user-badge" id="userBadge" aria-label="Аккаунт">
           <span class="user-avatar" id="userAvatar">?</span>
@@ -385,14 +395,9 @@ const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
   </svg>`;
   const icon = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
   const manifest = {
-    name: 'Финансы',
-    short_name: 'Финансы',
-    start_url: '.',
-    scope: '.',
-    display: 'standalone',
-    orientation: 'portrait',
-    background_color: '#0e1014',
-    theme_color: '#0e1014',
+    name: 'Финансы', short_name: 'Финансы', start_url: '.', scope: '.',
+    display: 'standalone', orientation: 'portrait',
+    background_color: '#0e1014', theme_color: '#0e1014',
     icons: [
       { src: icon, sizes: '192x192', type: 'image/svg+xml', purpose: 'any' },
       { src: icon, sizes: '512x512', type: 'image/svg+xml', purpose: 'any maskable' }
@@ -464,7 +469,6 @@ const INCOME_CATS = [
 const ALL_CATS = [...EXPENSE_CATS, ...INCOME_CATS];
 const catById = id => ALL_CATS.find(c => c.id === id) || { name:'Без категории', icon:'❓' };
 
-/* Сортировка категорий по частоте использования у пользователя */
 function sortCatsByUsage(cats) {
   const usage = state.categoryUsage || {};
   const any = cats.some(c => (usage[c.id] || 0) > 0);
@@ -515,10 +519,9 @@ function goalSaved(g) {
 }
 
 /* =====================================================================
-   PERIOD (для обзора)
+   PERIOD
    ===================================================================== */
-let uiPeriod = 'month'; // month | prev | all
-
+let uiPeriod = 'month';
 function periodRange() {
   const now = new Date();
   if (uiPeriod === 'month') {
@@ -599,8 +602,8 @@ function subscribeRealtime() {
     .on('postgres_changes',
       { event: '*', schema: 'public', table: 'user_data', filter: `user_id=eq.${currentUser.id}` },
       (payload) => {
-        if (syncState !== 'ok') return;                    // есть локальные несинхронизированные изменения
-        if (payload.new?.updated_at === lastPushTimestamp) return; // эхо нашего же пуша
+        if (syncState !== 'ok') return;
+        if (payload.new?.updated_at === lastPushTimestamp) return;
         const remote = payload.new?.data;
         if (!remote || typeof remote !== 'object') return;
         state = Object.assign(
@@ -609,7 +612,7 @@ function subscribeRealtime() {
         );
         saveLocal();
         render();
-        toast('Обновлено с другого устройства');
+        /*toast('Обновлено с другого устройства');*/
       })
     .subscribe((status) => {
       if (status === 'SUBSCRIBED') console.log('[rt] subscribed');
@@ -658,7 +661,6 @@ async function loadSharedGoals() {
     .order('created_at', { ascending: false });
   if (error) { console.warn('shared goals load', error); return; }
   if (!goals || !goals.length) { sharedGoals = []; saveLocalShared(); return; }
-
   const ids = goals.map(g => g.id);
   const [mRes, dRes] = await Promise.all([
     sb.from('shared_goal_members').select('*').in('goal_id', ids),
@@ -666,16 +668,11 @@ async function loadSharedGoals() {
   ]);
   const members = mRes.data || [];
   const deposits = dRes.data || [];
-
   sharedGoals = goals.map(g => {
     const gm = members.filter(m => m.goal_id === g.id);
     const gd = deposits.filter(d => d.goal_id === g.id);
-    return {
-      ...g,
-      members: gm,
-      deposits: gd,
-      total: gd.reduce((a, d) => a + Number(d.amount || 0), 0),
-    };
+    return { ...g, members: gm, deposits: gd,
+      total: gd.reduce((a, d) => a + Number(d.amount || 0), 0) };
   });
   saveLocalShared();
 }
@@ -781,16 +778,17 @@ $('#userBadge').addEventListener('click', () => {
 let currentTab = 'dashboard';
 const TITLES = { dashboard:'Обзор', transactions:'Операции', goals:'Цели', notes:'Заметки' };
 
+function goTab(tab) {
+  if (tab === currentTab) { window.scrollTo({ top:0, behavior:'smooth' }); return; }
+  currentTab = tab;
+  document.querySelectorAll('.nav-btn').forEach(b =>
+    b.classList.toggle('active', b.dataset.tab === tab));
+  $('#pageTitle').textContent = TITLES[tab];
+  haptic(6);
+  render(true);
+}
 document.querySelectorAll('.nav-btn').forEach(btn => {
-  btn.addEventListener('click', () => {
-    const tab = btn.dataset.tab;
-    if (tab === currentTab) { window.scrollTo({ top:0, behavior:'smooth' }); return; }
-    currentTab = tab;
-    document.querySelectorAll('.nav-btn').forEach(b => b.classList.toggle('active', b === btn));
-    $('#pageTitle').textContent = TITLES[currentTab];
-    haptic(6);
-    render(true);
-  });
+  btn.addEventListener('click', () => goTab(btn.dataset.tab));
 });
 $('#currencySel').addEventListener('change', e => { state.currency = e.target.value; save(); render(); });
 
@@ -830,8 +828,7 @@ backdrop.addEventListener('click', closeSheet);
 document.addEventListener('click', e => { if (e.target.closest('[data-action="close-sheet"]')) closeSheet(); });
 document.addEventListener('keydown', e => { if (e.key === 'Escape' && sheet.classList.contains('open')) closeSheet(); });
 
-/* Когда пользователь тапнул поле ввода — прокручиваем его в видимую часть sheet.
-   Работает только внутри .sheet-body, страницу не трогает. */
+/* Скролл поля ввода в видимую часть sheet при открытии клавиатуры */
 sheet.addEventListener('focusin', (e) => {
   const t = e.target;
   if (!(t instanceof HTMLInputElement || t instanceof HTMLTextAreaElement)) return;
@@ -845,9 +842,10 @@ sheet.addEventListener('focusin', (e) => {
     } else if (tr.top < br.top + 24) {
       body.scrollBy({ top: tr.top - br.top - 48, behavior: 'smooth' });
     }
-  }, 350);  // ждём, пока клавиатура откроется и sheet сдвинется
+  }, 350);
 });
 
+/* Визуальный вьюпорт (клавиатура на iOS) */
 if (window.visualViewport) {
   const vv = window.visualViewport;
   const root = document.documentElement;
@@ -855,7 +853,7 @@ if (window.visualViewport) {
   const update = () => {
     const kb  = Math.max(0, Math.round(window.innerHeight - vv.height - vv.offsetTop));
     const vvh = Math.round(vv.height);
-    if (kb === lastKb && vvh === lastVvh) return;  // игнорируем микроколебания
+    if (kb === lastKb && vvh === lastVvh) return;
     lastKb = kb; lastVvh = vvh;
     root.style.setProperty('--kb', kb + 'px');
     root.style.setProperty('--vvh', vvh + 'px');
@@ -982,7 +980,8 @@ VIEWS.dashboard = () => {
 
     ${state.goals.length ? `
       <div class="section-title">Активные цели</div>
-      ${state.goals.map(g => goalCard(g)).join('')}
+      ${state.goals.map(g => goalCard(g, { compact: true })).join('')}
+      <button class="btn ghost sm block" data-action="goto-goals" style="margin-top:10px">Все цели →</button>
     ` : ''}
 
     <div style="margin-top:36px;text-align:center">
@@ -1158,7 +1157,8 @@ function renderRecurringSection() {
 /* =====================================================================
    ЦЕЛИ
    ===================================================================== */
-function goalCard(g) {
+function goalCard(g, opts = {}) {
+  const compact = !!opts.compact;
   const saved     = goalSaved(g);
   const remaining = Math.max(0, g.target - saved);
   const pct       = g.target > 0 ? Math.min(100, saved / g.target * 100) : 0;
@@ -1190,7 +1190,7 @@ function goalCard(g) {
           `<span>Осталось: <b>${fmt(remaining)}</b></span>
            <span>В месяц: <b>${fmt(perMonth)}</b></span>`}
       </div>
-      ${(g.subgoals && g.subgoals.length) ? `
+      ${!compact && (g.subgoals && g.subgoals.length) ? `
         <div class="subgoals">
           <div class="section-title" style="margin:0 0 10px">Подцели</div>
           ${g.subgoals.map(s => `
@@ -1203,16 +1203,21 @@ function goalCard(g) {
           `).join('')}
           ${subSum !== g.target ? `<div class="hint">Подцели: ${fmt(subSum)} — ${subSum < g.target ? 'остаток' : 'перебор'} ${fmt(Math.abs(g.target - subSum))}</div>` : ''}
         </div>
-      ` : `<div class="hint">Разбей цель на подцели — виза, билеты, техника. Отмечаешь галочку → сумма уходит в «отложено».</div>`}
-      <form class="sub-add" data-goal="${g.id}">
-        <input name="title" placeholder="Подцель: виза, билеты…" required>
-        <input name="amount" type="number" step="0.01" min="0" inputmode="decimal" placeholder="сумма" required>
-        <button class="btn sm" type="submit">+</button>
-      </form>
-      <form class="deposit-row" data-goal="${g.id}">
-        <input name="amount" type="number" step="0.01" inputmode="decimal" placeholder="Отложить сумму…">
-        <button class="btn primary sm" type="submit">Отложить</button>
-      </form>
+      ` : ''}
+      ${!compact && !(g.subgoals && g.subgoals.length) ? `
+        <div class="hint">Разбей цель на подцели — виза, билеты, техника. Отмечаешь галочку → сумма уходит в «отложено».</div>
+      ` : ''}
+      ${!compact ? `
+        <form class="sub-add" data-goal="${g.id}">
+          <input name="title" placeholder="Подцель: виза, билеты…" required>
+          <input name="amount" type="number" step="0.01" min="0" inputmode="decimal" placeholder="Сумма" required>
+          <button class="btn sm" type="submit" aria-label="Добавить подцель">+</button>
+        </form>
+        <form class="deposit-row" data-goal="${g.id}">
+          <input name="amount" type="number" step="0.01" inputmode="decimal" placeholder="Отложить сумму…">
+          <button class="btn primary sm" type="submit">Отложить</button>
+        </form>
+      ` : ''}
     </div>
   `;
 }
@@ -1254,7 +1259,7 @@ function sharedGoalCard(g) {
             const name = (m?.email || '?').split('@')[0];
             return `
               <div style="display:flex;align-items:center;gap:11px;padding:8px 0;border-bottom:1px solid var(--border)">
-                <span style="flex:1;font-size:13.5px">${esc(name)}${d.note ? ` · ${esc(d.note)}` : ''}</span>
+                <span style="flex:1;font-size:13.5px;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(name)}${d.note ? ` · ${esc(d.note)}` : ''}</span>
                 <span style="font-size:13px;font-variant-numeric:tabular-nums">${fmt(d.amount)}</span>
                 ${d.user_id === currentUser?.id ? `<button class="icon-btn" data-action="del-shared-deposit" data-goal="${g.id}" data-id="${d.id}">✕</button>` : ''}
               </div>`;
@@ -1276,7 +1281,7 @@ VIEWS.goals = () => {
   const totalSaved  = state.goals.reduce((a,g) => a + goalSaved(g), 0);
   return `
     ${state.goals.length ? `
-      <div class="stats" style="grid-template-columns:1fr 1fr;margin-bottom:8px">
+      <div class="stats" style="grid-template-columns:repeat(2,minmax(0,1fr));margin-bottom:8px">
         <div class="card stat">
           <div class="lbl">Всего нужно</div>
           <div class="val">${fmt(totalTarget)}</div>
@@ -1366,7 +1371,7 @@ $('#fab').addEventListener('click', () => {
 });
 
 /* =====================================================================
-   TX SHEET (создание и редактирование)
+   TX SHEET
    ===================================================================== */
 let sheetTx = { type:'expense', category:'food', editId: null };
 
@@ -1385,7 +1390,6 @@ function renderTxSheet(prefill) {
   const cats = sortCatsByUsage(sheetTx.type === 'expense' ? EXPENSE_CATS : INCOME_CATS);
   if (!cats.some(c => c.id === sheetTx.category)) sheetTx.category = cats[0].id;
   const editing = !!sheetTx.editId;
-
   const html = `
     <div class="sheet-handle-wrap"><div class="sheet-handle"></div></div>
     <div class="sheet-header">
@@ -1495,19 +1499,16 @@ function mountTxSheet() {
 }
 
 /* =====================================================================
-   SWIPE TO DELETE
+   SWIPE
    ===================================================================== */
 function mountSwipe() {
   let touch = null;
-  const items = document.querySelectorAll('.tx-item');
-
-  items.forEach(item => {
+  document.querySelectorAll('.tx-item').forEach(item => {
     item.addEventListener('touchstart', e => {
       const content = e.target.closest('.tx-content');
       if (!content || e.target.closest('[data-action="del-tx"]')) return;
       touch = { content, item, x: e.touches[0].clientX, y: e.touches[0].clientY, swiped: false };
     }, { passive: true });
-
     item.addEventListener('touchmove', e => {
       if (!touch || touch.item !== item) return;
       const dx = e.touches[0].clientX - touch.x;
@@ -1520,26 +1521,19 @@ function mountSwipe() {
         touch.content.style.transform = `translateX(${shift}px)`;
       }
     }, { passive: true });
-
     item.addEventListener('touchend', e => {
       if (!touch || touch.item !== item) return;
       const dx = (e.changedTouches[0]?.clientX || 0) - touch.x;
       touch.content.classList.remove('dragging');
       touch.content.style.transform = '';
       document.querySelectorAll('.tx-item').forEach(i => i.classList.remove('swiped'));
-      if (touch.swiped && dx < -40) {
-        item.classList.add('swiped');
-        haptic(6);
-      }
-      // предотвращаем клик-переход в edit если был свайп
+      if (touch.swiped && dx < -40) { item.classList.add('swiped'); haptic(6); }
       if (touch.swiped) {
         item.addEventListener('click', ev => { ev.stopPropagation(); ev.preventDefault(); }, { capture: true, once: true });
       }
       touch = null;
     });
   });
-
-  // Тап в любое место (кроме свайпнутого) — закрываем открытые свайпы
   document.addEventListener('touchstart', e => {
     if (!e.target.closest('.tx-item.swiped')) {
       document.querySelectorAll('.tx-item.swiped').forEach(i => i.classList.remove('swiped'));
@@ -1548,7 +1542,7 @@ function mountSwipe() {
 }
 
 /* =====================================================================
-   SHEET: ЦЕЛЬ
+   GOAL SHEET
    ===================================================================== */
 function openGoalSheet() {
   const defDeadline = new Date(Date.now() + 180*86400000).toISOString().slice(0,10);
@@ -1593,7 +1587,7 @@ function openGoalSheet() {
 }
 
 /* =====================================================================
-   SHEET: БЮДЖЕТЫ
+   BUDGETS SHEET
    ===================================================================== */
 function openBudgetSheet() {
   const now = new Date();
@@ -1643,7 +1637,7 @@ function openBudgetSheet() {
 }
 
 /* =====================================================================
-   SHEET: РЕГУЛЯРНЫЙ ПЛАТЁЖ
+   RECURRING SHEET
    ===================================================================== */
 let recSheet = { type:'expense', category:'food' };
 function openRecurringSheet() {
@@ -1707,7 +1701,7 @@ function mountRecSheet() {
 }
 
 /* =====================================================================
-   SHEET: СОЗДАТЬ / ПРИСОЕДИНИТЬСЯ К ОБЩЕЙ ЦЕЛИ
+   SHARED GOALS SHEETS
    ===================================================================== */
 function openSharedGoalSheet() {
   const defDeadline = new Date(Date.now() + 180*86400000).toISOString().slice(0,10);
@@ -1810,7 +1804,6 @@ document.addEventListener('click', async e => {
     toast('Удалено');
   }
   if (a === 'edit-tx') {
-    // не открываем если строка свайпнута
     const item = el.closest('.tx-item');
     if (item?.classList.contains('swiped')) return;
     openTxEditSheet(el.dataset.id);
@@ -1894,9 +1887,9 @@ document.addEventListener('click', async e => {
     if (error) { toast('Ошибка: ' + error.message, false); return; }
     await loadSharedGoals(); render();
   }
+  if (a === 'goto-goals') goTab('goals');
 });
 
-/* Period chips */
 document.addEventListener('click', e => {
   const c = e.target.closest('[data-period]');
   if (!c) return;
@@ -1904,7 +1897,6 @@ document.addEventListener('click', e => {
   haptic(5); render();
 });
 
-/* Checkbox подцелей */
 document.addEventListener('change', e => {
   const cb = e.target.closest('[data-action="toggle-sub"]');
   if (!cb) return;
@@ -1916,10 +1908,8 @@ document.addEventListener('change', e => {
   setTimeout(render, 220);
 });
 
-/* Формы */
 document.addEventListener('submit', async e => {
   const form = e.target;
-
   if (form.classList.contains('sub-add')) {
     e.preventDefault();
     const g = state.goals.find(x => x.id === form.dataset.goal);
@@ -1931,7 +1921,6 @@ document.addEventListener('submit', async e => {
     g.subgoals.push({ id: uid(), title, amount, done: false });
     save(); haptic(10); toast('Подцель добавлена'); render();
   }
-
   if (form.classList.contains('deposit-row')) {
     e.preventDefault();
     const g = state.goals.find(x => x.id === form.dataset.goal);
@@ -1942,14 +1931,12 @@ document.addEventListener('submit', async e => {
       save(); haptic(12); toast(`Отложено ${fmt(amount)}`); render();
       return;
     }
-    // общая цель
     const sgId = form.dataset.shared;
     if (sgId) {
       const amount = parseFloat(form.querySelector('[name=amount]').value);
       if (!amount || amount <= 0) return;
       const { error } = await sb.from('shared_goal_deposits').insert({
-        goal_id: sgId, user_id: currentUser.id, amount,
-        date: todayStr(),
+        goal_id: sgId, user_id: currentUser.id, amount, date: todayStr(),
       });
       if (error) { toast('Ошибка: ' + error.message, false); return; }
       await loadSharedGoals(); haptic(12); toast(`Отложено ${fmt(amount)}`); render();
@@ -2051,7 +2038,6 @@ async function handleSession(session) {
   }
 })();
 
-/* Подтягиваем свежие общие цели при возврате на вкладку */
 let lastFocus = Date.now();
 document.addEventListener('visibilitychange', async () => {
   if (document.visibilityState !== 'visible') return;
