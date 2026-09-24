@@ -81,7 +81,14 @@ input,textarea,select{font-family:inherit}
 
 /* ============ CARDS ============ */
 .card{background:var(--panel);border:1px solid var(--border);border-radius:var(--r);padding:18px}
+/* Отступ между карточками в вертикальном стеке */
 .card + .card{margin-top:14px}
+
+/* Внутри сеток отступ не нужен — там gap уже разводит карточки */
+.stats > .card + .card,
+.grid2 > .card + .card{
+  margin-top:0;
+}
 .section-title{font-size:12.5px;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);
   font-weight:700;margin:26px 0 12px}
 .section-title:first-child{margin-top:0}
