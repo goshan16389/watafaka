@@ -403,6 +403,49 @@ textarea{resize:vertical;min-height:80px;line-height:1.5}
 }
 .shake{animation:shakeAnim .3s}
 
+/* BATTLE CARDS */
+.battle-deck{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px}
+.battle-card{display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:10px 2px 8px;border-radius:12px;background:var(--panel2);border:2px solid var(--border);
+  cursor:pointer;color:var(--text);transition:.15s;min-height:96px;position:relative;min-width:0}
+.battle-card.rarity-common{border-color:#3a4252}
+.battle-card.rarity-rare{border-color:#4f8cff;box-shadow:0 0 0 1px rgba(79,140,255,.25) inset}
+.battle-card.rarity-epic{border-color:#c084fc;box-shadow:0 0 0 1px rgba(192,132,252,.3) inset}
+.battle-card:hover:not(:disabled){transform:translateY(-2px);background:var(--panel3)}
+.battle-card:active:not(:disabled){transform:scale(.96)}
+.battle-card:disabled{opacity:.35;cursor:not-allowed}
+.battle-card .bc-icon{font-size:24px;line-height:1}
+.battle-card .bc-name{font-size:9.5px;font-weight:600;text-align:center;margin-top:4px;line-height:1.1;
+  padding:0 2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;width:100%}
+.battle-card .bc-cost{font-size:10px;color:#7aa8ff;font-weight:700;margin-top:3px}
+.battle-card .bc-cd{position:absolute;top:3px;right:4px;font-size:9px;font-weight:800;
+  background:rgba(0,0,0,.4);color:var(--yellow);padding:1px 4px;border-radius:4px}
+.slot-row{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px}
+.deck-slot{display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:10px 2px 8px;border-radius:12px;background:var(--panel2);border:2px dashed var(--border);
+  cursor:pointer;min-height:90px;color:var(--muted);transition:.15s;min-width:0}
+.deck-slot:hover{background:var(--panel3);border-color:var(--accent)}
+.deck-slot.filled{border-style:solid}
+.deck-slot.rarity-common{border-color:#3a4252}
+.deck-slot.rarity-rare{border-color:#4f8cff}
+.deck-slot.rarity-epic{border-color:#c084fc}
+.deck-slot .ds-icon{font-size:22px}
+.deck-slot .ds-name{font-size:10px;font-weight:600;text-align:center;margin-top:4px;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;width:100%;padding:0 2px}
+.deck-slot .ds-plus{font-size:24px;color:var(--accent)}
+.card-pool{display:grid;grid-template-columns:repeat(auto-fill,minmax(112px,1fr));gap:8px}
+.card-pool .card-mini{padding:10px 8px;border-radius:12px;background:var(--panel2);
+  border:2px solid var(--border);cursor:pointer;transition:.15s;min-width:0}
+.card-pool .card-mini.rarity-common{border-color:#3a4252}
+.card-pool .card-mini.rarity-rare{border-color:#4f8cff}
+.card-pool .card-mini.rarity-epic{border-color:#c084fc}
+.card-pool .card-mini.owned{opacity:.55;cursor:default}
+.card-pool .card-mini .cm-head{display:flex;align-items:center;gap:6px;margin-bottom:4px}
+.card-pool .card-mini .cm-icon{font-size:20px}
+.card-pool .card-mini .cm-name{font-size:12px;font-weight:600;line-height:1.15}
+.card-pool .card-mini .cm-desc{font-size:10.5px;color:var(--muted);line-height:1.3;margin-top:2px}
+.card-pool .card-mini .cm-cost{font-size:10px;color:#7aa8ff;font-weight:700;margin-top:5px}
+
 /* MOBILE */
 @media (max-width:768px){
   .app{flex-direction:column}
@@ -436,6 +479,10 @@ textarea{resize:vertical;min-height:80px;line-height:1.5}
     display:flex;align-items:center;justify-content:center}
   .toast{bottom:calc(var(--nav-h) + var(--safe-b) + 96px)}
   .quick-btn{flex:1;min-width:0}
+  .battle-card{min-height:88px;padding:8px 2px 6px}
+  .battle-card .bc-icon{font-size:20px}
+  .battle-card .bc-name{font-size:9px}
+  .battle-deck{gap:4px}
 }
 @media (min-width:769px){
   .topbar-add{display:inline-flex}
@@ -649,7 +696,6 @@ function getAllTags() {
   return [...s].sort();
 }
 
-/* Отображение транзакции (в т.ч. вклад в цель) */
 function txDisplay(x) {
   if (x.goalId && x.category === 'savings') {
     const g = state.goals.find(gg => gg.id === x.goalId);
@@ -750,7 +796,6 @@ function blankState() {
     customCats: { expense: [], income: [] }, rpg: null, game: null };
 }
 
-/* Создание расходных транзакций за вклады в цели */
 function applySavings(list, dateStr) {
   const today = dateStr || todayStr();
   let writtenCount = 0;
@@ -883,6 +928,7 @@ function unsubscribeRealtime() {
    ===================================================================== */
 function runRecurring() {
   normalizeRpg();
+  normalizeGame();
   const now = new Date();
   const ym = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
   let changed = false;
@@ -1188,6 +1234,9 @@ const ACHIEVEMENTS = [
   { id:'first_blood', icon:'⚔️', name:'Первая кровь', desc:'Победи первого босса', check: s => (s.game?.stats?.bossesKilled || 0) >= 1 },
   { id:'boss_slayer', icon:'🗡️', name:'Охотник', desc:'Победи 3 боссов', check: s => (s.game?.stats?.bossesKilled || 0) >= 3 },
   { id:'dragon_slayer', icon:'🐲', name:'Драконоборец', desc:'Победи Долгового Дракона', check: s => s.game?.dragonSlain === true },
+  { id:'first_farm', icon:'🦠', name:'Фармер', desc:'Победи обычного врага', check: s => (s.game?.stats?.enemiesKilled || 0) >= 1 },
+  { id:'collector', icon:'🃏', name:'Коллекционер карт', desc:'Собери 5 карт', check: s => (s.game?.collection?.length || 0) >= 5 },
+  { id:'deck_master', icon:'🎴', name:'Мастер колоды', desc:'Собери 10 карт', check: s => (s.game?.collection?.length || 0) >= 10 },
 ];
 
 function normalizeRpg() {
@@ -1276,92 +1325,417 @@ function checkQuests() {
 }
 
 /* =====================================================================
-   GAME — Битва с Долговым Драконом
+   GAME — Битва v3 (карточная)
    ===================================================================== */
-const BOSSES = [
-  { id:'impulse', icon:'🛍️', name:'Импульсивная Покупка', hp:100, atk:5,
-    reward:{ gold:60, xp:40 }, taunt:'«Давай, тебе же это надо прямо сейчас!»' },
-  { id:'delivery', icon:'🍔', name:'Доставка-Дракон', hp:250, atk:9,
-    reward:{ gold:140, xp:80 }, taunt:'«Ты же устал, закажи что-нибудь!»' },
-  { id:'subscription', icon:'🧛', name:'Вампир Подписок', hp:500, atk:14,
-    reward:{ gold:300, xp:140 }, taunt:'«Всего 4.99 в месяц. Ты не заметишь».' },
-  { id:'credit', icon:'💳', name:'Кредитка-Гидра', hp:1200, atk:22,
-    reward:{ gold:600, xp:260 }, taunt:'«Рассрочка 0-0-24!»' },
-  { id:'debt', icon:'🐉', name:'Долговой Дракон', hp:3000, atk:34,
-    reward:{ gold:1500, xp:500 }, taunt:'«Я твой последний босс. Порви меня — станешь свободным».' },
+const CARD_DEFS = {
+  strike:      { icon:'⚔️', name:'Удар',            cost:0, cd:0, rarity:'common', desc:'Базовый урон ×1',
+                 effect:{ damage:1.0 } },
+  block:       { icon:'🛡',  name:'Блок',            cost:1, cd:2, rarity:'common', desc:'Поглотить след. удар',
+                 effect:{ shield:true } },
+  heal:        { icon:'💚',  name:'Лечение',         cost:2, cd:3, rarity:'common', desc:'+30% HP',
+                 effect:{ heal:0.30 } },
+  rage:        { icon:'😡',  name:'Ярость',          cost:1, cd:3, rarity:'common', desc:'След. удар ×2',
+                 effect:{ nextMult:2 } },
+  power:       { icon:'💥',  name:'Мощный удар',     cost:2, cd:2, rarity:'rare',   desc:'Урон ×2.5',
+                 effect:{ damage:2.5 } },
+  lifesteal:   { icon:'🩸',  name:'Вампиризм',       cost:2, cd:2, rarity:'rare',   desc:'×1.5, лечит 50% урона',
+                 effect:{ damage:1.5, lifesteal:0.5 } },
+  fire:        { icon:'🔥',  name:'Огненный шар',    cost:3, cd:3, rarity:'rare',   desc:'×1.5 + горение 3 хода',
+                 effect:{ damage:1.5, burn:{ turns:3, mult:0.4 } } },
+  freeze:      { icon:'❄️',  name:'Заморозка',       cost:2, cd:4, rarity:'rare',   desc:'Враг пропускает ход',
+                 effect:{ stun:1 } },
+  pierce:      { icon:'⚡',  name:'Пробитие',        cost:2, cd:2, rarity:'rare',   desc:'×2, игнорирует отражение',
+                 effect:{ damage:2.0, pierce:true } },
+  reflect:     { icon:'🌀',  name:'Отражение',       cost:2, cd:3, rarity:'rare',   desc:'След. удар вернётся врагу',
+                 effect:{ reflect:1.0 } },
+  manaSurge:   { icon:'🔮',  name:'Мана-прилив',     cost:0, cd:3, rarity:'rare',   desc:'+5 маны, но враг бьёт дважды',
+                 effect:{ mana:5, selfExpose:1 } },
+  doubleStrike:{ icon:'🗡️',  name:'Двойной удар',    cost:3, cd:3, rarity:'epic',   desc:'×1.3 дважды',
+                 effect:{ damage:1.3, hits:2 } },
+  dragonFire:  { icon:'🐉',  name:'Драконье пламя',  cost:4, cd:4, rarity:'epic',   desc:'Урон ×4',
+                 effect:{ damage:4.0 } },
+  execute:     { icon:'☠️',  name:'Казнь',           cost:3, cd:4, rarity:'epic',   desc:'×1, ×5 если враг ниже 30% HP',
+                 effect:{ damage:1.0, executeThreshold:0.3, executeMult:5 } },
+  storm:       { icon:'🌪',  name:'Шторм',           cost:3, cd:3, rarity:'epic',   desc:'×3, но −10% HP себе',
+                 effect:{ damage:3.0, selfDamage:0.10 } },
+};
+
+const ENEMIES = [
+  { id:'slime',    icon:'🦠', name:'Слизень Импульса',  hp:80,    atk:4,  gold:20,   xp:15 },
+  { id:'piggy',    icon:'🐖', name:'Свинья-Копилка',    hp:200,   atk:7,  gold:50,   xp:40 },
+  { id:'zombie',   icon:'🧟', name:'Купон-Зомби',       hp:500,   atk:11, gold:130,  xp:90 },
+  { id:'bat',      icon:'🦇', name:'Реклама-Мышь',      hp:1100,  atk:16, gold:300,  xp:180 },
+  { id:'goblin',   icon:'👺', name:'Налоговый Гоблин',  hp:2200,  atk:22, gold:650,  xp:350 },
+  { id:'mushroom', icon:'🍄', name:'Инфляционный Гриб', hp:4000,  atk:30, gold:1400, xp:700 },
+  { id:'wolf',     icon:'🐺', name:'Кредитный Волк',    hp:8000,  atk:42, gold:3000, xp:1400 },
 ];
 
+const BOSSES = [
+  { id:'impulse',      icon:'🛍️', name:'Импульсивная Покупка', hp:150,  atk:5,  gold:120,  xp:60,   gimmick:'none',     card:'rage' },
+  { id:'delivery',     icon:'🍔', name:'Доставка-Дракон',      hp:400,  atk:9,  gold:350,  xp:150,  gimmick:'double-3', card:'power' },
+  { id:'subscription', icon:'🧛', name:'Вампир Подписок',      hp:1200, atk:13, gold:900,  xp:350,  gimmick:'vampire',  card:'fire' },
+  { id:'credit',       icon:'💳', name:'Кредитка-Гидра',       hp:3000, atk:18, gold:2200, xp:800,  gimmick:'double-4', card:'reflect' },
+  { id:'debt',         icon:'🐉', name:'Долговой Дракон',      hp:7000, atk:26, gold:5500, xp:1800, gimmick:'rage',     card:'dragonFire' },
+];
+
+const CARD_PRICE = { common:100, rare:300, epic:800 };
+
 function normalizeGame() {
-  if (!state.game) {
+  if (!state.game || state.game.version !== 3) {
+    const oldG = state.game || {};
     state.game = {
-      hp: 100, bossIndex: 0, bossHp: BOSSES[0].hp,
-      gold: 0, energy: 20, maxEnergyBase: 20,
-      lastEnergyAt: Date.now(),
-      unlockedBosses: 1,
-      upgrades: { atk:0, hp:0, energy:0 },
-      stats: { totalDamage:0, bossesKilled:0, clickCount:0 },
-      dragonSlain: false,
+      version: 3,
+      gold: Number(oldG.gold) || 0,
+      upgrades: {
+        atk:  Number(oldG.upgrades?.atk)  || 0,
+        hp:   Number(oldG.upgrades?.hp)   || 0,
+        mana: Number(oldG.upgrades?.mana) || 0,
+      },
+      stats: {
+        totalDamage: Number(oldG.stats?.totalDamage) || 0,
+        bossesKilled: Number(oldG.stats?.bossesKilled) || 0,
+        enemiesKilled: Number(oldG.stats?.enemiesKilled) || 0,
+        actions: Number(oldG.stats?.actions) || 0,
+        kills: oldG.stats?.kills || {},
+      },
+      dragonSlain: !!oldG.dragonSlain,
+      unlockedBosses: Math.max(1, Number(oldG.unlockedBosses) || 1),
+      collection: ['strike', 'block', 'heal'],
+      deck: ['strike', 'block', 'heal', null, null],
+      battle: null,
     };
   }
   const g = state.game;
-  g.hp = Number(g.hp) || 0;
-  g.gold = Number(g.gold) || 0;
-  g.energy = Number(g.energy) || 0;
-  g.bossIndex = Math.max(0, Math.min(BOSSES.length - 1, Number(g.bossIndex) || 0));
-  g.unlockedBosses = Math.max(1, Number(g.unlockedBosses) || 1);
-  g.upgrades = g.upgrades || { atk:0, hp:0, energy:0 };
-  g.stats = g.stats || { totalDamage:0, bossesKilled:0, clickCount:0 };
-  g.lastEnergyAt = g.lastEnergyAt || Date.now();
-  if (typeof g.bossHp !== 'number') g.bossHp = BOSSES[g.bossIndex].hp;
-  const stats = gamePlayerStats();
-  if (g.hp > stats.maxHp) g.hp = stats.maxHp;
-  if (g.energy > stats.maxEnergy) g.energy = stats.maxEnergy;
-  if (g.bossHp > BOSSES[g.bossIndex].hp) g.bossHp = BOSSES[g.bossIndex].hp;
+  g.collection = g.collection || ['strike','block','heal'];
+  g.deck = Array.isArray(g.deck) ? g.deck.slice(0,5) : ['strike','block','heal',null,null];
+  while (g.deck.length < 5) g.deck.push(null);
+  if (!g.battle) return;
+  const b = g.battle;
+  b.cds = b.cds || {};
+  b.log = b.log || [];
+  if (typeof b.nextMult !== 'number') b.nextMult = 1;
+  if (typeof b.reflect !== 'number') b.reflect = 0;
+  if (typeof b.stun !== 'number') b.stun = 0;
+  if (typeof b.expose !== 'number') b.expose = 0;
+  if (typeof b.burnTurns !== 'number') b.burnTurns = 0;
+  if (typeof b.burnDmg !== 'number') b.burnDmg = 0;
+  if (typeof b.shield !== 'boolean') b.shield = false;
 }
 
-function gamePlayerStats() {
+function playerStats() {
   const g = state.game;
   return {
-    maxHp: 100 + (g.upgrades.hp || 0) * 20,
-    atk: 10 + (g.upgrades.atk || 0) * 3,
-    maxEnergy: 20 + (g.upgrades.energy || 0) * 5,
+    maxHp: 150 + (g.upgrades.hp || 0) * 50,
+    atk: 15 + (g.upgrades.atk || 0) * 5,
+    maxMana: 10 + (g.upgrades.mana || 0) * 2,
   };
 }
-function currentBoss() {
-  return BOSSES[state.game.bossIndex] || BOSSES[BOSSES.length - 1];
-}
 function upgradeCost(type) {
-  const base = { atk:50, hp:40, energy:80 }[type];
-  const mult = { atk:1.4, hp:1.4, energy:1.5 }[type];
+  const base = { atk:100, hp:80, mana:150 }[type];
+  const mult = { atk:1.4, hp:1.4, mana:1.5 }[type];
   return Math.floor(base * Math.pow(mult, state.game.upgrades[type] || 0));
 }
-
-function tickEnergy() {
-  normalizeGame();
-  const g = state.game;
-  const stats = gamePlayerStats();
-  const now = Date.now();
-  const elapsed = now - g.lastEnergyAt;
-  const gained = Math.floor(elapsed / 15000);
-  if (gained > 0) {
-    if (g.energy < stats.maxEnergy) {
-      g.energy = Math.min(stats.maxEnergy, g.energy + gained);
-    }
-    g.lastEnergyAt += gained * 15000;
-  }
+function getEnemyDef(id) {
+  return ENEMIES.find(e => e.id === id) || BOSSES.find(e => e.id === id);
 }
 
-let _energyTimer = null;
-function startEnergyLoop() {
-  if (_energyTimer) return;
-  _energyTimer = setInterval(() => {
-    const before = state.game ? state.game.energy : 0;
-    tickEnergy();
-    if (state.game && state.game.energy !== before && currentTab === 'game') {
-      renderGamePanel();
-      save();
+function addLog(text) {
+  const b = state.game.battle;
+  if (!b) return;
+  b.log.unshift(text);
+  if (b.log.length > 5) b.log.length = 5;
+}
+
+function startBattle(enemyType, enemyId) {
+  normalizeGame();
+  const def = getEnemyDef(enemyId);
+  if (!def) return;
+  const stats = playerStats();
+  state.game.battle = {
+    enemyType, enemyId,
+    enemyHp: def.hp, enemyMaxHp: def.hp, enemyAtk: def.atk,
+    playerHp: stats.maxHp, playerMaxHp: stats.maxHp,
+    mana: Math.min(5, stats.maxMana), manaMax: stats.maxMana,
+    turn: 0, cds: {}, shield: false, reflect: 0, stun: 0,
+    nextMult: 1, expose: 0, burnTurns: 0, burnDmg: 0, log: [],
+  };
+  addLog(`⚔️ Бой начался!`);
+  save();
+  renderGamePanel();
+}
+
+function playCard(cardId) {
+  const b = state.game.battle;
+  if (!b) return;
+  const card = CARD_DEFS[cardId];
+  if (!card) return;
+  if (b.cds[cardId] > 0) return;
+  if (b.mana < card.cost) return;
+  if (b.playerHp <= 0 || b.enemyHp <= 0) return;
+
+  b.mana -= card.cost;
+  const stats = playerStats();
+  const eff = card.effect || {};
+
+  const hits = eff.hits || 1;
+  let totalDmg = 0;
+  if (eff.damage) {
+    for (let i = 0; i < hits; i++) {
+      let dmg = Math.floor(stats.atk * eff.damage * b.nextMult);
+      if (eff.executeThreshold && b.enemyHp / b.enemyMaxHp < eff.executeThreshold) {
+        dmg = Math.floor(dmg * (eff.executeMult || 1));
+      }
+      dmg = Math.max(1, dmg);
+      b.enemyHp = Math.max(0, b.enemyHp - dmg);
+      totalDmg += dmg;
+      floatDamage('boss', dmg, false);
     }
-  }, 4000);
+    state.game.stats.totalDamage += totalDmg;
+    addLog(`${card.icon} ${card.name}: −${totalDmg}`);
+    shakeElement('#bossSprite');
+  }
+  b.nextMult = 1;
+
+  if (eff.lifesteal && totalDmg > 0) {
+    const heal = Math.floor(totalDmg * eff.lifesteal);
+    const before = b.playerHp;
+    b.playerHp = Math.min(b.playerMaxHp, b.playerHp + heal);
+    const real = b.playerHp - before;
+    if (real > 0) { addLog(`🩸 Лайфстил: +${real}`); floatDamage('player', real, false, true); }
+  }
+
+  if (eff.heal) {
+    const heal = Math.floor(b.playerMaxHp * eff.heal);
+    const before = b.playerHp;
+    b.playerHp = Math.min(b.playerMaxHp, b.playerHp + heal);
+    const real = b.playerHp - before;
+    if (real > 0) { addLog(`💚 ${card.name}: +${real}`); floatDamage('player', real, false, true); }
+  }
+
+  if (eff.shield) { b.shield = true; addLog(`🛡 Блок активен`); }
+  if (eff.reflect) { b.reflect = eff.reflect; addLog(`🌀 Отражение активно`); }
+  if (eff.stun) { b.stun += eff.stun; addLog(`❄️ Враг оглушён`); }
+  if (eff.nextMult) { b.nextMult = eff.nextMult; addLog(`😡 След. удар ×${eff.nextMult}`); }
+  if (eff.mana) { b.mana = Math.min(b.manaMax, b.mana + eff.mana); addLog(`🔮 Мана +${eff.mana}`); }
+  if (eff.selfDamage) {
+    const dmg = Math.floor(b.playerMaxHp * eff.selfDamage);
+    b.playerHp = Math.max(0, b.playerHp - dmg);
+    addLog(`💔 Урон себе: −${dmg}`);
+    floatDamage('player', dmg, false);
+  }
+  if (eff.selfExpose) { b.expose += eff.selfExpose; }
+  if (eff.burn) {
+    b.burnTurns = eff.burn.turns;
+    b.burnDmg = Math.floor(stats.atk * eff.burn.mult);
+    addLog(`🔥 Горение ${eff.burn.turns} хода`);
+  }
+
+  if (card.cd > 0) b.cds[cardId] = card.cd;
+  Object.keys(b.cds).forEach(k => {
+    if (k !== cardId && b.cds[k] > 0) b.cds[k]--;
+  });
+
+  b.mana = Math.min(b.manaMax, b.mana + 2);
+  b.turn++;
+
+  if (b.enemyHp <= 0) return winBattle();
+  enemyTurn();
+  if (b.playerHp <= 0) return loseBattle();
+
+  save();
+  renderGamePanel();
+}
+
+function enemyTurn() {
+  const b = state.game.battle;
+  const e = getEnemyDef(b.enemyId);
+  if (!b || !e) return;
+
+  if (b.stun > 0) {
+    b.stun--;
+    addLog(`❄️ Враг пропускает ход`);
+    return;
+  }
+
+  if (b.burnTurns > 0) {
+    b.enemyHp = Math.max(0, b.enemyHp - b.burnDmg);
+    b.burnTurns--;
+    addLog(`🔥 Горение: −${b.burnDmg}`);
+    floatDamage('boss', b.burnDmg, false);
+    if (b.enemyHp <= 0) return winBattle();
+  }
+
+  let hits = 1;
+  let note = '';
+  if (e.gimmick === 'double-3' && b.turn % 3 === 0) { hits = 2; note = ' (двойной!)'; }
+  if (e.gimmick === 'double-4' && b.turn % 4 === 0) { hits = 2; note = ' (двойной!)'; }
+  if (e.gimmick === 'rage' && b.enemyHp / b.enemyMaxHp < 0.3) { hits = 2; note = ' (в ярости!)'; }
+  if (e.gimmick === 'vampire') {
+    const heal = Math.floor(e.hp * 0.03);
+    b.enemyHp = Math.min(e.hp, b.enemyHp + heal);
+    addLog(`🧛 Вампир высасывает ${heal}`);
+  }
+
+  hits += b.expose;
+  b.expose = 0;
+
+  let totalDmg = 0;
+  for (let i = 0; i < hits; i++) {
+    if (b.enemyHp <= 0) break;
+    const variance = 0.8 + Math.random() * 0.4;
+    let dmg = Math.max(1, Math.floor(e.atk * variance));
+
+    if (b.reflect > 0) {
+      const rd = Math.floor(dmg * b.reflect);
+      b.enemyHp = Math.max(0, b.enemyHp - rd);
+      addLog(`🌀 Отражено: −${rd}`);
+      floatDamage('boss', rd, false);
+      b.reflect = 0;
+      continue;
+    }
+    if (b.shield) {
+      b.shield = false;
+      addLog(`🛡 Блок поглотил ${dmg}`);
+      continue;
+    }
+    b.playerHp = Math.max(0, b.playerHp - dmg);
+    totalDmg += dmg;
+    floatDamage('player', dmg, false);
+  }
+  if (totalDmg > 0) {
+    addLog(`💀 ${e.name}: −${totalDmg} тебе${note}`);
+    shakeElement('#playerCard');
+  }
+  if (b.enemyHp <= 0) return winBattle();
+}
+
+function winBattle() {
+  const b = state.game.battle;
+  const g = state.game;
+  const def = getEnemyDef(b.enemyId);
+  if (!def) return;
+
+  g.gold += def.gold;
+  g.stats.actions += b.turn;
+  if (b.enemyType === 'boss') {
+    g.stats.bossesKilled++;
+    g.stats.kills[def.id] = true;
+    if (def.id === 'debt') g.dragonSlain = true;
+    const idx = BOSSES.findIndex(x => x.id === def.id);
+    if (idx >= 0 && idx + 1 >= g.unlockedBosses && idx + 1 < BOSSES.length) {
+      g.unlockedBosses = idx + 2;
+    }
+    if (def.card && !g.collection.includes(def.card)) {
+      g.collection.push(def.card);
+      toast(`🃏 Новая карта: ${CARD_DEFS[def.card].name}!`, false);
+    }
+  } else {
+    g.stats.enemiesKilled++;
+    if (Math.random() < 0.12) {
+      const pool = Object.keys(CARD_DEFS).filter(id => !g.collection.includes(id) && CARD_DEFS[id].rarity === 'common');
+      if (pool.length) {
+        const pick = pool[Math.floor(Math.random() * pool.length)];
+        g.collection.push(pick);
+        toast(`🃏 Дроп: ${CARD_DEFS[pick].name}!`, false);
+      }
+    }
+  }
+
+  const xp = def.xp || 0;
+  if (xp) awardXP(xp);
+  toast(`🏆 Победа! +${def.gold}💰 +${xp} XP`, false);
+  g.battle = null;
+  checkAchievements();
+  save();
+  renderGamePanel();
+}
+
+function loseBattle() {
+  const b = state.game.battle;
+  const g = state.game;
+  const lost = Math.floor(g.gold * 0.15);
+  g.gold = Math.max(0, g.gold - lost);
+  g.stats.actions += b.turn;
+  toast(`💀 Поражение... −${lost}💰`, false);
+  g.battle = null;
+  save();
+  renderGamePanel();
+}
+
+function buyUpgrade(type) {
+  normalizeGame();
+  const g = state.game;
+  const cost = upgradeCost(type);
+  if (g.gold < cost) { toast('Не хватает золота', false); return; }
+  g.gold -= cost;
+  g.upgrades[type] = (g.upgrades[type] || 0) + 1;
+  save(); haptic(12);
+  toast('Улучшение куплено!');
+  renderGamePanel();
+}
+
+function buyCard(cardId) {
+  normalizeGame();
+  const g = state.game;
+  if (g.collection.includes(cardId)) return;
+  const def = CARD_DEFS[cardId];
+  if (!def) return;
+  const price = CARD_PRICE[def.rarity] || 100;
+  if (g.gold < price) { toast('Не хватает золота', false); return; }
+  g.gold -= price;
+  g.collection.push(cardId);
+  save(); haptic(12);
+  toast(`🃏 Куплено: ${def.name}`);
+  renderGamePanel();
+}
+
+function setDeckSlot(slotIndex, cardId) {
+  normalizeGame();
+  const g = state.game;
+  if (cardId === null || cardId === undefined) {
+    g.deck[slotIndex] = null;
+  } else {
+    if (!g.collection.includes(cardId)) return;
+    g.deck = g.deck.map((c, i) => (c === cardId && i !== slotIndex ? null : c));
+    g.deck[slotIndex] = cardId;
+  }
+  save();
+  renderGamePanel();
+}
+
+function fleeBattle() {
+  if (!state.game.battle) return;
+  if (!confirm('Сбежать из боя? Прогресс боя сбросится.')) return;
+  state.game.battle = null;
+  save();
+  renderGamePanel();
+}
+
+function floatDamage(target, dmg, crit, isHeal) {
+  const parent = target === 'boss'
+    ? document.querySelector('#bossSpriteWrap')
+    : document.querySelector('#playerCard');
+  if (!parent) return;
+  const el = document.createElement('div');
+  el.className = 'dmg-float' + (crit ? ' crit' : '');
+  if (isHeal) el.style.color = 'var(--green)';
+  el.textContent = (isHeal ? '+' : (crit ? '💥 -' : '-')) + dmg;
+  parent.appendChild(el);
+  setTimeout(() => el.remove(), 900);
+}
+
+function shakeElement(sel) {
+  const el = document.querySelector(sel);
+  if (!el) return;
+  el.classList.add('shake');
+  setTimeout(() => el.classList.remove('shake'), 320);
+}
+
+function renderGamePanel() {
+  if (currentTab !== 'game') return;
+  const view = $('#view');
+  view.innerHTML = VIEWS.game();
+  if (MOUNTS.game) MOUNTS.game();
 }
 
 /* =====================================================================
@@ -2169,7 +2543,7 @@ VIEWS.profile = () => {
         • День подряд — <b>+20 XP</b><br>
         • Квест — <b>+30 XP</b><br>
         • Ачивка — <b>+25 XP</b><br>
-        • Победа над боссом — <b>+40…+500 XP</b>
+        • Победа над боссом — <b>+60…+1800 XP</b>
       </div>
     </div>
   `;
@@ -2178,100 +2552,140 @@ VIEWS.profile = () => {
 /* =====================================================================
    БИТВА
    ===================================================================== */
-let _attacking = false;
+let gameTab = 'battle'; // battle | deck | shop
 
 VIEWS.game = () => {
   normalizeGame();
-  tickEnergy();
   const g = state.game;
-  const stats = gamePlayerStats();
-  const b = currentBoss();
-  const bossMaxHp = b.hp;
-  const hpPct = Math.max(0, g.hp / stats.maxHp * 100);
-  const bossPct = Math.max(0, g.bossHp / bossMaxHp * 100);
-  const energyPct = stats.maxEnergy > 0 ? g.energy / stats.maxEnergy * 100 : 0;
-  const enraged = bossPct < 30 && g.bossHp > 0;
-  const rpgLevel = levelFromXp(state.rpg?.xp || 0);
+  const stats = playerStats();
 
-  return `
-    <div class="game-arena">
-      <div class="card" id="playerCard" style="background:linear-gradient(135deg,rgba(61,220,151,.12),transparent);position:relative">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;gap:8px">
-          <div style="font-weight:700">🧙 Ты · Ур. ${rpgLevel}</div>
-          <div style="font-size:12.5px;color:var(--muted)">⚔️ ATK ${stats.atk}</div>
-        </div>
-        <div class="bar" style="height:12px"><div class="bar-fill green" style="width:${hpPct}%"></div></div>
-        <div class="hint" style="margin-top:6px">❤️ ${g.hp} / ${stats.maxHp}</div>
-        <div class="bar" style="height:8px;margin-top:10px"><div class="bar-fill" style="width:${energyPct}%;background:linear-gradient(90deg,#ffcc66,#ffa94d)"></div></div>
-        <div class="hint" style="margin-top:6px">⚡ ${g.energy} / ${stats.maxEnergy} <span style="color:var(--muted)">(+1 / 15 сек)</span></div>
-      </div>
+  if (g.battle) {
+    return renderBattleScreen();
+  }
 
-      <div style="text-align:center;font-size:20px;font-weight:800;color:var(--muted);padding:6px 0;letter-spacing:.2em">— VS —</div>
-
-      <div class="card" style="background:linear-gradient(135deg,rgba(255,92,122,.12),transparent)">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;gap:8px">
-          <div style="font-weight:700;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${b.icon} ${esc(b.name)}</div>
-          <div style="font-size:12.5px;color:var(--muted);flex:0 0 auto">💀 ATK ${b.atk}${enraged ? ' 🔥' : ''}</div>
-        </div>
-        <div id="bossSpriteWrap" style="text-align:center;position:relative;padding:12px 0">
-          <div id="bossSprite" style="font-size:78px;line-height:1;display:inline-block;user-select:none">${b.icon}</div>
-        </div>
-        <div class="bar" style="height:12px"><div class="bar-fill" style="width:${bossPct}%;background:linear-gradient(90deg,#ff5c7a,#ff8da1)"></div></div>
-        <div class="hint" style="margin-top:6px">💀 ${g.bossHp} / ${bossMaxHp}${enraged ? ' · <span style="color:var(--red)">В ЯРОСТИ (×1.5 урон)</span>' : ''}</div>
-        <div style="margin-top:10px;font-size:12.5px;color:var(--muted);font-style:italic;text-align:center">${esc(b.taunt)}</div>
-      </div>
-
-      <button class="btn primary block" id="attackBtn" style="margin-top:14px;padding:16px;font-size:16px"
-        ${g.energy < 1 || g.hp <= 0 || g.bossHp <= 0 ? 'disabled' : ''}>
-        ${g.energy < 1 ? '⚡ Нет энергии' : '⚔️ Атаковать −1 ⚡'}
-      </button>
-      <button class="btn ghost sm block" id="fleeBtn" style="margin-top:8px">🏳️ Отступить (сброс боя)</button>
+  const chips = `
+    <div class="chips" style="margin-bottom:16px">
+      <button class="chip ${gameTab==='battle'?'active':''}" data-game-tab="battle">⚔️ Бой</button>
+      <button class="chip ${gameTab==='deck'?'active':''}" data-game-tab="deck">🃏 Колода</button>
+      <button class="chip ${gameTab==='shop'?'active':''}" data-game-tab="shop">🛒 Магазин</button>
     </div>
+  `;
 
-    <div class="stats" style="grid-template-columns:repeat(3,minmax(0,1fr));margin-top:14px">
-      <div class="card stat">
-        <div class="lbl">💰 Золото</div>
-        <div class="val">${g.gold}</div>
-        <div class="sub">убито: ${g.stats.bossesKilled}</div>
+  if (gameTab === 'battle') {
+    return chips + `
+      <div class="card" style="background:linear-gradient(135deg,rgba(79,140,255,.12),transparent)">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:8px">
+          <div style="font-weight:700;font-size:15px">🧙 Твой боец</div>
+          <div style="font-weight:700;color:var(--yellow)">${g.gold}💰</div>
+        </div>
+        <div class="stats" style="grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:12px">
+          <div><div class="hint" style="margin:0">❤️ HP</div><div style="font-weight:700;font-size:16px">${stats.maxHp}</div></div>
+          <div><div class="hint" style="margin:0">⚔️ ATK</div><div style="font-weight:700;font-size:16px">${stats.atk}</div></div>
+          <div><div class="hint" style="margin:0">🔮 Мана</div><div style="font-weight:700;font-size:16px">${stats.maxMana}</div></div>
+        </div>
       </div>
-      <div class="card stat">
-        <div class="lbl">⚔️ Урон</div>
-        <div class="val">${g.stats.totalDamage}</div>
-        <div class="sub">кликов: ${g.stats.clickCount}</div>
-      </div>
-      <div class="card stat">
-        <div class="lbl">🏆 Боссы</div>
-        <div class="val">${g.unlockedBosses}/${BOSSES.length}</div>
-        <div class="sub">открыто</div>
-      </div>
-    </div>
 
-    <div class="section-title">Улучшения</div>
-    <div class="card">
-      ${renderUpgradeRow('atk', '⚔️ Атака +3', stats.atk)}
-      ${renderUpgradeRow('hp', '❤️ Макс. HP +20', stats.maxHp)}
-      ${renderUpgradeRow('energy', '⚡ Макс. Энергия +5', stats.maxEnergy)}
-    </div>
+      <div class="section-title">🎯 Кампания</div>
+      <div class="card" style="padding:0 18px">
+        ${BOSSES.map((boss, i) => {
+          const unlocked = i < g.unlockedBosses;
+          const killed = g.stats.kills?.[boss.id];
+          const nextToKill = unlocked && !killed;
+          return `
+            <div style="display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid var(--border);${!unlocked ? 'opacity:.4' : ''}">
+              <div style="font-size:28px">${boss.icon}</div>
+              <div style="flex:1;min-width:0">
+                <div style="font-weight:600;font-size:14px">${esc(boss.name)}${killed ? ' ✓' : ''}</div>
+                <div class="hint" style="margin:2px 0 0">HP ${boss.hp} · ATK ${boss.atk} · +${boss.gold}💰 +${boss.xp}XP${boss.card ? ` · 🃏` : ''}</div>
+              </div>
+              ${unlocked
+                ? `<button class="btn ${nextToKill?'primary':'ghost'} sm" data-fight="boss" data-id="${boss.id}">Бой</button>`
+                : '<span style="color:var(--muted);font-size:18px">🔒</span>'}
+            </div>`;
+        }).join('')}
+      </div>
 
-    <div class="section-title">Боссы</div>
-    <div class="card" style="padding:0 18px">
-      ${BOSSES.map((boss, i) => {
-        const unlocked = i < g.unlockedBosses;
-        const current = i === g.bossIndex;
-        return `
-          <div style="display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid var(--border);${!unlocked ? 'opacity:.4' : ''}">
-            <div style="font-size:26px">${boss.icon}</div>
+      <div class="section-title">🦠 Тренировка</div>
+      <div class="card" style="padding:0 18px">
+        ${ENEMIES.map(e => `
+          <div style="display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid var(--border)">
+            <div style="font-size:26px">${e.icon}</div>
             <div style="flex:1;min-width:0">
-              <div style="font-weight:600;font-size:14px">${esc(boss.name)}${current ? ' 🎯' : ''}</div>
-              <div class="hint" style="margin:2px 0 0">HP ${boss.hp} · ATK ${boss.atk} · +${boss.reward.gold}💰 +${boss.reward.xp}XP</div>
+              <div style="font-weight:600;font-size:14px">${esc(e.name)}</div>
+              <div class="hint" style="margin:2px 0 0">HP ${e.hp} · ATK ${e.atk} · +${e.gold}💰 +${e.xp}XP · 🃏 12%</div>
             </div>
-            ${!unlocked ? '<span style="color:var(--muted);font-size:18px">🔒</span>' : ''}
+            <button class="btn ghost sm" data-fight="enemy" data-id="${e.id}">Бой</button>
+          </div>`).join('')}
+      </div>
+
+      <div class="hint" style="margin-top:14px;text-align:center">
+        💡 Реальные операции дают золото: <b>+2💰</b> за расход, <b>+5💰</b> за доход, <b>+10💰</b> за вклад в цель.
+      </div>
+    `;
+  }
+
+  if (gameTab === 'deck') {
+    return chips + `
+      <div class="section-title" style="margin-top:0">Твоя колода · ${g.deck.filter(x=>x).length}/5</div>
+      <div class="slot-row">
+        ${g.deck.map((cardId, i) => {
+          if (!cardId) return `<button class="deck-slot" data-slot="${i}"><span class="ds-plus">+</span></button>`;
+          const c = CARD_DEFS[cardId];
+          return `<button class="deck-slot filled rarity-${c.rarity}" data-slot="${i}">
+            <span class="ds-icon">${c.icon}</span>
+            <span class="ds-name">${esc(c.name)}</span>
+          </button>`;
+        }).join('')}
+      </div>
+      <div class="hint" style="margin-top:10px">Тапни слот — выбрать карту. Тапни занятый — заменить или убрать.</div>
+
+      <div class="section-title">Коллекция · ${g.collection.length}/${Object.keys(CARD_DEFS).length}</div>
+      <div class="card-pool">
+        ${Object.entries(CARD_DEFS).map(([id, c]) => {
+          const owned = g.collection.includes(id);
+          const inDeck = g.deck.includes(id);
+          return `
+            <div class="card-mini rarity-${c.rarity} ${owned ? '' : 'owned'}" ${owned ? `data-pool-card="${id}"` : ''}>
+              <div class="cm-head">
+                <span class="cm-icon">${c.icon}</span>
+                <span class="cm-name">${esc(c.name)}</span>
+              </div>
+              <div class="cm-desc">${esc(c.desc)}</div>
+              <div class="cm-cost">${c.cost > 0 ? '🔮' + c.cost : '🔮 бесплатно'}${c.cd ? ` · CD ${c.cd}` : ''}${inDeck ? ' · в колоде' : ''}</div>
+            </div>`;
+        }).join('')}
+      </div>
+    `;
+  }
+
+  return chips + `
+    <div class="section-title" style="margin-top:0">Улучшения</div>
+    <div class="card">
+      ${renderUpgradeRow('atk', '⚔️ Атака +5', playerStats().atk)}
+      ${renderUpgradeRow('hp', '❤️ Макс. HP +50', playerStats().maxHp)}
+      ${renderUpgradeRow('mana', '🔮 Макс. мана +2', playerStats().maxMana)}
+    </div>
+
+    <div class="section-title">Карточки · ${g.gold}💰</div>
+    <div class="card-pool">
+      ${Object.entries(CARD_DEFS).map(([id, c]) => {
+        const owned = g.collection.includes(id);
+        const price = CARD_PRICE[c.rarity];
+        const canBuy = !owned && g.gold >= price;
+        return `
+          <div class="card-mini rarity-${c.rarity} ${owned ? 'owned' : ''}">
+            <div class="cm-head">
+              <span class="cm-icon">${c.icon}</span>
+              <span class="cm-name">${esc(c.name)}</span>
+            </div>
+            <div class="cm-desc">${esc(c.desc)}</div>
+            <div class="cm-cost" style="display:flex;justify-content:space-between;align-items:center">
+              <span>${c.cost > 0 ? '🔮' + c.cost : '🔮0'}${c.cd ? ` · CD ${c.cd}` : ''}</span>
+              ${owned ? '<span style="color:var(--green)">✓</span>'
+                : `<button class="btn ${canBuy?'primary':'ghost'} sm" style="padding:4px 8px;font-size:11px" data-buy-card="${id}" ${canBuy?'':'disabled'}>${price}💰</button>`}
+            </div>
           </div>`;
       }).join('')}
-    </div>
-
-    <div class="hint" style="margin-top:14px;text-align:center">
-      💡 Записывай реальные операции — за каждую капает <b>+2 ⚡</b> к бою.
     </div>
   `;
 };
@@ -2290,145 +2704,165 @@ function renderUpgradeRow(type, label, currentValue) {
   `;
 }
 
+function renderBattleScreen() {
+  const b = state.game.battle;
+  const e = getEnemyDef(b.enemyId);
+  const hpPct = Math.max(0, b.playerHp / b.playerMaxHp * 100);
+  const bossPct = Math.max(0, b.enemyHp / b.enemyMaxHp * 100);
+  const manaPct = b.manaMax > 0 ? Math.min(100, b.mana / b.manaMax * 100) : 0;
+  const isBoss = b.enemyType === 'boss';
+
+  const statuses = [];
+  if (b.shield) statuses.push('🛡');
+  if (b.reflect > 0) statuses.push('🌀');
+  if (b.stun > 0) statuses.push('❄️');
+  if (b.nextMult > 1) statuses.push('😡×' + b.nextMult);
+  if (b.burnTurns > 0) statuses.push('🔥' + b.burnTurns);
+
+  return `
+    <div class="game-arena">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;gap:8px">
+        <button class="btn ghost sm" id="fleeBtn">← Сбежать</button>
+        <div style="font-weight:700;color:var(--yellow)">${state.game.gold}💰</div>
+      </div>
+
+      <div class="card" id="bossCard" style="background:linear-gradient(135deg,rgba(255,92,122,.12),transparent);position:relative">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;gap:8px">
+          <div style="font-weight:700;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${e.icon} ${esc(e.name)}${isBoss?' 💀':''}</div>
+          <div style="font-size:12.5px;color:var(--muted);flex:0 0 auto">ATK ${e.atk}</div>
+        </div>
+        <div id="bossSpriteWrap" style="text-align:center;position:relative;padding:14px 0">
+          <div id="bossSprite" style="font-size:70px;line-height:1;display:inline-block;user-select:none">${e.icon}</div>
+        </div>
+        <div class="bar" style="height:12px"><div class="bar-fill" style="width:${bossPct}%;background:linear-gradient(90deg,#ff5c7a,#ff8da1)"></div></div>
+        <div class="hint" style="margin-top:6px">💀 ${b.enemyHp} / ${b.enemyMaxHp}</div>
+      </div>
+
+      <div class="card" id="playerCard" style="background:linear-gradient(135deg,rgba(61,220,151,.12),transparent);position:relative;margin-top:14px">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;gap:8px">
+          <div style="font-weight:700">🧙 Ты</div>
+          <div style="font-size:14px">${statuses.join(' ')}</div>
+        </div>
+        <div class="bar" style="height:12px"><div class="bar-fill green" style="width:${hpPct}%"></div></div>
+        <div class="hint" style="margin-top:6px">❤️ ${b.playerHp} / ${b.playerMaxHp}</div>
+        <div class="bar" style="height:9px;margin-top:8px"><div class="bar-fill" style="width:${manaPct}%;background:linear-gradient(90deg,#7aa8ff,#4f8cff)"></div></div>
+        <div class="hint" style="margin-top:6px">🔮 ${b.mana} / ${b.manaMax}</div>
+      </div>
+
+      ${b.log.length ? `
+        <div class="card" style="margin-top:14px;padding:10px 14px">
+          ${b.log.map(l => `<div style="font-size:12px;color:var(--muted);margin-bottom:2px">${l}</div>`).join('')}
+        </div>
+      ` : ''}
+
+      <div class="section-title">Твой ход</div>
+      <div class="battle-deck">
+        ${state.game.deck.map(cardId => {
+          if (!cardId) return '<div></div>';
+          const c = CARD_DEFS[cardId];
+          const cd = b.cds[cardId] || 0;
+          const canPlay = !cd && b.mana >= c.cost;
+          return `
+            <button class="battle-card rarity-${c.rarity}" data-play="${cardId}" ${canPlay ? '' : 'disabled'}>
+              <div class="bc-icon">${c.icon}</div>
+              <div class="bc-name">${esc(c.name)}</div>
+              <div class="bc-cost">${c.cost > 0 ? '🔮' + c.cost : '—'}</div>
+              ${cd ? `<div class="bc-cd">${cd}</div>` : ''}
+            </button>`;
+        }).join('')}
+      </div>
+    </div>
+  `;
+}
+
 MOUNTS.game = () => {
-  const btn = $('#attackBtn');
-  if (btn) btn.addEventListener('click', attack);
-  const flee = $('#fleeBtn');
-  if (flee) flee.addEventListener('click', () => {
-    if (!confirm('Сбросить бой? HP босса и твоё HP восстановятся.')) return;
-    const b = currentBoss();
-    state.game.bossHp = b.hp;
-    state.game.hp = gamePlayerStats().maxHp;
-    save(); renderGamePanel();
+  document.querySelectorAll('[data-game-tab]').forEach(el => {
+    el.addEventListener('click', () => {
+      gameTab = el.dataset.gameTab;
+      haptic(5);
+      renderGamePanel();
+    });
   });
+  document.querySelectorAll('[data-fight]').forEach(el => {
+    el.addEventListener('click', () => {
+      haptic(10);
+      startBattle(el.dataset.fight, el.dataset.id);
+    });
+  });
+  document.querySelectorAll('[data-play]').forEach(el => {
+    el.addEventListener('click', () => {
+      haptic(6);
+      playCard(el.dataset.play);
+    });
+  });
+  const flee = $('#fleeBtn');
+  if (flee) flee.addEventListener('click', fleeBattle);
   document.querySelectorAll('[data-buy-upgrade]').forEach(b => {
     b.addEventListener('click', () => buyUpgrade(b.dataset.buyUpgrade));
   });
-  startEnergyLoop();
+  document.querySelectorAll('[data-buy-card]').forEach(b => {
+    b.addEventListener('click', () => buyCard(b.dataset.buyCard));
+  });
+  document.querySelectorAll('[data-slot]').forEach(b => {
+    b.addEventListener('click', () => openDeckSlotSheet(parseInt(b.dataset.slot)));
+  });
+  document.querySelectorAll('[data-pool-card]').forEach(b => {
+    b.addEventListener('click', () => {
+      const cardId = b.dataset.poolCard;
+      if (state.game.deck.includes(cardId)) {
+        toast('Уже в колоде', false);
+        return;
+      }
+      const emptyIdx = state.game.deck.findIndex(x => !x);
+      if (emptyIdx === -1) {
+        toast('Колода полна — убери карту сначала', false);
+        return;
+      }
+      setDeckSlot(emptyIdx, cardId);
+      haptic(10);
+      toast('Добавлено в колоду');
+    });
+  });
 };
 
-function attack() {
-  if (_attacking) return;
+function openDeckSlotSheet(slotIndex) {
   normalizeGame();
   const g = state.game;
-  const stats = gamePlayerStats();
-  const b = currentBoss();
-  if (g.energy < 1) { toast('Нет энергии — подожди или запиши операцию', false); return; }
-  if (g.hp <= 0 || g.bossHp <= 0) return;
-
-  _attacking = true;
-  setTimeout(() => { _attacking = false; }, 350);
-
-  g.energy -= 1;
-  g.stats.clickCount++;
-
-  const crit = Math.random() < 0.1;
-  const variance = 0.8 + Math.random() * 0.4;
-  const dmg = Math.max(1, Math.floor(stats.atk * variance * (crit ? 2 : 1)));
-  g.bossHp = Math.max(0, g.bossHp - dmg);
-  g.stats.totalDamage += dmg;
-
-  floatDamage('boss', dmg, crit);
-  shakeElement('#bossSprite');
-
-  if (g.bossHp <= 0) {
-    setTimeout(victory, 260);
-    return;
-  }
-
-  const enrage = g.bossHp / b.hp < 0.3;
-  const bossDmg = Math.max(1, Math.floor(b.atk * (enrage ? 1.5 : 1) * (0.8 + Math.random() * 0.4)));
-  g.hp = Math.max(0, g.hp - bossDmg);
-  floatDamage('player', bossDmg, false);
-  shakeElement('#playerCard');
-
-  save();
-
-  if (g.hp <= 0) {
-    setTimeout(defeat, 260);
-    return;
-  }
-  setTimeout(renderGamePanel, 280);
-}
-
-function victory() {
-  normalizeGame();
-  const g = state.game;
-  const b = currentBoss();
-  g.gold += b.reward.gold;
-  g.stats.bossesKilled++;
-  if (b.id === 'debt') g.dragonSlain = true;
-
-  const wasLast = g.bossIndex === BOSSES.length - 1;
-  if (!wasLast) {
-    g.bossIndex += 1;
-    if (g.bossIndex + 1 > g.unlockedBosses) g.unlockedBosses = g.bossIndex + 1;
-  }
-
-  const stats = gamePlayerStats();
-  g.hp = stats.maxHp;
-  g.bossHp = currentBoss().hp;
-
-  toast(`🏆 ${b.name} повержен! +${b.reward.gold}💰`, false);
-  save();
-  awardXP(b.reward.xp);
-  checkAchievements();
-  save();
-  renderGamePanel();
-}
-
-function defeat() {
-  normalizeGame();
-  const g = state.game;
-  const lost = Math.floor(g.gold * 0.1);
-  g.gold = Math.max(0, g.gold - lost);
-  const b = currentBoss();
-  g.bossHp = b.hp;
-  g.hp = gamePlayerStats().maxHp;
-  toast(`💀 Поражение... −${lost}💰`, false);
-  save();
-  renderGamePanel();
-}
-
-function buyUpgrade(type) {
-  normalizeGame();
-  const g = state.game;
-  const cost = upgradeCost(type);
-  if (g.gold < cost) { toast('Не хватает золота', false); return; }
-  g.gold -= cost;
-  g.upgrades[type] = (g.upgrades[type] || 0) + 1;
-  const stats = gamePlayerStats();
-  if (type === 'hp') g.hp = stats.maxHp;
-  if (type === 'energy') g.energy = Math.min(stats.maxEnergy, g.energy + 5);
-  save(); haptic(12);
-  toast('Улучшение куплено!');
-  renderGamePanel();
-}
-
-function floatDamage(target, dmg, crit) {
-  const parent = target === 'boss'
-    ? document.querySelector('#bossSpriteWrap')
-    : document.querySelector('#playerCard');
-  if (!parent) return;
-  const el = document.createElement('div');
-  el.className = 'dmg-float' + (crit ? ' crit' : '');
-  el.textContent = (crit ? '💥 ' : '') + '-' + dmg;
-  parent.appendChild(el);
-  setTimeout(() => el.remove(), 900);
-}
-
-function shakeElement(sel) {
-  const el = document.querySelector(sel);
-  if (!el) return;
-  el.classList.add('shake');
-  setTimeout(() => el.classList.remove('shake'), 320);
-}
-
-function renderGamePanel() {
-  if (currentTab !== 'game') return;
-  const view = $('#view');
-  view.innerHTML = VIEWS.game();
-  if (MOUNTS.game) MOUNTS.game();
+  const current = g.deck[slotIndex];
+  const html = `
+    <div class="sheet-handle-wrap"><div class="sheet-handle"></div></div>
+    <div class="sheet-header"><h2>Слот ${slotIndex + 1}</h2>
+      <button class="sheet-close" data-action="close-sheet">✕</button></div>
+    <div class="sheet-body">
+      ${current ? `<div class="hint" style="margin-top:0">Сейчас в слоте: <b>${esc(CARD_DEFS[current].name)}</b></div>` : ''}
+      <button class="ctx-item" data-deck-pick-slot="${slotIndex}" data-deck-pick="">
+        <span class="ico">🚫</span><span>Очистить слот</span>
+      </button>
+      <div class="section-title" style="margin:14px 0 10px">Выбрать карту</div>
+      ${g.collection.map(id => {
+        const c = CARD_DEFS[id];
+        if (!c) return '';
+        const inOtherSlot = g.deck.some((x, i) => x === id && i !== slotIndex);
+        return `
+          <button class="ctx-item" data-deck-pick-slot="${slotIndex}" data-deck-pick="${id}">
+            <span class="ico">${c.icon}</span>
+            <span style="flex:1">${esc(c.name)}${inOtherSlot ? ' <span class="hint" style="display:inline">· в слоте ' + (g.deck.findIndex(x => x === id) + 1) + '</span>' : ''}</span>
+            <span class="hint" style="margin:0">${c.cost > 0 ? '🔮' + c.cost : '—'}</span>
+          </button>`;
+      }).join('')}
+    </div>
+  `;
+  openSheet(html, () => {
+    document.querySelectorAll('[data-deck-pick-slot]').forEach(b => {
+      b.addEventListener('click', () => {
+        const slot = parseInt(b.dataset.deckPickSlot);
+        const cardId = b.dataset.deckPick || null;
+        setDeckSlot(slot, cardId);
+        closeSheet();
+        haptic(8);
+      });
+    });
+  });
 }
 
 /* =====================================================================
@@ -2439,10 +2873,9 @@ function fabAction() {
   if (currentTab === 'goals') openGoalSheet();
   else if (currentTab === 'notes') {
     state.notes.unshift({ id: uid(), title: '', text: '', updated: new Date().toISOString() });
+    awardXP(XP_REWARDS.note);
     save(); render();
     setTimeout(() => { const f = document.querySelector('.note-card input.note-title'); if (f) f.focus(); }, 40);
-  } else if (currentTab === 'profile' || currentTab === 'game') {
-    openTxSheet();
   } else openTxSheet();
 }
 $('#fab').addEventListener('click', fabAction);
@@ -2740,14 +3173,13 @@ function mountTxSheet() {
       state.transactions.push({ id: txId, ...data, createdAt: new Date().toISOString() });
       state.categoryUsage[sheetTx.category] = (state.categoryUsage[sheetTx.category] || 0) + 1;
 
-      /* RPG + энергия в битве */
       awardXP(data.type === 'income' ? XP_REWARDS.income : XP_REWARDS.tx);
       bumpDaily('tx');
       bumpDaily(data.type === 'expense' ? 'expense' : 'income');
       if (data.tags.length) bumpDaily('tag', data.tags.length);
       touchStreak();
       normalizeGame();
-      state.game.energy = Math.min(gamePlayerStats().maxEnergy, state.game.energy + 2);
+      state.game.gold += data.type === 'income' ? 5 : 2;
 
       if (data.type === 'income') {
         const pending = [];
@@ -2847,6 +3279,8 @@ function openConfirmSavingsSheet(list, dateStr, opts = {}) {
       awardXP(XP_REWARDS.deposit);
       bumpDaily('deposit');
       touchStreak();
+      normalizeGame();
+      state.game.gold += list.length * 10;
       haptic(15); closeSheet();
       setTimeout(() => { toast(`Отложено ${fmt(total)}`); render(); }, 200);
     });
@@ -3573,6 +4007,8 @@ document.addEventListener('submit', async e => {
       awardXP(XP_REWARDS.deposit);
       bumpDaily('deposit');
       touchStreak();
+      normalizeGame();
+      state.game.gold += 10;
       haptic(12);
       toast(g.virtual ? `Отложено ${fmt(amount)} (виртуально)` : `Отложено ${fmt(amount)} → Накопления`);
       render();
@@ -3661,7 +4097,6 @@ async function handleSession(session) {
 
     setSyncStatus('ok');
     subscribeRealtime();
-    startEnergyLoop();
     render(true);
 
   } else if (!currentUser && wasUser) {
