@@ -1459,6 +1459,7 @@ function startBattle(enemyType, enemyId) {
     turn: 0, cds: {}, shield: false, reflect: 0, stun: 0,
     nextMult: 1, expose: 0, burnTurns: 0, burnDmg: 0, log: [],
   };
+_playing = false;
   addLog(`⚔️ Бой начался!`);
   save();
   renderGamePanel();
@@ -1565,21 +1566,22 @@ function playCard(cardId) {
       return;
     }
 
-    /* === ФАЗА 3: реген маны на СЛЕДУЮЩИЙ ход + накал === */
+     /* === ФАЗА 3: реген маны на СЛЕДУЮЩИЙ ход + накал === */
     setTimeout(() => {
       b.mana = Math.min(b.manaMax, b.mana + 1);
       b.turn++;
+      _playing = false;
       save();
       renderGamePanel();
-      _playing = false;
     }, 250);
   }, 450);
 }
 
 function enemyTurn() {
   const b = state.game.battle;
+  if (!b) return;
   const e = getEnemyDef(b.enemyId);
-  if (!b || !e) return;
+  if (!e) return;
 
   if (b.stun > 0) {
     b.stun--;
@@ -1648,10 +1650,11 @@ function enemyTurn() {
 }
 
 function winBattle() {
+  if (!state.game.battle) return;   // защита от двойного вызова
   const b = state.game.battle;
   const g = state.game;
   const def = getEnemyDef(b.enemyId);
-  if (!def) return;
+  if (!def) { g.battle = null; save(); renderGamePanel(); return; }
 
   g.gold += def.gold;
   g.stats.actions += b.turn;
@@ -1683,12 +1686,14 @@ function winBattle() {
   if (xp) awardXP(xp);
   toast(`🏆 Победа! +${def.gold}💰 +${xp} XP`, false);
   g.battle = null;
+  _playing = false;
   checkAchievements();
   save();
   renderGamePanel();
 }
 
 function loseBattle() {
+  if (!state.game.battle) return;
   const b = state.game.battle;
   const g = state.game;
   const lost = Math.floor(g.gold * 0.15);
@@ -1696,6 +1701,7 @@ function loseBattle() {
   g.stats.actions += b.turn;
   toast(`💀 Поражение... −${lost}💰`, false);
   g.battle = null;
+  _playing = false;
   save();
   renderGamePanel();
 }
@@ -1745,6 +1751,7 @@ function fleeBattle() {
   if (!state.game.battle) return;
   if (!confirm('Сбежать из боя? Прогресс боя сбросится.')) return;
   state.game.battle = null;
+_playing = false;
   save();
   renderGamePanel();
 }
