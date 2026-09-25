@@ -174,6 +174,7 @@ textarea{resize:vertical;min-height:80px;line-height:1.5}
 .btn.danger{background:rgba(255,92,122,.15);color:#ff8da1}
 .btn.block{width:100%}
 .btn.sm{padding:8px 13px;font-size:13.5px;border-radius:10px}
+.btn:disabled{opacity:.5;cursor:not-allowed;transform:none!important}
 .hint{font-size:12.5px;color:var(--muted);margin-top:8px;line-height:1.5}
 
 /* SEGMENTED */
@@ -381,6 +382,27 @@ textarea{resize:vertical;min-height:80px;line-height:1.5}
 .toast.show{opacity:1;transform:translate(-50%,0)}
 .toast .tick{color:var(--green);margin-right:6px}
 
+/* GAME */
+.game-arena .card{transition:transform .15s}
+#bossSprite{display:inline-block;transition:transform .12s}
+.dmg-float{position:absolute;font-weight:800;font-size:22px;color:var(--red);
+  pointer-events:none;animation:dmgFloat .9s ease-out forwards;
+  text-shadow:0 2px 8px rgba(0,0,0,.7);left:50%;top:12px;transform:translateX(-50%);z-index:10}
+.dmg-float.crit{color:var(--yellow);font-size:30px}
+@keyframes dmgFloat{
+  0%{opacity:0;transform:translate(-50%,0) scale(.6)}
+  20%{opacity:1;transform:translate(-50%,-12px) scale(1.15)}
+  100%{opacity:0;transform:translate(-50%,-64px) scale(1)}
+}
+@keyframes shakeAnim{
+  0%,100%{transform:translateX(0)}
+  20%{transform:translateX(-8px) rotate(-3deg)}
+  40%{transform:translateX(8px) rotate(3deg)}
+  60%{transform:translateX(-5px) rotate(-2deg)}
+  80%{transform:translateX(5px) rotate(2deg)}
+}
+.shake{animation:shakeAnim .3s}
+
 /* MOBILE */
 @media (max-width:768px){
   .app{flex-direction:column}
@@ -389,10 +411,10 @@ textarea{resize:vertical;min-height:80px;line-height:1.5}
     padding:6px 4px calc(6px + var(--safe-b));border-right:0;border-top:1px solid var(--border);
     background:rgba(22,26,34,.92);backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px);z-index:40;gap:0}
   .logo{display:none}
-  .nav-btn{flex-direction:column;gap:2px;padding:8px 4px 6px;border-radius:12px;font-size:10px;
-    font-weight:500;flex:1;max-width:84px;justify-content:center;align-items:center;text-align:center;
+  .nav-btn{flex-direction:column;gap:2px;padding:8px 2px 6px;border-radius:12px;font-size:9.5px;
+    font-weight:500;flex:1;max-width:74px;justify-content:center;align-items:center;text-align:center;
     background:transparent!important;box-shadow:none!important}
-  .nav-btn i{font-size:21px;width:auto;line-height:1}
+  .nav-btn i{font-size:20px;width:auto;line-height:1}
   .nav-btn.active{color:var(--accent)}
   .main{padding:8px 14px calc(var(--nav-h) + var(--safe-b) + 90px);max-width:none}
   .topbar{position:sticky;top:0;z-index:30;background:linear-gradient(180deg,var(--bg) 70%,rgba(14,16,20,0));
@@ -460,6 +482,8 @@ textarea{resize:vertical;min-height:80px;line-height:1.5}
     <button class="nav-btn" data-tab="transactions"><i>🧾</i><span>Операции</span></button>
     <button class="nav-btn" data-tab="goals"><i>🎯</i><span>Цели</span></button>
     <button class="nav-btn" data-tab="notes"><i>📝</i><span>Заметки</span></button>
+    <button class="nav-btn" data-tab="profile"><i>🏆</i><span>Профиль</span></button>
+    <button class="nav-btn" data-tab="game"><i>⚔️</i><span>Битва</span></button>
   </aside>
   <main class="main">
     <header class="topbar">
@@ -662,6 +686,8 @@ let state = {
   budgets: {}, monthlyBudget: 0,
   recurring: [], categoryUsage: {},
   customCats: { expense: [], income: [] },
+  rpg: null,
+  game: null,
 };
 let sharedGoals = [];
 let currentUser = null;
@@ -685,6 +711,8 @@ function normalizeState() {
     if (g.virtual === undefined) g.virtual = false;
     (g.subgoals || []).forEach(s => { if (s.spentAt === undefined) s.spentAt = null; });
   });
+  normalizeRpg();
+  normalizeGame();
 }
 
 function loadLocal() {
@@ -719,7 +747,7 @@ function archivedGoals() { return state.goals.filter(g => g.archived); }
 function blankState() {
   return { transactions: [], goals: [], notes: [], currency: state.currency || '€',
     budgets: {}, monthlyBudget: 0, recurring: [], categoryUsage: {},
-    customCats: { expense: [], income: [] } };
+    customCats: { expense: [], income: [] }, rpg: null, game: null };
 }
 
 /* Создание расходных транзакций за вклады в цели */
@@ -730,7 +758,6 @@ function applySavings(list, dateStr) {
     const g = state.goals.find(x => x.id === item.goalId);
     if (!g) return;
     g.deposits = (Number(g.deposits) || 0) + item.amount;
-    /* Виртуальная копилка — не пишем расход */
     if (g.virtual) return;
     state.transactions.push({
       id: uid(),
@@ -855,6 +882,7 @@ function unsubscribeRealtime() {
    RECURRING
    ===================================================================== */
 function runRecurring() {
+  normalizeRpg();
   const now = new Date();
   const ym = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
   let changed = false;
@@ -998,7 +1026,7 @@ $('#userBadge').addEventListener('click', () => {
    НАВИГАЦИЯ
    ===================================================================== */
 let currentTab = 'dashboard';
-const TITLES = { dashboard:'Обзор', transactions:'Операции', goals:'Цели', notes:'Заметки' };
+const TITLES = { dashboard:'Обзор', transactions:'Операции', goals:'Цели', notes:'Заметки', profile:'Профиль', game:'Битва' };
 
 function goTab(tab) {
   if (tab === currentTab) { window.scrollTo({ top:0, behavior:'smooth' }); return; }
@@ -1114,6 +1142,226 @@ function attachHorizontalWheel(el) {
   }
   setTimeout(updateOverflow, 0);
   updateOverflow();
+}
+
+/* =====================================================================
+   RPG
+   ===================================================================== */
+const XP_REWARDS = {
+  tx: 5, income: 8, goal: 20, goalDone: 50,
+  customCat: 15, note: 10, deposit: 12, budget: 15,
+  recurring: 10, streakDay: 20, bossKill: 60,
+};
+function xpForLevel(l) { return 50 * Math.pow(l - 1, 2); }
+function levelFromXp(xp) {
+  let l = 1;
+  while (xpForLevel(l + 1) <= xp) l++;
+  return l;
+}
+
+const ACHIEVEMENTS = [
+  { id:'first_tx', icon:'🧾', name:'Первая операция', desc:'Запиши первую операцию', check: s => s.transactions.length >= 1 },
+  { id:'tx_10', icon:'📚', name:'Копилка', desc:'10 операций', check: s => s.transactions.length >= 10 },
+  { id:'tx_100', icon:'🗃️', name:'Архивариус', desc:'100 операций', check: s => s.transactions.length >= 100 },
+  { id:'tx_500', icon:'🏛️', name:'Магистр учёта', desc:'500 операций', check: s => s.transactions.length >= 500 },
+  { id:'first_income', icon:'💰', name:'Первый доход', desc:'Запиши доход', check: s => s.transactions.some(t => t.type === 'income') },
+  { id:'first_goal', icon:'🎯', name:'Целеустремлённый', desc:'Создай цель', check: s => s.goals.length >= 1 },
+  { id:'goals_3', icon:'🎯', name:'Стратег', desc:'3 активные цели', check: s => s.goals.filter(g => !g.archived).length >= 3 },
+  { id:'goal_done', icon:'🏆', name:'Достиг цели', desc:'Закрой цель', check: s => s.goals.some(g => { const b = goalBreakdown(g); return b.target > 0 && b.remaining <= 0; }) },
+  { id:'saver_100', icon:'🐷', name:'Копейка', desc:'Накопи 100', check: s => s.goals.reduce((a,g) => a + (Number(g.deposits)||0), 0) >= 100 },
+  { id:'saver_1000', icon:'💎', name:'Тысячник', desc:'Накопи 1000', check: s => s.goals.reduce((a,g) => a + (Number(g.deposits)||0), 0) >= 1000 },
+  { id:'saver_10000', icon:'👑', name:'Сберегатель', desc:'Накопи 10 000', check: s => s.goals.reduce((a,g) => a + (Number(g.deposits)||0), 0) >= 10000 },
+  { id:'streak_3', icon:'🔥', name:'Разогрев', desc:'3 дня подряд', check: s => (s.rpg?.streak?.best || 0) >= 3 },
+  { id:'streak_7', icon:'🔥', name:'Неделя', desc:'7 дней подряд', check: s => (s.rpg?.streak?.best || 0) >= 7 },
+  { id:'streak_30', icon:'🌋', name:'Месяц огня', desc:'30 дней подряд', check: s => (s.rpg?.streak?.best || 0) >= 30 },
+  { id:'cat_custom', icon:'🏷️', name:'Своя игра', desc:'Создай свою категорию', check: s => ((s.customCats?.expense?.length||0) + (s.customCats?.income?.length||0)) >= 1 },
+  { id:'cats_5', icon:'🎨', name:'Коллекционер', desc:'5 своих категорий', check: s => ((s.customCats?.expense?.length||0) + (s.customCats?.income?.length||0)) >= 5 },
+  { id:'tags_5', icon:'🏷️', name:'Меточник', desc:'5 разных тегов', check: s => { const set = new Set(); s.transactions.forEach(t => (t.tags||[]).forEach(x => set.add(x))); return set.size >= 5; } },
+  { id:'tags_20', icon:'📚', name:'Библиотекарь', desc:'20 разных тегов', check: s => { const set = new Set(); s.transactions.forEach(t => (t.tags||[]).forEach(x => set.add(x))); return set.size >= 20; } },
+  { id:'note_first', icon:'📝', name:'Летописец', desc:'Создай заметку', check: s => s.notes.length >= 1 },
+  { id:'notes_10', icon:'📖', name:'Дневник', desc:'10 заметок', check: s => s.notes.length >= 10 },
+  { id:'budget_set', icon:'💼', name:'Планировщик', desc:'Установи бюджет', check: s => !!s.monthlyBudget || Object.keys(s.budgets||{}).length > 0 },
+  { id:'recurring_first', icon:'🔁', name:'Автопилот', desc:'Добавь регулярный платёж', check: s => (s.recurring||[]).length >= 1 },
+  { id:'level_5', icon:'⭐', name:'Уровень 5', desc:'Достигни 5 уровня', check: s => levelFromXp(s.rpg?.xp || 0) >= 5 },
+  { id:'level_10', icon:'🌟', name:'Уровень 10', desc:'Достигни 10 уровня', check: s => levelFromXp(s.rpg?.xp || 0) >= 10 },
+  { id:'level_20', icon:'✨', name:'Уровень 20', desc:'Достигни 20 уровня', check: s => levelFromXp(s.rpg?.xp || 0) >= 20 },
+  { id:'first_blood', icon:'⚔️', name:'Первая кровь', desc:'Победи первого босса', check: s => (s.game?.stats?.bossesKilled || 0) >= 1 },
+  { id:'boss_slayer', icon:'🗡️', name:'Охотник', desc:'Победи 3 боссов', check: s => (s.game?.stats?.bossesKilled || 0) >= 3 },
+  { id:'dragon_slayer', icon:'🐲', name:'Драконоборец', desc:'Победи Долгового Дракона', check: s => s.game?.dragonSlain === true },
+];
+
+function normalizeRpg() {
+  if (!state.rpg) state.rpg = {};
+  const r = state.rpg;
+  r.xp = Number(r.xp) || 0;
+  r.achievements = r.achievements || {};
+  r.streak = r.streak || { current: 0, best: 0, lastDate: null };
+  r.quests = r.quests || { date: null, list: [] };
+  r.stats = r.stats || {};
+  r.stats.daysTracked = r.stats.daysTracked || 0;
+  r._dailyCounts = r._dailyCounts || { tx:0, income:0, expense:0, deposit:0, tag:0 };
+  rollQuests();
+}
+
+function awardXP(amount) {
+  normalizeRpg();
+  const before = levelFromXp(state.rpg.xp);
+  state.rpg.xp += amount;
+  const after = levelFromXp(state.rpg.xp);
+  if (after > before) setTimeout(() => toast(`⭐ Уровень ${after}!`, false), 500);
+  checkAchievements();
+}
+
+function checkAchievements() {
+  normalizeRpg();
+  const unlocked = [];
+  ACHIEVEMENTS.forEach(a => {
+    if (state.rpg.achievements[a.id]) return;
+    try { if (a.check(state)) {
+      state.rpg.achievements[a.id] = new Date().toISOString();
+      unlocked.push(a);
+    }} catch(e) {}
+  });
+  if (unlocked.length) {
+    state.rpg.xp += unlocked.length * 25;
+    unlocked.forEach((a, i) => setTimeout(() => toast(`${a.icon} ${a.name}`, false), 700 + i * 550));
+  }
+}
+
+function touchStreak() {
+  normalizeRpg();
+  const today = todayStr();
+  const s = state.rpg.streak;
+  if (s.lastDate === today) return;
+  const y = new Date(); y.setDate(y.getDate() - 1);
+  const yest = y.toISOString().slice(0,10);
+  s.current = (s.lastDate === yest) ? s.current + 1 : 1;
+  s.lastDate = today;
+  if (s.current > s.best) s.best = s.current;
+  state.rpg.stats.daysTracked = (state.rpg.stats.daysTracked || 0) + 1;
+  awardXP(XP_REWARDS.streakDay);
+}
+
+const QUEST_POOL = [
+  { id:'q_tx3', text:'Запиши 3 операции', target:3, get:s => s.rpg?._dailyCounts?.tx || 0 },
+  { id:'q_income', text:'Запиши доход', target:1, get:s => s.rpg?._dailyCounts?.income || 0 },
+  { id:'q_expense', text:'Запиши расход', target:1, get:s => s.rpg?._dailyCounts?.expense || 0 },
+  { id:'q_deposit', text:'Отложи в цель', target:1, get:s => s.rpg?._dailyCounts?.deposit || 0 },
+  { id:'q_tag', text:'Добавь тег к операции', target:1, get:s => s.rpg?._dailyCounts?.tag || 0 },
+];
+function rollQuests() {
+  const today = todayStr();
+  if (state.rpg.quests.date === today) return;
+  const pool = [...QUEST_POOL].sort(() => Math.random() - 0.5);
+  state.rpg.quests = { date: today, list: pool.slice(0,3).map(q => ({ id:q.id, done:false })) };
+  state.rpg._dailyCounts = { tx:0, income:0, expense:0, deposit:0, tag:0 };
+}
+function bumpDaily(key, by=1) {
+  normalizeRpg();
+  state.rpg._dailyCounts[key] = (state.rpg._dailyCounts[key] || 0) + by;
+  checkQuests();
+}
+function checkQuests() {
+  normalizeRpg();
+  (state.rpg.quests.list || []).forEach(q => {
+    if (q.done) return;
+    const def = QUEST_POOL.find(x => x.id === q.id);
+    if (!def) return;
+    if (def.get(state) >= def.target) {
+      q.done = true;
+      state.rpg.xp += 30;
+      setTimeout(() => toast(`✅ Квест: ${def.text}`, false), 500);
+    }
+  });
+}
+
+/* =====================================================================
+   GAME — Битва с Долговым Драконом
+   ===================================================================== */
+const BOSSES = [
+  { id:'impulse', icon:'🛍️', name:'Импульсивная Покупка', hp:100, atk:5,
+    reward:{ gold:60, xp:40 }, taunt:'«Давай, тебе же это надо прямо сейчас!»' },
+  { id:'delivery', icon:'🍔', name:'Доставка-Дракон', hp:250, atk:9,
+    reward:{ gold:140, xp:80 }, taunt:'«Ты же устал, закажи что-нибудь!»' },
+  { id:'subscription', icon:'🧛', name:'Вампир Подписок', hp:500, atk:14,
+    reward:{ gold:300, xp:140 }, taunt:'«Всего 4.99 в месяц. Ты не заметишь».' },
+  { id:'credit', icon:'💳', name:'Кредитка-Гидра', hp:1200, atk:22,
+    reward:{ gold:600, xp:260 }, taunt:'«Рассрочка 0-0-24!»' },
+  { id:'debt', icon:'🐉', name:'Долговой Дракон', hp:3000, atk:34,
+    reward:{ gold:1500, xp:500 }, taunt:'«Я твой последний босс. Порви меня — станешь свободным».' },
+];
+
+function normalizeGame() {
+  if (!state.game) {
+    state.game = {
+      hp: 100, bossIndex: 0, bossHp: BOSSES[0].hp,
+      gold: 0, energy: 20, maxEnergyBase: 20,
+      lastEnergyAt: Date.now(),
+      unlockedBosses: 1,
+      upgrades: { atk:0, hp:0, energy:0 },
+      stats: { totalDamage:0, bossesKilled:0, clickCount:0 },
+      dragonSlain: false,
+    };
+  }
+  const g = state.game;
+  g.hp = Number(g.hp) || 0;
+  g.gold = Number(g.gold) || 0;
+  g.energy = Number(g.energy) || 0;
+  g.bossIndex = Math.max(0, Math.min(BOSSES.length - 1, Number(g.bossIndex) || 0));
+  g.unlockedBosses = Math.max(1, Number(g.unlockedBosses) || 1);
+  g.upgrades = g.upgrades || { atk:0, hp:0, energy:0 };
+  g.stats = g.stats || { totalDamage:0, bossesKilled:0, clickCount:0 };
+  g.lastEnergyAt = g.lastEnergyAt || Date.now();
+  if (typeof g.bossHp !== 'number') g.bossHp = BOSSES[g.bossIndex].hp;
+  const stats = gamePlayerStats();
+  if (g.hp > stats.maxHp) g.hp = stats.maxHp;
+  if (g.energy > stats.maxEnergy) g.energy = stats.maxEnergy;
+  if (g.bossHp > BOSSES[g.bossIndex].hp) g.bossHp = BOSSES[g.bossIndex].hp;
+}
+
+function gamePlayerStats() {
+  const g = state.game;
+  return {
+    maxHp: 100 + (g.upgrades.hp || 0) * 20,
+    atk: 10 + (g.upgrades.atk || 0) * 3,
+    maxEnergy: 20 + (g.upgrades.energy || 0) * 5,
+  };
+}
+function currentBoss() {
+  return BOSSES[state.game.bossIndex] || BOSSES[BOSSES.length - 1];
+}
+function upgradeCost(type) {
+  const base = { atk:50, hp:40, energy:80 }[type];
+  const mult = { atk:1.4, hp:1.4, energy:1.5 }[type];
+  return Math.floor(base * Math.pow(mult, state.game.upgrades[type] || 0));
+}
+
+function tickEnergy() {
+  normalizeGame();
+  const g = state.game;
+  const stats = gamePlayerStats();
+  const now = Date.now();
+  const elapsed = now - g.lastEnergyAt;
+  const gained = Math.floor(elapsed / 15000);
+  if (gained > 0) {
+    if (g.energy < stats.maxEnergy) {
+      g.energy = Math.min(stats.maxEnergy, g.energy + gained);
+    }
+    g.lastEnergyAt += gained * 15000;
+  }
+}
+
+let _energyTimer = null;
+function startEnergyLoop() {
+  if (_energyTimer) return;
+  _energyTimer = setInterval(() => {
+    const before = state.game ? state.game.energy : 0;
+    tickEnergy();
+    if (state.game && state.game.energy !== before && currentTab === 'game') {
+      renderGamePanel();
+      save();
+    }
+  }, 4000);
 }
 
 /* =====================================================================
@@ -1829,6 +2077,361 @@ MOUNTS.notes = () => {
 };
 
 /* =====================================================================
+   ПРОФИЛЬ
+   ===================================================================== */
+VIEWS.profile = () => {
+  normalizeRpg();
+  const xp = state.rpg.xp;
+  const level = levelFromXp(xp);
+  const xpCur = xp - xpForLevel(level);
+  const xpNext = xpForLevel(level + 1) - xpForLevel(level);
+  const pct = xpNext > 0 ? Math.min(100, xpCur / xpNext * 100) : 100;
+  const unlocked = Object.keys(state.rpg.achievements).length;
+  const total = ACHIEVEMENTS.length;
+  const s = state.rpg.streak;
+  const quests = state.rpg.quests.list || [];
+
+  return `
+    <div class="card" style="background:linear-gradient(135deg,rgba(79,140,255,.15),rgba(122,168,255,.04))">
+      <div style="display:flex;align-items:center;gap:16px;margin-bottom:14px">
+        <div style="width:72px;height:72px;flex:0 0 72px;border-radius:50%;
+          background:linear-gradient(135deg,#4f8cff,#7aa8ff);color:#fff;
+          display:flex;align-items:center;justify-content:center;font-size:26px;font-weight:800;
+          box-shadow:0 10px 30px -8px rgba(79,140,255,.6)">${level}</div>
+        <div style="flex:1;min-width:0">
+          <div style="font-size:18px;font-weight:700;margin-bottom:2px">Уровень ${level}</div>
+          <div style="font-size:12.5px;color:var(--muted)">${xp} XP · ещё ${Math.max(0, xpNext - xpCur)} до ур. ${level+1}</div>
+        </div>
+      </div>
+      <div class="bar"><div class="bar-fill" style="width:${pct}%"></div></div>
+    </div>
+
+    <div class="stats" style="grid-template-columns:repeat(3,minmax(0,1fr));margin-top:14px">
+      <div class="card stat">
+        <div class="lbl">🔥 Серия</div>
+        <div class="val">${s.current}</div>
+        <div class="sub">рекорд ${s.best}</div>
+      </div>
+      <div class="card stat">
+        <div class="lbl">🏆 Ачивки</div>
+        <div class="val">${unlocked}/${total}</div>
+        <div class="sub">${Math.round(unlocked/total*100)}%</div>
+      </div>
+      <div class="card stat">
+        <div class="lbl">📅 Дней</div>
+        <div class="val">${state.rpg.stats.daysTracked || 0}</div>
+        <div class="sub">с приложением</div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:14px">
+      <div class="section-title" style="margin-top:0">Квесты на сегодня</div>
+      ${quests.length === 0 ? `<div class="hint">Квесты появятся после первой операции.</div>` :
+        quests.map(q => {
+          const def = QUEST_POOL.find(x => x.id === q.id);
+          if (!def) return '';
+          const cur = Math.min(def.get(state), def.target);
+          return `
+            <div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--border)">
+              <div style="font-size:20px">${q.done ? '✅' : '⏳'}</div>
+              <div style="flex:1;min-width:0">
+                <div style="font-size:14px;${q.done ? 'text-decoration:line-through;color:var(--green)' : ''}">${def.text}</div>
+                <div class="hint" style="margin:2px 0 0">${cur}/${def.target} · +30 XP</div>
+              </div>
+            </div>`;
+        }).join('')}
+    </div>
+
+    <div class="section-title">Достижения</div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(108px,1fr));gap:8px">
+      ${ACHIEVEMENTS.map(a => {
+        const un = !!state.rpg.achievements[a.id];
+        return `
+          <div class="card" style="padding:12px 8px;text-align:center;
+            ${un ? 'border-color:rgba(79,140,255,.4);background:rgba(79,140,255,.06)' : 'opacity:.4'}"
+            title="${esc(a.desc)}">
+            <div style="font-size:26px;margin-bottom:6px">${a.icon}</div>
+            <div style="font-size:11.5px;font-weight:600;line-height:1.2">${esc(a.name)}</div>
+          </div>`;
+      }).join('')}
+    </div>
+
+    <div class="card" style="margin-top:14px">
+      <div class="section-title" style="margin-top:0">Как получать XP</div>
+      <div class="hint" style="margin:0;line-height:1.8">
+        • Операция — <b>+5 XP</b> (доход <b>+8</b>)<br>
+        • Отложить в цель — <b>+12 XP</b><br>
+        • Новая цель — <b>+20 XP</b><br>
+        • Своя категория — <b>+15 XP</b><br>
+        • Бюджет — <b>+15 XP</b><br>
+        • Заметка — <b>+10 XP</b><br>
+        • Регулярный — <b>+10 XP</b><br>
+        • День подряд — <b>+20 XP</b><br>
+        • Квест — <b>+30 XP</b><br>
+        • Ачивка — <b>+25 XP</b><br>
+        • Победа над боссом — <b>+40…+500 XP</b>
+      </div>
+    </div>
+  `;
+};
+
+/* =====================================================================
+   БИТВА
+   ===================================================================== */
+let _attacking = false;
+
+VIEWS.game = () => {
+  normalizeGame();
+  tickEnergy();
+  const g = state.game;
+  const stats = gamePlayerStats();
+  const b = currentBoss();
+  const bossMaxHp = b.hp;
+  const hpPct = Math.max(0, g.hp / stats.maxHp * 100);
+  const bossPct = Math.max(0, g.bossHp / bossMaxHp * 100);
+  const energyPct = stats.maxEnergy > 0 ? g.energy / stats.maxEnergy * 100 : 0;
+  const enraged = bossPct < 30 && g.bossHp > 0;
+  const rpgLevel = levelFromXp(state.rpg?.xp || 0);
+
+  return `
+    <div class="game-arena">
+      <div class="card" id="playerCard" style="background:linear-gradient(135deg,rgba(61,220,151,.12),transparent);position:relative">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;gap:8px">
+          <div style="font-weight:700">🧙 Ты · Ур. ${rpgLevel}</div>
+          <div style="font-size:12.5px;color:var(--muted)">⚔️ ATK ${stats.atk}</div>
+        </div>
+        <div class="bar" style="height:12px"><div class="bar-fill green" style="width:${hpPct}%"></div></div>
+        <div class="hint" style="margin-top:6px">❤️ ${g.hp} / ${stats.maxHp}</div>
+        <div class="bar" style="height:8px;margin-top:10px"><div class="bar-fill" style="width:${energyPct}%;background:linear-gradient(90deg,#ffcc66,#ffa94d)"></div></div>
+        <div class="hint" style="margin-top:6px">⚡ ${g.energy} / ${stats.maxEnergy} <span style="color:var(--muted)">(+1 / 15 сек)</span></div>
+      </div>
+
+      <div style="text-align:center;font-size:20px;font-weight:800;color:var(--muted);padding:6px 0;letter-spacing:.2em">— VS —</div>
+
+      <div class="card" style="background:linear-gradient(135deg,rgba(255,92,122,.12),transparent)">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;gap:8px">
+          <div style="font-weight:700;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${b.icon} ${esc(b.name)}</div>
+          <div style="font-size:12.5px;color:var(--muted);flex:0 0 auto">💀 ATK ${b.atk}${enraged ? ' 🔥' : ''}</div>
+        </div>
+        <div id="bossSpriteWrap" style="text-align:center;position:relative;padding:12px 0">
+          <div id="bossSprite" style="font-size:78px;line-height:1;display:inline-block;user-select:none">${b.icon}</div>
+        </div>
+        <div class="bar" style="height:12px"><div class="bar-fill" style="width:${bossPct}%;background:linear-gradient(90deg,#ff5c7a,#ff8da1)"></div></div>
+        <div class="hint" style="margin-top:6px">💀 ${g.bossHp} / ${bossMaxHp}${enraged ? ' · <span style="color:var(--red)">В ЯРОСТИ (×1.5 урон)</span>' : ''}</div>
+        <div style="margin-top:10px;font-size:12.5px;color:var(--muted);font-style:italic;text-align:center">${esc(b.taunt)}</div>
+      </div>
+
+      <button class="btn primary block" id="attackBtn" style="margin-top:14px;padding:16px;font-size:16px"
+        ${g.energy < 1 || g.hp <= 0 || g.bossHp <= 0 ? 'disabled' : ''}>
+        ${g.energy < 1 ? '⚡ Нет энергии' : '⚔️ Атаковать −1 ⚡'}
+      </button>
+      <button class="btn ghost sm block" id="fleeBtn" style="margin-top:8px">🏳️ Отступить (сброс боя)</button>
+    </div>
+
+    <div class="stats" style="grid-template-columns:repeat(3,minmax(0,1fr));margin-top:14px">
+      <div class="card stat">
+        <div class="lbl">💰 Золото</div>
+        <div class="val">${g.gold}</div>
+        <div class="sub">убито: ${g.stats.bossesKilled}</div>
+      </div>
+      <div class="card stat">
+        <div class="lbl">⚔️ Урон</div>
+        <div class="val">${g.stats.totalDamage}</div>
+        <div class="sub">кликов: ${g.stats.clickCount}</div>
+      </div>
+      <div class="card stat">
+        <div class="lbl">🏆 Боссы</div>
+        <div class="val">${g.unlockedBosses}/${BOSSES.length}</div>
+        <div class="sub">открыто</div>
+      </div>
+    </div>
+
+    <div class="section-title">Улучшения</div>
+    <div class="card">
+      ${renderUpgradeRow('atk', '⚔️ Атака +3', stats.atk)}
+      ${renderUpgradeRow('hp', '❤️ Макс. HP +20', stats.maxHp)}
+      ${renderUpgradeRow('energy', '⚡ Макс. Энергия +5', stats.maxEnergy)}
+    </div>
+
+    <div class="section-title">Боссы</div>
+    <div class="card" style="padding:0 18px">
+      ${BOSSES.map((boss, i) => {
+        const unlocked = i < g.unlockedBosses;
+        const current = i === g.bossIndex;
+        return `
+          <div style="display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid var(--border);${!unlocked ? 'opacity:.4' : ''}">
+            <div style="font-size:26px">${boss.icon}</div>
+            <div style="flex:1;min-width:0">
+              <div style="font-weight:600;font-size:14px">${esc(boss.name)}${current ? ' 🎯' : ''}</div>
+              <div class="hint" style="margin:2px 0 0">HP ${boss.hp} · ATK ${boss.atk} · +${boss.reward.gold}💰 +${boss.reward.xp}XP</div>
+            </div>
+            ${!unlocked ? '<span style="color:var(--muted);font-size:18px">🔒</span>' : ''}
+          </div>`;
+      }).join('')}
+    </div>
+
+    <div class="hint" style="margin-top:14px;text-align:center">
+      💡 Записывай реальные операции — за каждую капает <b>+2 ⚡</b> к бою.
+    </div>
+  `;
+};
+
+function renderUpgradeRow(type, label, currentValue) {
+  const cost = upgradeCost(type);
+  const can = state.game.gold >= cost;
+  return `
+    <div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--border)">
+      <div style="flex:1;min-width:0">
+        <div style="font-weight:600;font-size:14px">${label}</div>
+        <div class="hint" style="margin:2px 0 0">Сейчас: ${currentValue} · Цена: ${cost}💰</div>
+      </div>
+      <button class="btn ${can ? 'primary' : 'ghost'} sm" data-buy-upgrade="${type}" ${can ? '' : 'disabled'}>Купить</button>
+    </div>
+  `;
+}
+
+MOUNTS.game = () => {
+  const btn = $('#attackBtn');
+  if (btn) btn.addEventListener('click', attack);
+  const flee = $('#fleeBtn');
+  if (flee) flee.addEventListener('click', () => {
+    if (!confirm('Сбросить бой? HP босса и твоё HP восстановятся.')) return;
+    const b = currentBoss();
+    state.game.bossHp = b.hp;
+    state.game.hp = gamePlayerStats().maxHp;
+    save(); renderGamePanel();
+  });
+  document.querySelectorAll('[data-buy-upgrade]').forEach(b => {
+    b.addEventListener('click', () => buyUpgrade(b.dataset.buyUpgrade));
+  });
+  startEnergyLoop();
+};
+
+function attack() {
+  if (_attacking) return;
+  normalizeGame();
+  const g = state.game;
+  const stats = gamePlayerStats();
+  const b = currentBoss();
+  if (g.energy < 1) { toast('Нет энергии — подожди или запиши операцию', false); return; }
+  if (g.hp <= 0 || g.bossHp <= 0) return;
+
+  _attacking = true;
+  setTimeout(() => { _attacking = false; }, 350);
+
+  g.energy -= 1;
+  g.stats.clickCount++;
+
+  const crit = Math.random() < 0.1;
+  const variance = 0.8 + Math.random() * 0.4;
+  const dmg = Math.max(1, Math.floor(stats.atk * variance * (crit ? 2 : 1)));
+  g.bossHp = Math.max(0, g.bossHp - dmg);
+  g.stats.totalDamage += dmg;
+
+  floatDamage('boss', dmg, crit);
+  shakeElement('#bossSprite');
+
+  if (g.bossHp <= 0) {
+    setTimeout(victory, 260);
+    return;
+  }
+
+  const enrage = g.bossHp / b.hp < 0.3;
+  const bossDmg = Math.max(1, Math.floor(b.atk * (enrage ? 1.5 : 1) * (0.8 + Math.random() * 0.4)));
+  g.hp = Math.max(0, g.hp - bossDmg);
+  floatDamage('player', bossDmg, false);
+  shakeElement('#playerCard');
+
+  save();
+
+  if (g.hp <= 0) {
+    setTimeout(defeat, 260);
+    return;
+  }
+  setTimeout(renderGamePanel, 280);
+}
+
+function victory() {
+  normalizeGame();
+  const g = state.game;
+  const b = currentBoss();
+  g.gold += b.reward.gold;
+  g.stats.bossesKilled++;
+  if (b.id === 'debt') g.dragonSlain = true;
+
+  const wasLast = g.bossIndex === BOSSES.length - 1;
+  if (!wasLast) {
+    g.bossIndex += 1;
+    if (g.bossIndex + 1 > g.unlockedBosses) g.unlockedBosses = g.bossIndex + 1;
+  }
+
+  const stats = gamePlayerStats();
+  g.hp = stats.maxHp;
+  g.bossHp = currentBoss().hp;
+
+  toast(`🏆 ${b.name} повержен! +${b.reward.gold}💰`, false);
+  save();
+  awardXP(b.reward.xp);
+  checkAchievements();
+  save();
+  renderGamePanel();
+}
+
+function defeat() {
+  normalizeGame();
+  const g = state.game;
+  const lost = Math.floor(g.gold * 0.1);
+  g.gold = Math.max(0, g.gold - lost);
+  const b = currentBoss();
+  g.bossHp = b.hp;
+  g.hp = gamePlayerStats().maxHp;
+  toast(`💀 Поражение... −${lost}💰`, false);
+  save();
+  renderGamePanel();
+}
+
+function buyUpgrade(type) {
+  normalizeGame();
+  const g = state.game;
+  const cost = upgradeCost(type);
+  if (g.gold < cost) { toast('Не хватает золота', false); return; }
+  g.gold -= cost;
+  g.upgrades[type] = (g.upgrades[type] || 0) + 1;
+  const stats = gamePlayerStats();
+  if (type === 'hp') g.hp = stats.maxHp;
+  if (type === 'energy') g.energy = Math.min(stats.maxEnergy, g.energy + 5);
+  save(); haptic(12);
+  toast('Улучшение куплено!');
+  renderGamePanel();
+}
+
+function floatDamage(target, dmg, crit) {
+  const parent = target === 'boss'
+    ? document.querySelector('#bossSpriteWrap')
+    : document.querySelector('#playerCard');
+  if (!parent) return;
+  const el = document.createElement('div');
+  el.className = 'dmg-float' + (crit ? ' crit' : '');
+  el.textContent = (crit ? '💥 ' : '') + '-' + dmg;
+  parent.appendChild(el);
+  setTimeout(() => el.remove(), 900);
+}
+
+function shakeElement(sel) {
+  const el = document.querySelector(sel);
+  if (!el) return;
+  el.classList.add('shake');
+  setTimeout(() => el.classList.remove('shake'), 320);
+}
+
+function renderGamePanel() {
+  if (currentTab !== 'game') return;
+  const view = $('#view');
+  view.innerHTML = VIEWS.game();
+  if (MOUNTS.game) MOUNTS.game();
+}
+
+/* =====================================================================
    FAB / topbar-add
    ===================================================================== */
 function fabAction() {
@@ -1838,6 +2441,8 @@ function fabAction() {
     state.notes.unshift({ id: uid(), title: '', text: '', updated: new Date().toISOString() });
     save(); render();
     setTimeout(() => { const f = document.querySelector('.note-card input.note-title'); if (f) f.focus(); }, 40);
+  } else if (currentTab === 'profile' || currentTab === 'game') {
+    openTxSheet();
   } else openTxSheet();
 }
 $('#fab').addEventListener('click', fabAction);
@@ -1992,7 +2597,6 @@ function mountTxSheet() {
     });
   });
 
-  /* Категории + создание новой */
   const newCatForm = $('#newCatForm');
   const ncName  = $('#ncName');
   const ncIcon  = $('#ncIcon');
@@ -2043,13 +2647,13 @@ function mountTxSheet() {
     if (!state.customCats) state.customCats = { expense: [], income: [] };
     const bucket = sheetTx.type === 'expense' ? 'expense' : 'income';
     state.customCats[bucket] = state.customCats[bucket] || [];
-    /* Защита от дублей по имени */
     if (state.customCats[bucket].some(c => c.name.toLowerCase() === name.toLowerCase())) {
       toast('Такая категория уже есть', false);
       return;
     }
     state.customCats[bucket].push({ id, name, icon: ncIconValue, custom: true });
     sheetTx.category = id;
+    awardXP(XP_REWARDS.customCat);
     save(); haptic(12);
     const v = amountEl.value;
     const n = $('#txNote')?.value || '';
@@ -2058,7 +2662,6 @@ function mountTxSheet() {
     renderTxSheet({ amount: v, note: n, date: d });
   });
 
-  /* Теги */
   const tagsSelected = $('#tagsSelected');
   const tagsSuggest = $('#tagsSuggest');
   const tagInput = $('#tagInput');
@@ -2137,6 +2740,15 @@ function mountTxSheet() {
       state.transactions.push({ id: txId, ...data, createdAt: new Date().toISOString() });
       state.categoryUsage[sheetTx.category] = (state.categoryUsage[sheetTx.category] || 0) + 1;
 
+      /* RPG + энергия в битве */
+      awardXP(data.type === 'income' ? XP_REWARDS.income : XP_REWARDS.tx);
+      bumpDaily('tx');
+      bumpDaily(data.type === 'expense' ? 'expense' : 'income');
+      if (data.tags.length) bumpDaily('tag', data.tags.length);
+      touchStreak();
+      normalizeGame();
+      state.game.energy = Math.min(gamePlayerStats().maxEnergy, state.game.energy + 2);
+
       if (data.type === 'income') {
         const pending = [];
         state.goals.forEach(g => {
@@ -2206,9 +2818,7 @@ function openConfirmSavingsSheet(list, dateStr, opts = {}) {
     </div>
   `).join('');
 
-  const intro = isAuto
-    ? 'С этого дохода можно отложить:'
-    : 'Записать вклад';
+  const intro = isAuto ? 'С этого дохода можно отложить:' : 'Записать вклад';
 
   openSheet(`
     <div class="sheet-handle-wrap"><div class="sheet-handle"></div></div>
@@ -2234,6 +2844,9 @@ function openConfirmSavingsSheet(list, dateStr, opts = {}) {
   `, () => {
     $('#confirmSavingsBtn').addEventListener('click', () => {
       applySavings(list, dateStr);
+      awardXP(XP_REWARDS.deposit);
+      bumpDaily('deposit');
+      touchStreak();
       haptic(15); closeSheet();
       setTimeout(() => { toast(`Отложено ${fmt(total)}`); render(); }, 200);
     });
@@ -2390,7 +3003,7 @@ function mountSwipe() {
 }
 
 /* =====================================================================
-   GOAL SHEET (создание + редактирование)
+   GOAL SHEET
    ===================================================================== */
 function openGoalSheet(goal) {
   const editing = !!goal;
@@ -2454,6 +3067,7 @@ function openGoalSheet(goal) {
         state.goals.push({ id: uid(), title, target, deadline, deposits: 0, subgoals: [],
           autoSavePercent: 0, archived: false, archivedAt: null,
           virtual: false, createdAt: new Date().toISOString() });
+        awardXP(XP_REWARDS.goal);
         save(); haptic(15); closeSheet();
         setTimeout(() => { toast('Цель создана'); render(); }, 180);
       }
@@ -2558,6 +3172,7 @@ function openBudgetSheet() {
       state.budgets = next;
       const tb = parseFloat($('#totalBudget').value);
       state.monthlyBudget = tb > 0 ? tb : 0;
+      awardXP(XP_REWARDS.budget);
       save(); haptic(12); closeSheet();
       setTimeout(() => { toast('Бюджеты сохранены'); render(); }, 180);
     });
@@ -2623,6 +3238,7 @@ function mountRecSheet() {
       note: $('#recNote').value.trim(), dayOfMonth: day,
       active: true, lastRun: null, createdAt: new Date().toISOString(),
     });
+    awardXP(XP_REWARDS.recurring);
     save(); haptic(12); closeSheet();
     setTimeout(() => { toast('Регулярный добавлен'); render(); }, 180);
   });
@@ -2814,6 +3430,7 @@ document.addEventListener('click', async e => {
   }
   if (a === 'new-note') {
     state.notes.unshift({ id: uid(), title: '', text: '', updated: new Date().toISOString() });
+    awardXP(XP_REWARDS.note);
     save(); render();
     setTimeout(() => { const f = document.querySelector('.note-card input.note-title'); if (f) f.focus(); }, 30);
   }
@@ -2840,7 +3457,7 @@ document.addEventListener('click', async e => {
     if (!g) return;
     g.virtual = !g.virtual;
     save(); haptic(10);
-    toast(g.virtual ? 'Виртуальная копилка включена — вклады не будут в расходах' : 'Виртуальная копилка выключена');
+    toast(g.virtual ? 'Виртуальная копилка включена' : 'Виртуальная копилка выключена');
     render();
   }
   if (a === 'new-recurring') openRecurringSheet();
@@ -2953,6 +3570,9 @@ document.addEventListener('submit', async e => {
       if (bd.remaining <= 0) return;
 
       applySavings([{ goalId: g.id, goalTitle: g.title, amount, auto: false }], todayStr());
+      awardXP(XP_REWARDS.deposit);
+      bumpDaily('deposit');
+      touchStreak();
       haptic(12);
       toast(g.virtual ? `Отложено ${fmt(amount)} (виртуально)` : `Отложено ${fmt(amount)} → Накопления`);
       render();
@@ -3041,6 +3661,7 @@ async function handleSession(session) {
 
     setSyncStatus('ok');
     subscribeRealtime();
+    startEnergyLoop();
     render(true);
 
   } else if (!currentUser && wasUser) {
