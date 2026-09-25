@@ -1330,33 +1330,33 @@ function checkQuests() {
 const CARD_DEFS = {
   strike:      { icon:'⚔️', name:'Удар',            cost:0, cd:0, rarity:'common', desc:'Базовый урон ×1',
                  effect:{ damage:1.0 } },
-  block:       { icon:'🛡',  name:'Блок',            cost:1, cd:2, rarity:'common', desc:'Поглотить след. удар',
+  block:       { icon:'🛡',  name:'Блок',            cost:2, cd:3, rarity:'common', desc:'Поглотить след. удар',
                  effect:{ shield:true } },
-  heal:        { icon:'💚',  name:'Лечение',         cost:2, cd:3, rarity:'common', desc:'+30% HP',
-                 effect:{ heal:0.30 } },
-  rage:        { icon:'😡',  name:'Ярость',          cost:1, cd:3, rarity:'common', desc:'След. удар ×2',
+  heal:        { icon:'💚',  name:'Лечение',         cost:3, cd:4, rarity:'common', desc:'+25% HP',
+                 effect:{ heal:0.25 } },
+  rage:        { icon:'😡',  name:'Ярость',          cost:2, cd:3, rarity:'common', desc:'След. удар ×2',
                  effect:{ nextMult:2 } },
   power:       { icon:'💥',  name:'Мощный удар',     cost:2, cd:2, rarity:'rare',   desc:'Урон ×2.5',
                  effect:{ damage:2.5 } },
-  lifesteal:   { icon:'🩸',  name:'Вампиризм',       cost:2, cd:2, rarity:'rare',   desc:'×1.5, лечит 50% урона',
+  lifesteal:   { icon:'🩸',  name:'Вампиризм',       cost:2, cd:3, rarity:'rare',   desc:'×1.5, лечит 50% урона',
                  effect:{ damage:1.5, lifesteal:0.5 } },
   fire:        { icon:'🔥',  name:'Огненный шар',    cost:3, cd:3, rarity:'rare',   desc:'×1.5 + горение 3 хода',
                  effect:{ damage:1.5, burn:{ turns:3, mult:0.4 } } },
-  freeze:      { icon:'❄️',  name:'Заморозка',       cost:2, cd:4, rarity:'rare',   desc:'Враг пропускает ход',
+  freeze:      { icon:'❄️',  name:'Заморозка',       cost:3, cd:4, rarity:'rare',   desc:'Враг пропускает ход',
                  effect:{ stun:1 } },
   pierce:      { icon:'⚡',  name:'Пробитие',        cost:2, cd:2, rarity:'rare',   desc:'×2, игнорирует отражение',
                  effect:{ damage:2.0, pierce:true } },
-  reflect:     { icon:'🌀',  name:'Отражение',       cost:2, cd:3, rarity:'rare',   desc:'След. удар вернётся врагу',
+  reflect:     { icon:'🌀',  name:'Отражение',       cost:3, cd:4, rarity:'rare',   desc:'След. удар вернётся врагу',
                  effect:{ reflect:1.0 } },
-  manaSurge:   { icon:'🔮',  name:'Мана-прилив',     cost:0, cd:3, rarity:'rare',   desc:'+5 маны, но враг бьёт дважды',
-                 effect:{ mana:5, selfExpose:1 } },
+  manaSurge:   { icon:'🔮',  name:'Мана-прилив',     cost:0, cd:5, rarity:'rare',   desc:'+3 маны, но враг бьёт дважды',
+                 effect:{ mana:3, selfExpose:1 } },
   doubleStrike:{ icon:'🗡️',  name:'Двойной удар',    cost:3, cd:3, rarity:'epic',   desc:'×1.3 дважды',
                  effect:{ damage:1.3, hits:2 } },
-  dragonFire:  { icon:'🐉',  name:'Драконье пламя',  cost:4, cd:4, rarity:'epic',   desc:'Урон ×4',
+  dragonFire:  { icon:'🐉',  name:'Драконье пламя',  cost:5, cd:5, rarity:'epic',   desc:'Урон ×4',
                  effect:{ damage:4.0 } },
   execute:     { icon:'☠️',  name:'Казнь',           cost:3, cd:4, rarity:'epic',   desc:'×1, ×5 если враг ниже 30% HP',
                  effect:{ damage:1.0, executeThreshold:0.3, executeMult:5 } },
-  storm:       { icon:'🌪',  name:'Шторм',           cost:3, cd:3, rarity:'epic',   desc:'×3, но −10% HP себе',
+  storm:       { icon:'🌪',  name:'Шторм',           cost:3, cd:4, rarity:'epic',   desc:'×3, но −10% HP себе',
                  effect:{ damage:3.0, selfDamage:0.10 } },
 };
 
@@ -1427,7 +1427,7 @@ function playerStats() {
   return {
     maxHp: 150 + (g.upgrades.hp || 0) * 50,
     atk: 15 + (g.upgrades.atk || 0) * 5,
-    maxMana: 10 + (g.upgrades.mana || 0) * 2,
+    maxMana: 5 + (g.upgrades.mana || 0) * 2,
   };
 }
 function upgradeCost(type) {
@@ -1455,7 +1455,7 @@ function startBattle(enemyType, enemyId) {
     enemyType, enemyId,
     enemyHp: def.hp, enemyMaxHp: def.hp, enemyAtk: def.atk,
     playerHp: stats.maxHp, playerMaxHp: stats.maxHp,
-    mana: Math.min(5, stats.maxMana), manaMax: stats.maxMana,
+    mana: Math.min(3, stats.maxMana), manaMax: stats.maxMana,
     turn: 0, cds: {}, shield: false, reflect: 0, stun: 0,
     nextMult: 1, expose: 0, burnTurns: 0, burnDmg: 0, log: [],
   };
@@ -1535,7 +1535,7 @@ function playCard(cardId) {
     if (k !== cardId && b.cds[k] > 0) b.cds[k]--;
   });
 
-  b.mana = Math.min(b.manaMax, b.mana + 2);
+  b.mana = Math.min(b.manaMax, b.mana + 1);
   b.turn++;
 
   if (b.enemyHp <= 0) return winBattle();
@@ -1565,6 +1565,10 @@ function enemyTurn() {
     if (b.enemyHp <= 0) return winBattle();
   }
 
+  /* 🔥 Накал: каждые 4 хода +20% к урону (стакается) */
+  const rageStacks = Math.floor(b.turn / 4);
+  const rageMult = 1 + rageStacks * 0.20;
+
   let hits = 1;
   let note = '';
   if (e.gimmick === 'double-3' && b.turn % 3 === 0) { hits = 2; note = ' (двойной!)'; }
@@ -1579,11 +1583,15 @@ function enemyTurn() {
   hits += b.expose;
   b.expose = 0;
 
+  if (rageStacks > 0 && hits > 0) {
+    note += ` · 🔥+${rageStacks*20}%`;
+  }
+
   let totalDmg = 0;
   for (let i = 0; i < hits; i++) {
     if (b.enemyHp <= 0) break;
     const variance = 0.8 + Math.random() * 0.4;
-    let dmg = Math.max(1, Math.floor(e.atk * variance));
+    let dmg = Math.max(1, Math.floor(e.atk * variance * rageMult));
 
     if (b.reflect > 0) {
       const rd = Math.floor(dmg * b.reflect);
@@ -2619,7 +2627,8 @@ VIEWS.game = () => {
       </div>
 
       <div class="hint" style="margin-top:14px;text-align:center">
-        💡 Реальные операции дают золото: <b>+2💰</b> за расход, <b>+5💰</b> за доход, <b>+10💰</b> за вклад в цель.
+        💡 Реальные операции дают золото: <b>+2💰</b> за расход, <b>+5💰</b> за доход, <b>+10💰</b> за вклад в цель.<br>
+⏱ Каждые <b>4 хода</b> враг бьёт на <b>+20%</b> сильнее — не затягивай бой.
       </div>
     `;
   }
@@ -2729,7 +2738,11 @@ function renderBattleScreen() {
       <div class="card" id="bossCard" style="background:linear-gradient(135deg,rgba(255,92,122,.12),transparent);position:relative">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;gap:8px">
           <div style="font-weight:700;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${e.icon} ${esc(e.name)}${isBoss?' 💀':''}</div>
-          <div style="font-size:12.5px;color:var(--muted);flex:0 0 auto">ATK ${e.atk}</div>
+          ${(() => {
+  const stacks = Math.floor(b.turn / 4);
+  const rage = stacks * 20;
+  return `<div style="font-size:12.5px;color:var(--muted);flex:0 0 auto">ATK ${e.atk}${rage > 0 ? ` · <span style="color:var(--red)">🔥+${rage}%</span>` : ''}</div>`;
+})()}
         </div>
         <div id="bossSpriteWrap" style="text-align:center;position:relative;padding:14px 0">
           <div id="bossSprite" style="font-size:70px;line-height:1;display:inline-block;user-select:none">${e.icon}</div>
