@@ -1464,7 +1464,10 @@ function startBattle(enemyType, enemyId) {
   renderGamePanel();
 }
 
+let _playing = false;
+
 function playCard(cardId) {
+  if (_playing) return;
   const b = state.game.battle;
   if (!b) return;
   const card = CARD_DEFS[cardId];
@@ -1473,6 +1476,9 @@ function playCard(cardId) {
   if (b.mana < card.cost) return;
   if (b.playerHp <= 0 || b.enemyHp <= 0) return;
 
+  _playing = true;
+
+  /* === ФАЗА 1: платим стоимость, применяем эффекты === */
   b.mana -= card.cost;
   const stats = playerStats();
   const eff = card.effect || {};
@@ -1535,15 +1541,39 @@ function playCard(cardId) {
     if (k !== cardId && b.cds[k] > 0) b.cds[k]--;
   });
 
-  b.mana = Math.min(b.manaMax, b.mana + 1);
-  b.turn++;
-
-  if (b.enemyHp <= 0) return winBattle();
-  enemyTurn();
-  if (b.playerHp <= 0) return loseBattle();
-
   save();
-  renderGamePanel();
+  renderGamePanel();   // игрок ВИДИТ списанную ману
+
+  if (b.enemyHp <= 0) {
+    setTimeout(() => { _playing = false; winBattle(); }, 400);
+    return;
+  }
+
+  /* === ФАЗА 2: враг бьёт === */
+  setTimeout(() => {
+    enemyTurn();
+
+    save();
+    renderGamePanel();  // игрок видит удар врага
+
+    if (b.playerHp <= 0) {
+      setTimeout(() => { _playing = false; loseBattle(); }, 300);
+      return;
+    }
+    if (b.enemyHp <= 0) {
+      setTimeout(() => { _playing = false; winBattle(); }, 300);
+      return;
+    }
+
+    /* === ФАЗА 3: реген маны на СЛЕДУЮЩИЙ ход + накал === */
+    setTimeout(() => {
+      b.mana = Math.min(b.manaMax, b.mana + 1);
+      b.turn++;
+      save();
+      renderGamePanel();
+      _playing = false;
+    }, 250);
+  }, 450);
 }
 
 function enemyTurn() {
@@ -2774,7 +2804,7 @@ function renderBattleScreen() {
           if (!cardId) return '<div></div>';
           const c = CARD_DEFS[cardId];
           const cd = b.cds[cardId] || 0;
-          const canPlay = !cd && b.mana >= c.cost;
+          const canPlay = !cd && b.mana >= c.cost && !_playing;
           return `
             <button class="battle-card rarity-${c.rarity}" data-play="${cardId}" ${canPlay ? '' : 'disabled'}>
               <div class="bc-icon">${c.icon}</div>
